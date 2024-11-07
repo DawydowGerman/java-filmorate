@@ -71,6 +71,7 @@ class FilmTest {
         film0.setDescription("another desc");
         Assertions.assertEquals(film0.getDescription(), "another desc");
     }
+
     @Test
     void getReleaseDateMethodTest() {
         Assertions.assertEquals(film0.getReleaseDate(), Instant.parse("2022-12-28T00:00:00.00Z"));
