@@ -1,0 +1,112 @@
+package ru.yandex.practicum.filmorate;
+
+import java.time.Instant;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import ru.yandex.practicum.filmorate.model.User;
+
+@SpringBootTest
+public class UserTest {
+    User user0;
+    User user1;
+    User user2;
+
+    @BeforeEach
+    public void beforeEach() {
+        user0 = User.builder()
+                .id(Long.valueOf(23))
+                .email("email0")
+                .login("login0")
+                .name("name0")
+                .birthday(Instant.parse("1986-12-28T00:00:00.00Z"))
+                .build();
+
+        user1 = User.builder()
+                .id(Long.valueOf(44))
+                .email("email1")
+                .login("login1")
+                .name("name1")
+                .birthday(Instant.parse("2012-12-28T00:00:00.00Z"))
+                .build();
+
+        user2 = User.builder()
+                .id(Long.valueOf(44))
+                .email("email1")
+                .login("login1")
+                .name("name1")
+                .birthday(Instant.parse("2012-12-28T00:00:00.00Z"))
+                .build();
+    }
+
+    @Test
+    void getIdMethodTest() {
+        Assertions.assertEquals(user0.getId(), Long.valueOf(23));
+    }
+
+    @Test
+    void setIdMethodTest() {
+        user0.setId(Long.valueOf(46));
+        Assertions.assertEquals(user0.getId(), Long.valueOf(46));
+    }
+
+    @Test
+    void getEmailMethodTest() {
+        Assertions.assertEquals(user0.getEmail(), "email0");
+    }
+
+    @Test
+    void setEmailMethodTest() {
+        user0.setEmail("another email");
+        Assertions.assertEquals(user0.getEmail(),"another email");
+    }
+
+    @Test
+    void getLoginMethodTest() {
+        Assertions.assertEquals(user0.getLogin(), "login0");
+    }
+
+    @Test
+    void setLoginMethodTest() {
+        user0.setLogin("another login");
+        Assertions.assertEquals(user0.getLogin(),"another login");
+    }
+
+    @Test
+    void getNameMethodTest() {
+        Assertions.assertEquals(user0.getName(), "name0");
+    }
+
+    @Test
+    void setNameMethodTest() {
+        user0.setName("another name");
+        Assertions.assertEquals(user0.getName(),"another name");
+    }
+
+    @Test
+    void getBirthdayMethodTest() {
+        Assertions.assertEquals(user0.getBirthday(), Instant.parse("1986-12-28T00:00:00.00Z"));
+    }
+
+    @Test
+    void setBirthdayMethodTest() {
+        user0.setName("another name");
+        Assertions.assertEquals(user0.getName(),"another name");
+    }
+
+    @Test
+    void toStringMethodTest() {
+        Assertions.assertEquals(user1.toString(),"User(id=44, email=email1, login=login1, name=name1, birthday=2012-12-28T00:00:00Z)");
+    }
+
+    @Test
+    void equalsMethodTest() {
+        Assertions.assertEquals(user1.equals(user1), true);
+    }
+
+    @Test
+    void hashCodeMethodTest() {
+        Assertions.assertEquals(user1.hashCode(), user2.hashCode());
+    }
+}
