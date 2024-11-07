@@ -8,7 +8,7 @@ import java.time.Instant;
 @Builder
 public class User {
     @Builder.Default
-    private Long id = Long.valueOf(0);;
+    private Long id = Long.valueOf(0);
     @Builder.Default
     private String email = "Default email";
     @Builder.Default
