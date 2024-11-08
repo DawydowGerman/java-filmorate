@@ -21,21 +21,21 @@ class FilmTest {
                 .name("film0")
                 .description("some desc0")
                 .releaseDate(LocalDate.of(2022, 12, 28))
-                .duration(Duration.ofMinutes(120))
+                .duration(Integer.valueOf(120))
                 .build();
         film1 = Film.builder()
                 .id(Long.valueOf(44))
                 .name("film1")
                 .description("some desc1")
                 .releaseDate(LocalDate.of(2012,12,28))
-                .duration(Duration.ofMinutes(134))
+                .duration(Integer.valueOf(134))
                 .build();
         film2 = Film.builder()
                 .id(Long.valueOf(44))
                 .name("film1")
                 .description("some desc1")
                 .releaseDate(LocalDate.of(2012,12,28))
-                .duration(Duration.ofMinutes(134))
+                .duration(Integer.valueOf(134))
                 .build();
     }
 
@@ -85,18 +85,18 @@ class FilmTest {
 
     @Test
     void getDurationDateMethodTest() {
-        Assertions.assertEquals(film0.getDuration(), Duration.ofMinutes(120));
+        Assertions.assertEquals(film0.getDuration(), Integer.valueOf(120));
     }
 
     @Test
     void setDurationDateMethodTest() {
-        film0.setDuration(Duration.ofMinutes(160));
-        Assertions.assertEquals(film0.getDuration(), Duration.ofMinutes(160));
+        film0.setDuration(Integer.valueOf(160));
+        Assertions.assertEquals(film0.getDuration(), Integer.valueOf(160));
     }
 
     @Test
     void toStringMethodTest() {
-        Assertions.assertEquals(film1.toString(),"Film(id=44, name=film1, description=some desc1, releaseDate=2012-12-28, duration=PT2H14M)");
+        Assertions.assertEquals(film1.toString(),"Film(id=44, name=film1, description=some desc1, releaseDate=2012-12-28, duration=134)");
     }
 
     @Test

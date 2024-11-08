@@ -20,7 +20,7 @@ public class FilmControllerTest {
             .name("film0")
             .description("some desc0")
             .releaseDate(LocalDate.of(2022, 12,28))
-            .duration(Duration.ofMinutes(120))
+            .duration(Integer.valueOf(120))
             .build();
 
     @Test
@@ -111,7 +111,7 @@ public class FilmControllerTest {
 
     @Test
     public void testCreateMethodWithNegativeDuration() throws Exception {
-        film0.setDuration(Duration.ofMinutes(-120));
+        film0.setDuration(Integer.valueOf(-120));
         try {
             filmController.create(film0);
         } catch (ValidationException e) {
@@ -157,7 +157,7 @@ public class FilmControllerTest {
     public void testUpdateMethodWithOtherDurationDate() throws Exception {
         filmController.create(film0);
         Film film1 = film0;
-        film1.setDuration(Duration.ofMinutes(119));
+        film1.setDuration(Integer.valueOf(119));
         try {
             filmController.update(film1);
         } catch (ValidationException e) {

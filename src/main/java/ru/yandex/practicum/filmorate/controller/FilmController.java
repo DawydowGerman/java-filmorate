@@ -58,8 +58,7 @@ public class FilmController {
             e = new ValidationException("Продолжительность фильма должна быть указана");
             log.error("Ошибка при добавлении фильма", e);
             throw e;
-
-        } else if (film.getDuration().isNegative()) {
+        } else if (film.getDuration() < 0) {
             e = new ValidationException("Продолжительность фильма должна быть положительным числом");
             log.error("Ошибка при добавлении фильма", e);
             throw e;
