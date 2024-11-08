@@ -62,8 +62,9 @@ public class FilmController {
             e = new ValidationException("Продолжительность фильма должна быть положительным числом");
             log.error("Ошибка при добавлении фильма", e);
             throw e;
+        } if (film.getId() == null) {
+            film.setId(getNextId());
         }
-        film.setId(getNextId());
         films.put(film.getId(), film);
         log.debug("Добавлен фильм с Id {}", film.getId());
         return film;
