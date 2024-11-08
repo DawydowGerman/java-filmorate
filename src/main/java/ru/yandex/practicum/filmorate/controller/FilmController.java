@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class FilmController {
             e = new ValidationException("Дата релиза должна быть указана");
             log.error("Ошибка при добавлении фильма", e);
             throw e;
-        } else if (film.getReleaseDate().isBefore(Instant.parse("1895-12-28T00:00:00.00Z"))) {
+        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
             e = new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
             log.error("Ошибка при добавлении фильма", e);
             throw e;

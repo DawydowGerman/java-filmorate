@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
 import lombok.Data;
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -16,5 +16,5 @@ public class User {
     @Builder.Default
     private String name = "Default name";
     @Builder.Default
-    private Instant birthday = Instant.parse("2000-12-28T00:00:00.00Z");
+    LocalDate birthday = LocalDate.of(2000, 12, 01);
 }

@@ -5,7 +5,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import java.time.Instant;
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -18,7 +19,14 @@ public class UserControllerTest {
             .email("some@mail.ru")
             .login("somelogin")
             .name("some name")
-            .birthday(Instant.parse("2000-12-28T00:00:00.00Z"))
+            .birthday(LocalDate.of(2000, 12, 28))
+            .build();
+
+    User userPostman = User.builder()
+            .login("dolore")
+            .name("Nick Name")
+            .email("mail@mail.ru")
+            .birthday(LocalDate.of(1946,8,20))
             .build();
 
     @Test
@@ -41,6 +49,14 @@ public class UserControllerTest {
         User testUserObj = userController.create(user0);
         assertEquals(testUserObj, user0);
     }
+
+
+    @Test
+    public void testCreateMethodWithValidObjectForPostman() throws Exception {
+        User testUserObj = userController.create(userPostman);
+        assertEquals(testUserObj, userPostman);
+    }
+
 
     @Test
     public void testCreateMethodWithEmptyEmail() throws Exception {
@@ -74,7 +90,7 @@ public class UserControllerTest {
 
     @Test
     public void testCreateMethodWithBirthdayInFuture() throws Exception {
-        user0.setBirthday(Instant.parse("2300-12-28T00:00:00.00Z"));
+        user0.setBirthday(LocalDate.of(2300,12,28));
         try {
             User testUserObj = userController.create(user0);
         } catch (ValidationException e) {
@@ -123,13 +139,11 @@ public class UserControllerTest {
         user0.setEmail("another@Mail");
         user0.setLogin("anotherLogin");
         user0.setName("anotherName");
-        user0.setBirthday(Instant.parse("2013-12-28T00:00:00.00Z"));
-
+        user0.setBirthday(LocalDate.of(2013, 12, 28));
         userController.update(user0);
-
         assertEquals(user0.getEmail(),"another@Mail");
         assertEquals(user0.getLogin(),"anotherLogin");
         assertEquals(user0.getName(), "anotherName");
-        assertEquals(user0.getBirthday(),Instant.parse("2013-12-28T00:00:00.00Z"));
+        assertEquals(user0.getBirthday(),LocalDate.of(2013, 12, 28));
     }
 }

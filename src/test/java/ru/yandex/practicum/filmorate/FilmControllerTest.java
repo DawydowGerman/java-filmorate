@@ -7,7 +7,8 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
@@ -18,7 +19,7 @@ public class FilmControllerTest {
             .id(Long.valueOf(23))
             .name("film0")
             .description("some desc0")
-            .releaseDate(Instant.parse("2022-12-28T00:00:00.00Z"))
+            .releaseDate(LocalDate.of(2022, 12,28))
             .duration(Duration.ofMinutes(120))
             .build();
 
@@ -90,7 +91,7 @@ public class FilmControllerTest {
 
     @Test
     public void testCreateMethodWhenReleaseDateBefore18951228() throws Exception {
-        film0.setReleaseDate(Instant.parse("1894-12-28T00:00:00.00Z"));
+        film0.setReleaseDate(LocalDate.of(1894,12,28));
         try {
             filmController.create(film0);
         } catch (ValidationException e) {
@@ -144,7 +145,7 @@ public class FilmControllerTest {
     public void testUpdateMethodWithOtherReleaseDate() throws Exception {
         filmController.create(film0);
         Film film1 = film0;
-        film1.setReleaseDate(Instant.parse("2022-12-21T00:00:00.00Z"));
+        film1.setReleaseDate(LocalDate.of(2022,12,21));
         try {
             filmController.update(film1);
         } catch (ValidationException e) {

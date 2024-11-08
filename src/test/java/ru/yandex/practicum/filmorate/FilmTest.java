@@ -5,8 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
-import java.time.Instant;
 import java.time.Duration;
+import java.time.LocalDate;
 
 @SpringBootTest
 class FilmTest {
@@ -20,21 +20,21 @@ class FilmTest {
                 .id(Long.valueOf(23))
                 .name("film0")
                 .description("some desc0")
-                .releaseDate(Instant.parse("2022-12-28T00:00:00.00Z"))
+                .releaseDate(LocalDate.of(2022, 12, 28))
                 .duration(Duration.ofMinutes(120))
                 .build();
         film1 = Film.builder()
                 .id(Long.valueOf(44))
                 .name("film1")
                 .description("some desc1")
-                .releaseDate(Instant.parse("2012-12-28T00:00:00.00Z"))
+                .releaseDate(LocalDate.of(2012,12,28))
                 .duration(Duration.ofMinutes(134))
                 .build();
         film2 = Film.builder()
                 .id(Long.valueOf(44))
                 .name("film1")
                 .description("some desc1")
-                .releaseDate(Instant.parse("2012-12-28T00:00:00.00Z"))
+                .releaseDate(LocalDate.of(2012,12,28))
                 .duration(Duration.ofMinutes(134))
                 .build();
     }
@@ -74,13 +74,13 @@ class FilmTest {
 
     @Test
     void getReleaseDateMethodTest() {
-        Assertions.assertEquals(film0.getReleaseDate(), Instant.parse("2022-12-28T00:00:00.00Z"));
+        Assertions.assertEquals(film0.getReleaseDate(), LocalDate.of(2022,12,28));
     }
 
     @Test
     void setReleaseDateMethodTest() {
-        film0.setReleaseDate(Instant.parse("1999-12-28T00:00:00.00Z"));
-        Assertions.assertEquals(film0.getReleaseDate(), Instant.parse("1999-12-28T00:00:00.00Z"));
+        film0.setReleaseDate(LocalDate.of(1999,12,28));
+        Assertions.assertEquals(film0.getReleaseDate(), LocalDate.of(1999,12,28));
     }
 
     @Test
@@ -96,7 +96,7 @@ class FilmTest {
 
     @Test
     void toStringMethodTest() {
-        Assertions.assertEquals(film1.toString(),"Film(id=44, name=film1, description=some desc1, releaseDate=2012-12-28T00:00:00Z, duration=PT2H14M)");
+        Assertions.assertEquals(film1.toString(),"Film(id=44, name=film1, description=some desc1, releaseDate=2012-12-28, duration=PT2H14M)");
     }
 
     @Test

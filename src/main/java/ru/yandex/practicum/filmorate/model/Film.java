@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
 import java.time.Duration;
-import java.time.Instant;
 import lombok.Data;
 import lombok.Builder;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -15,7 +15,7 @@ public class Film {
     @Builder.Default
     private String description = "Default description";
     @Builder.Default
-    private Instant releaseDate = Instant.parse("2000-12-28T00:00:00.00Z");
+    private LocalDate releaseDate = LocalDate.of(2000, 12,28);
     @Builder.Default
     private Duration duration = Duration.ofMinutes(110);
 }

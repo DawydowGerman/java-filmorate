@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class UserController {
             e = new ValidationException("Дата рождения должна быть указана");
             log.error("Ошибка при добавлении юзера", e);
             throw e;
-        } else if (user.getBirthday().isAfter(Instant.now())) {
+        } else if (user.getBirthday().isAfter(LocalDate.now())) {
             e = new ValidationException("Дата рождения не может быть в будущем");
             log.error("Ошибка при добавлении юзера", e);
             throw e;
@@ -97,7 +97,7 @@ public class UserController {
                 log.trace("Изменено имя юзера с Id {}", newUser.getId());
                 oldUser.setName(newUser.getName());
             }
-            if (newUser.getBirthday() != null && !newUser.getBirthday().isAfter(Instant.now())) {
+            if (newUser.getBirthday() != null && !newUser.getBirthday().isAfter(LocalDate.now())) {
                 log.trace("Изменена дата рождения юзера с Id {}", newUser.getId());
                 oldUser.setBirthday(newUser.getBirthday());
             }

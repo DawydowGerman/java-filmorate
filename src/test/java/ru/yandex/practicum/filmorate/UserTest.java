@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ public class UserTest {
                 .email("email0")
                 .login("login0")
                 .name("name0")
-                .birthday(Instant.parse("1986-12-28T00:00:00.00Z"))
+                .birthday(LocalDate.of(1986,12,28))
                 .build();
 
         user1 = User.builder()
@@ -28,7 +28,7 @@ public class UserTest {
                 .email("email1")
                 .login("login1")
                 .name("name1")
-                .birthday(Instant.parse("2012-12-28T00:00:00.00Z"))
+                .birthday(LocalDate.of(2012,12,28))
                 .build();
 
         user2 = User.builder()
@@ -36,7 +36,7 @@ public class UserTest {
                 .email("email1")
                 .login("login1")
                 .name("name1")
-                .birthday(Instant.parse("2012-12-28T00:00:00.00Z"))
+                .birthday(LocalDate.of(2012,12,28))
                 .build();
     }
 
@@ -86,7 +86,7 @@ public class UserTest {
 
     @Test
     void getBirthdayMethodTest() {
-        Assertions.assertEquals(user0.getBirthday(), Instant.parse("1986-12-28T00:00:00.00Z"));
+        Assertions.assertEquals(user0.getBirthday(), LocalDate.of(1986,12,28));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class UserTest {
 
     @Test
     void toStringMethodTest() {
-        Assertions.assertEquals(user1.toString(),"User(id=44, email=email1, login=login1, name=name1, birthday=2012-12-28T00:00:00Z)");
+        Assertions.assertEquals(user1.toString(),"User(id=44, email=email1, login=login1, name=name1, birthday=2012-12-28)");
     }
 
     @Test
