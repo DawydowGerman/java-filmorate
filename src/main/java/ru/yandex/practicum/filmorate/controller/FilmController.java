@@ -90,20 +90,17 @@ public class FilmController {
         }
         if (films.containsKey(newFilm.getId())) {
             Film oldFilm = films.get(newFilm.getId());
-            if (!newFilm.getName().equals(oldFilm.getName())) {
-                e = new ValidationException("Название фильма не может быть изменено");
-                log.error("Ошибка при добавлении фильма", e);
-                throw e;
+            if (newFilm.getName() != null && !newFilm.getName().isEmpty()) {
+                log.trace("Изменено название фильма с Id {}", newFilm.getId());
+                oldFilm.setName(newFilm.getName());
             }
-            if (!newFilm.getReleaseDate().equals(oldFilm.getReleaseDate())) {
-                e = new ValidationException("Дата релиза не может быть изменена");
-                log.error("Ошибка при добавлении фильма", e);
-                throw e;
+            if (newFilm.getReleaseDate() != null) {
+                log.trace("Изменена дата релиза фильма с Id {}", newFilm.getId());
+                oldFilm.setReleaseDate(newFilm.getReleaseDate());
             }
-            if (!newFilm.getDuration().equals(oldFilm.getDuration())) {
-                e = new ValidationException("Продолжительность фильма не может быть изменена");
-                log.error("Ошибка при добавлении фильма", e);
-                throw e;
+            if (newFilm.getDuration() != null) {
+                log.trace("Изменена дата продолительность фильма с Id {}", newFilm.getId());
+                oldFilm.setDuration(newFilm.getDuration());
             }
             if (newFilm.getDescription() != null && !newFilm.getDescription().isEmpty()) {
                 log.trace("Изменено описание фильма с Id {}", newFilm.getId());
