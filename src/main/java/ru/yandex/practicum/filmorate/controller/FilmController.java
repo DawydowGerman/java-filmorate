@@ -19,49 +19,39 @@ public class FilmController {
     private final Map<Long, Film> films = new HashMap<>();
 
     @GetMapping
-    public Collection<Film> findAll() throws Exception {
-        Exception e;
+    public Collection<Film> findAll() {
         if (films.size() == 0) {
-            e = new NotFoundException("Список фильмов пуст");
-            log.error("Ошибка при добавлении фильма", e);
-            throw e;
+            log.error("Ошибка при получении списка фильма");
+            return null;
         } else return films.values();
     }
 
     @PostMapping
-    public Film create(@RequestBody Film film) throws Exception {
-        Exception e;
+    public Film create(@RequestBody Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
-            e = new ValidationException("Название не может быть пустым");
-            log.error("Ошибка при добавлении фильма", e);
-            throw e;
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Название не может быть пустым");
         }
         if (film.getDescription() == null || film.getDescription().isBlank()) {
-            e = new ValidationException("Описание не может быть пустым");
-            log.error("Ошибка при добавлении фильма", e);
-            throw e;
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Описание не может быть пустым");
         } else if (film.getDescription().length() > 200) {
-            e = new ValidationException("Максимальная длина описания — 200 символов");
-            log.error("Ошибка при добавлении фильма", e);
-            throw e;
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Максимальная длина описания — 200 символов");
         }
         if (film.getReleaseDate() == null) {
-            e = new ValidationException("Дата релиза должна быть указана");
-            log.error("Ошибка при добавлении фильма", e);
-            throw e;
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Дата релиза должна быть указана");
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
-            e = new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
-            log.error("Ошибка при добавлении фильма", e);
-            throw e;
-        }
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
+         }
         if (film.getDuration() == null) {
-            e = new ValidationException("Продолжительность фильма должна быть указана");
-            log.error("Ошибка при добавлении фильма", e);
-            throw e;
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Продолжительность фильма должна быть указана");
         } else if (film.getDuration() < 0) {
-            e = new ValidationException("Продолжительность фильма должна быть положительным числом");
-            log.error("Ошибка при добавлении фильма", e);
-            throw e;
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Продолжительность фильма должна быть положительным числом");
         }
         if (film.getId() == null) {
             film.setId(getNextId());
@@ -81,12 +71,10 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@RequestBody Film newFilm) throws Exception {
-        Exception e;
+    public Film update(@RequestBody Film newFilm) {
         if (newFilm.getId() == null) {
-            e = new ValidationException("Id должен быть указан");
-            log.error("Ошибка при добавлении фильма", e);
-            throw e;
+            log.error("Ошибка при обновлении фильма");
+            throw new ValidationException("Id должен быть указан");
         }
         if (films.containsKey(newFilm.getId())) {
             Film oldFilm = films.get(newFilm.getId());
@@ -109,8 +97,7 @@ public class FilmController {
             log.debug("Обновлен фильм с Id {}", newFilm.getId());
             return oldFilm;
         }
-        e = new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
-        log.error("Ошибка при добавлении фильма", e);
-        throw e;
+        log.error("Ошибка при обновлении фильма");
+        throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
     }
 }

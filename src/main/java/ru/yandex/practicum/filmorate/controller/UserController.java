@@ -19,36 +19,29 @@ public class UserController {
     private final Map<Long, User> users = new HashMap<>();
 
     @GetMapping
-    public Collection<User> findAll() throws Exception {
-        Exception e;
+    public Collection<User> findAll() {
         if (users.size() == 0) {
-            e = new NotFoundException("Список юзеров пуст");
-            log.error("Ошибка при добавлении юзера", e);
-            throw e;
+            log.error("Ошибка при получении списка юзеров");
+            return null;
         } else return users.values();
     }
 
     @PostMapping
-    public User create(@RequestBody User user) throws Exception {
-        Exception e;
+    public User create(@RequestBody User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            e = new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-            log.error("Ошибка при добавлении юзера", e);
-            throw e;
+            log.error("Ошибка при добавлении юзера");
+            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
         }
         if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            e = new ValidationException("Логин не может быть пустым и содержать пробелы");
-            log.error("Ошибка при добавлении юзера", e);
-            throw e;
+            log.error("Ошибка при добавлении юзера");
+            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
         }
         if (user.getBirthday() == null) {
-            e = new ValidationException("Дата рождения должна быть указана");
-            log.error("Ошибка при добавлении юзера", e);
-            throw e;
+            log.error("Ошибка при добавлении юзера");
+            throw new ValidationException("Дата рождения должна быть указана");
         } else if (user.getBirthday().isAfter(LocalDate.now())) {
-            e = new ValidationException("Дата рождения не может быть в будущем");
-            log.error("Ошибка при добавлении юзера", e);
-            throw e;
+            log.error("Ошибка при добавлении юзера");
+            throw new ValidationException("Дата рождения не может быть в будущем");
         }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -69,20 +62,17 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@RequestBody User newUser) throws Exception {
-        Exception e;
+    public User update(@RequestBody User newUser) {
         if (newUser.getId() == null) {
-            e = new ValidationException("Id должен быть указан");
-            log.error("Ошибка при добавлении юзера", e);
-            throw e;
+            log.error("Ошибка при обновлении данных юзера");
+            throw new ValidationException("Id должен быть указан");
         }
         if (users.containsKey(newUser.getId())) {
             User oldUser = users.get(newUser.getId());
             for (User user0 : users.values()) {
                 if (!user0.getId().equals(newUser.getId()) && user0.getEmail().equals(newUser.getEmail())) {
-                    e = new ValidationException("Этот имейл уже используется");
-                    log.error("Ошибка при добавлении юзера", e);
-                    throw e;
+                    log.error("Ошибка при обновлении данных юзера");
+                    throw new ValidationException("Этот имейл уже используется");
                 }
             }
             if (newUser.getEmail() != null && !newUser.getEmail().isEmpty()) {
@@ -104,8 +94,7 @@ public class UserController {
             log.debug("Обновлен юзер с Id {}", newUser.getId());
             return oldUser;
         }
-        e = new NotFoundException("Юзер с id = " + newUser.getId() + " не найден");
-        log.error("Ошибка при добавлении юзера", e);
-        throw e;
+        log.error("Ошибка при добавлении юзера");
+        throw new NotFoundException("Юзер с id = " + newUser.getId() + " не найден");
     }
 }

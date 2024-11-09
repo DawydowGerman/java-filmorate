@@ -16,5 +16,5 @@ public class User {
     @Builder.Default
     private String name = "Default name";
     @Builder.Default
-    LocalDate birthday = LocalDate.of(2000, 12, 01);
+    private LocalDate birthday = LocalDate.of(2000, 12, 01);
 }

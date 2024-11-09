@@ -65,10 +65,7 @@ public class FilmControllerTest {
 
     @Test
     public void testCreateMethodWhenDescMoreThan200Chars() throws Exception {
-        String desc = "1";
-        for (int i = 0; i < 201; i++) {
-            desc = desc + "1";
-        }
+        String desc = "1".repeat(201);;
         film0.setDescription(desc);
         try {
 
@@ -120,12 +117,14 @@ public class FilmControllerTest {
 
     @Test
     public void testUpdateMethodWithNullId() throws Exception {
+        filmController.create(film0);
         film0.setId(null);
         try {
             filmController.update(film0);
         } catch (ValidationException e) {
             assertEquals(e.getMessage(), "Id должен быть указан");
         }
+
     }
 
     @Test
