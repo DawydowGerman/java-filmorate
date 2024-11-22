@@ -2,12 +2,6 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import lombok.Builder;
-import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
