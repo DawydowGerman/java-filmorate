@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -71,8 +72,18 @@ public class UserController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleThrowable(final Throwable e) {
-        return Map.of(
-                "error", "Передан отрицательный параметр count.",
-                "errorMessage", e.getMessage());
+        return Map.of("errorMessage", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationException(final ValidationException e) {
+        return Map.of("errorMessage", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    public Map<String, String> handleNotFoundException(final NotFoundException e) {
+        return Map.of("errorMessage", e.getMessage());
     }
 }
