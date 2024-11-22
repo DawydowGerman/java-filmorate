@@ -42,6 +42,9 @@ public class InMemoryUserStorage implements UserStorage {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
+        if (user.getFriends() == null) {
+            user.setFriends(new HashSet<>());
+        }
         user.setId(getNextId());
         users.put(user.getId(), user);
         log.debug("Добавлен юзер с Id {}", user.getId());
