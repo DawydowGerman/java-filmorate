@@ -112,7 +112,7 @@ public class InMemoryUserStorage implements UserStorage {
             return Optional.empty();
         }
         if (users.containsKey(id) && users.get(id).getFriends().size() > 0) {
-            for(Long userFriendId : users.get(id).getFriends()) {
+            for (Long userFriendId : users.get(id).getFriends()) {
                 result.add(users.get(userFriendId));
             }
             return Optional.of(result);
