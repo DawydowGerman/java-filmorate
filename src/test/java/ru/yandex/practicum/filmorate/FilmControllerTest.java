@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
@@ -21,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class FilmControllerTest {
-    InMemoryFilmStorage InMemoryFilmStorage = new InMemoryFilmStorage();
-    FilmService filmService = new FilmService(InMemoryFilmStorage);
-    FilmController filmController = new FilmController(InMemoryFilmStorage, filmService);
+    InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
+    FilmService filmService = new FilmService(inMemoryFilmStorage);
+    FilmController filmController = new FilmController(inMemoryFilmStorage, filmService);
 
     Film film0 = Film.builder()
             .id(Long.valueOf(23))
@@ -261,14 +260,14 @@ public class FilmControllerTest {
 
     @Test
     public void giveLikeMethodWithWrongId() throws Exception {
-        InMemoryFilmStorage.create(film0);
+        inMemoryFilmStorage.create(film0);
         filmController.giveLike(Long.valueOf(01), film0.getId());
         assertEquals(film0.getLikes().size(), 1);
     }
 
     @Test
     public void removeLikeMethodWithWrongId() throws Exception {
-        InMemoryFilmStorage.create(film0);
+        inMemoryFilmStorage.create(film0);
         filmController.giveLike(Long.valueOf(01), film0.getId());
         filmController.removeLike(Long.valueOf(01), film0.getId());
         assertEquals(film0.getLikes().size(), 0);
@@ -276,7 +275,7 @@ public class FilmControllerTest {
 
     @Test
     public void getFilmByIdMethodWithWrongId() throws Exception {
-        InMemoryFilmStorage.create(film0);
+        inMemoryFilmStorage.create(film0);
         assertEquals(filmController.getFilmById(film0.getId()), film0);
     }
 
@@ -284,25 +283,25 @@ public class FilmControllerTest {
     public void getMostPopularFilmsMethodTest() throws Exception {
         film00.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0))));
-        InMemoryFilmStorage.create(film00);
+        inMemoryFilmStorage.create(film00);
 
         film1.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
                 Long.valueOf(1))));
-        InMemoryFilmStorage.create(film1);
+        inMemoryFilmStorage.create(film1);
 
         film2.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
                 Long.valueOf(1),
                 Long.valueOf(2))));
-        InMemoryFilmStorage.create(film2);
+        inMemoryFilmStorage.create(film2);
 
         film3.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
                 Long.valueOf(1),
                 Long.valueOf(2),
                 Long.valueOf(3))));
-        InMemoryFilmStorage.create(film3);
+        inMemoryFilmStorage.create(film3);
 
         film4.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
@@ -310,7 +309,7 @@ public class FilmControllerTest {
                 Long.valueOf(2),
                 Long.valueOf(3),
                 Long.valueOf(4))));
-        InMemoryFilmStorage.create(film4);
+        inMemoryFilmStorage.create(film4);
 
         film5.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
@@ -319,7 +318,7 @@ public class FilmControllerTest {
                 Long.valueOf(3),
                 Long.valueOf(4),
                 Long.valueOf(5))));
-        InMemoryFilmStorage.create(film5);
+        inMemoryFilmStorage.create(film5);
 
         film6.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
@@ -329,7 +328,7 @@ public class FilmControllerTest {
                 Long.valueOf(4),
                 Long.valueOf(5),
                 Long.valueOf(6))));
-        InMemoryFilmStorage.create(film6);
+        inMemoryFilmStorage.create(film6);
 
         film7.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
@@ -340,7 +339,7 @@ public class FilmControllerTest {
                 Long.valueOf(5),
                 Long.valueOf(6),
                 Long.valueOf(7))));
-        InMemoryFilmStorage.create(film7);
+        inMemoryFilmStorage.create(film7);
 
         film8.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
@@ -352,7 +351,7 @@ public class FilmControllerTest {
                 Long.valueOf(6),
                 Long.valueOf(7),
                 Long.valueOf(8))));
-        InMemoryFilmStorage.create(film8);
+        inMemoryFilmStorage.create(film8);
 
         film9.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
@@ -365,7 +364,7 @@ public class FilmControllerTest {
                 Long.valueOf(7),
                 Long.valueOf(8),
                 Long.valueOf(9))));
-        InMemoryFilmStorage.create(film9);
+        inMemoryFilmStorage.create(film9);
 
         film10.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
@@ -379,7 +378,7 @@ public class FilmControllerTest {
                 Long.valueOf(8),
                 Long.valueOf(9),
                 Long.valueOf(10))));
-        InMemoryFilmStorage.create(film10);
+        inMemoryFilmStorage.create(film10);
 
         film11.setLikes(new HashSet<>(Arrays.asList(
                 Long.valueOf(0),
@@ -394,7 +393,7 @@ public class FilmControllerTest {
                 Long.valueOf(9),
                 Long.valueOf(10),
                 Long.valueOf(11))));
-        InMemoryFilmStorage.create(film11);
+        inMemoryFilmStorage.create(film11);
 
         List<Film> filmsList = filmController.getMostPopularFilms(Optional.of(10));
 
