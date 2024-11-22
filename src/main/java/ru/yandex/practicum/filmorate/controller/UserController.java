@@ -1,100 +1,82 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final Map<Long, User> users = new HashMap<>();
+    private UserService userService;
+    private InMemoryUserStorage inMemoryUserStorage;
+
+    @Autowired
+    public UserController(InMemoryUserStorage inMemoryUserStorage, UserService userService) {
+        this.userService = userService;
+        this.inMemoryUserStorage = inMemoryUserStorage;
+    }
 
     @GetMapping
     public Collection<User> findAll() {
-        if (users.size() == 0) {
-            log.error("Ошибка при получении списка юзеров");
-            return null;
-        } else return users.values();
+        return inMemoryUserStorage.findAll();
     }
 
     @PostMapping
     public User create(@RequestBody User user) {
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
-        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-        }
-        if (user.getBirthday() == null) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Дата рождения должна быть указана");
-        } else if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        user.setId(getNextId());
-        users.put(user.getId(), user);
-        log.debug("Добавлен юзер с Id {}", user.getId());
-        return user;
-    }
-
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+        return inMemoryUserStorage.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody User newUser) {
-        if (newUser.getId() == null) {
-            log.error("Ошибка при обновлении данных юзера");
-            throw new ValidationException("Id должен быть указан");
-        }
-        if (users.containsKey(newUser.getId())) {
-            User oldUser = users.get(newUser.getId());
-            for (User user0 : users.values()) {
-                if (!user0.getId().equals(newUser.getId()) && user0.getEmail().equals(newUser.getEmail())) {
-                    log.error("Ошибка при обновлении данных юзера");
-                    throw new ValidationException("Этот имейл уже используется");
-                }
-            }
-            if (newUser.getEmail() != null && !newUser.getEmail().isEmpty()) {
-                log.trace("Изменен имейл юзера с Id {}", newUser.getId());
-                oldUser.setEmail(newUser.getEmail());
-            }
-            if (newUser.getLogin() != null && !newUser.getLogin().isEmpty()) {
-                log.trace("Изменен логин юзера с Id {}", newUser.getId());
-                oldUser.setLogin(newUser.getLogin());
-            }
-            if (newUser.getName() != null && !newUser.getName().isEmpty()) {
-                log.trace("Изменено имя юзера с Id {}", newUser.getId());
-                oldUser.setName(newUser.getName());
-            }
-            if (newUser.getBirthday() != null && !newUser.getBirthday().isAfter(LocalDate.now())) {
-                log.trace("Изменена дата рождения юзера с Id {}", newUser.getId());
-                oldUser.setBirthday(newUser.getBirthday());
-            }
-            log.debug("Обновлен юзер с Id {}", newUser.getId());
-            return oldUser;
-        }
-        log.error("Ошибка при добавлении юзера");
-        throw new NotFoundException("Юзер с id = " + newUser.getId() + " не найден");
+        return inMemoryUserStorage.update(newUser);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable Long id) {
+        Optional<List<User>> friendsList = inMemoryUserStorage.getFriends(id);
+        if (friendsList.isPresent()) {
+            return friendsList.get();
+        } else throw new NotFoundException("У Юзера с " + id + " отсутствуют друзья.");
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getMutualFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        return userService.getMutualFriends(id, otherId);
+    }
+
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable Long userId) {
+        Optional<User> user = inMemoryUserStorage.getUserById(userId);
+        if (user.isPresent()) {
+            return user.get();
+        } else throw new NotFoundException("Юзер с " + userId + " отсутствует.");
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleThrowable(final Throwable e) {
+        return Map.of(
+                "error", "Передан отрицательный параметр count.",
+                "errorMessage", e.getMessage());
     }
 }
