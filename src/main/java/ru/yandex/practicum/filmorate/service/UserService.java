@@ -26,7 +26,7 @@ public class UserService {
     public void addFriend(Long idUser0, Long idUser1) {
         Optional<User> user0 = inMemoryUserStorage.getUserById(idUser0);
         Optional<User> user1 = inMemoryUserStorage.getUserById(idUser1);
-        if(user0.isPresent() && user1.isPresent()) {
+        if (user0.isPresent() && user1.isPresent()) {
             user0.get().setToFriends(user1.get().getId());
             user1.get().setToFriends(user0.get().getId());
             log.trace("Юзеры с id: " + idUser0 + ", " + idUser1 + " добавлены в друзья");
@@ -39,7 +39,7 @@ public class UserService {
     public void removeFriend(Long idUser0, Long idUser1) {
         Optional<User> user0 = inMemoryUserStorage.getUserById(idUser0);
         Optional<User> user1 = inMemoryUserStorage.getUserById(idUser1);
-        if(user0.isPresent()
+        if (user0.isPresent()
                 && user1.isPresent()
                 && user0.get().isFriend(user1.get().getId())) {
             user0.get().removeFromFriends(user1.get().getId());
@@ -55,8 +55,8 @@ public class UserService {
         Optional<User> user0 = inMemoryUserStorage.getUserById(idUser0);
         Optional<User> user1 = inMemoryUserStorage.getUserById(idUser1);
         List<User> result = new ArrayList<>();
-        if(user0.isPresent() && user1.isPresent()) {
-            for(User user : inMemoryUserStorage.findAll()) {
+        if (user0.isPresent() && user1.isPresent()) {
+            for (User user : inMemoryUserStorage.findAll()) {
                 if (user.getFriends().contains(user0.get().getId())
                         && user.getFriends().contains(user1.get().getId())) {
                     result.add(user);
