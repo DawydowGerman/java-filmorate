@@ -39,6 +39,10 @@ public class UserService {
     public void removeFriend(Long idUser0, Long idUser1) {
         Optional<User> user0 = inMemoryUserStorage.getUserById(idUser0);
         Optional<User> user1 = inMemoryUserStorage.getUserById(idUser1);
+        if (user0.isEmpty()) {
+            log.error("Ошибка при удалении из друзей");
+            throw new NotFoundException("Юзер с id " + idUser0 + " отсутствует");
+        }
         if (user0.isPresent()
                 && user1.isPresent()
                 && user0.get().isFriend(user1.get().getId())) {
