@@ -394,7 +394,6 @@ public class FilmControllerTest {
                 Long.valueOf(10),
                 Long.valueOf(11))));
         inMemoryFilmStorage.create(film11);
-
         List<Film> filmsList = filmController.getMostPopularFilms(Optional.of(10));
 
         assertEquals(filmsList.contains(film00), false);
