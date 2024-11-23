@@ -9,10 +9,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -54,6 +51,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (film.getId() == null) {
             film.setId(getNextId());
+        }
+        if (film.getLikes() == null) {
+            film.setLikes(new HashSet<>());
         }
         films.put(film.getId(), film);
         log.debug("Добавлен фильм с Id {}", film.getId());
