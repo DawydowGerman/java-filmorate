@@ -48,10 +48,13 @@ public class UserController {
         userService.removeFriend(id, friendId);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable Long id) {
         Optional<List<User>> friendsList = inMemoryUserStorage.getFriends(id);
-        return friendsList.get();
+        if (friendsList.isPresent()) {
+            return friendsList.get();
+        } else return Collections.emptyList();
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
