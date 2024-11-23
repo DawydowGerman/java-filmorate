@@ -50,7 +50,7 @@ public class FilmService {
         List<Film> allFilmsList = new ArrayList<>(inMemoryFilmStorage.findAll());
         List<Film> result = new ArrayList<>();
         Film fimlWithLargestLikes;
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count && i < allFilmsList.size(); i++) {
             for (int j = 0; j < allFilmsList.size(); j++) {
                 fimlWithLargestLikes = Film.builder().build();
                 if (allFilmsList.get(j).getLikes().size() > fimlWithLargestLikes.getLikes().size()) {

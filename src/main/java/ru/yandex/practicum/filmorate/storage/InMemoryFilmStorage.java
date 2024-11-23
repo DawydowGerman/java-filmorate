@@ -18,7 +18,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public Collection<Film> findAll() {
         if (films.size() == 0) {
-            log.error("Ошибка при получении списка фильма");
+            log.error("Ошибка при получении списка фильмов");
             return null;
         } else return films.values();
     }

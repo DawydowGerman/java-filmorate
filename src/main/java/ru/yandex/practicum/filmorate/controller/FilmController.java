@@ -47,9 +47,9 @@ public class FilmController {
     public void removeLike(@PathVariable Long userId, @PathVariable Long id) {
         filmService.removeLike(userId, id);
     }
-
-    @GetMapping("/films/popular?count={count}")
-    public List<Film> getMostPopularFilms(@PathVariable @RequestParam Optional<Integer> count) {
+// @RequestParam, "/popular?count={count}"
+    @GetMapping("/popular")
+    public List<Film> getMostPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
         if (count.isPresent()) {
             return filmService.getMostPopularFilms(count.get());
         }
