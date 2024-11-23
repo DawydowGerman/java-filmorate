@@ -53,9 +53,15 @@ public class FilmService {
         Film fimlWithLargestLikes;
         for (int i = 0; i < count && i < allFilmsListSize; i++) {
             for (int j = 0; j < allFilmsList.size(); j++) {
+                boolean arrayOfFilmsWithEmptyLikes = true;
                 fimlWithLargestLikes = Film.builder().build();
                 if (allFilmsList.get(j).getLikes().size() > fimlWithLargestLikes.getLikes().size()) {
                     fimlWithLargestLikes = allFilmsList.get(j);
+                    arrayOfFilmsWithEmptyLikes = false;
+                }
+                if (j == allFilmsList.size() - 1 && arrayOfFilmsWithEmptyLikes) {
+                    result.addAll(allFilmsList);
+                    return result;
                 }
                 if (j == allFilmsList.size() - 1) {
                     allFilmsList.remove(fimlWithLargestLikes);
