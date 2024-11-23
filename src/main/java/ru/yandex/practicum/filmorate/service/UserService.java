@@ -43,6 +43,10 @@ public class UserService {
             log.error("Ошибка при удалении из друзей");
             throw new NotFoundException("Юзер с id " + idUser0 + " отсутствует");
         }
+        if (user1.isEmpty()) {
+            log.error("Ошибка при удалении из друзей");
+            throw new NotFoundException("Юзер с id " + idUser1 + " отсутствует");
+        }
         if (user0.isPresent()
                 && user1.isPresent()
                 && user0.get().isFriend(user1.get().getId())) {
