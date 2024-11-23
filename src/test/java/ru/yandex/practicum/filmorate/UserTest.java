@@ -20,7 +20,7 @@ public class UserTest {
     InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
     UserService userService = new UserService(inMemoryUserStorage);
     InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
-    FilmService filmService = new FilmService(inMemoryFilmStorage);
+    FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
 
     User user0;
     User user1;

@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -20,8 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class FilmControllerTest {
+    InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
     InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
-    FilmService filmService = new FilmService(inMemoryFilmStorage);
+    FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
     FilmController filmController = new FilmController(inMemoryFilmStorage, filmService);
 
     Film film0 = Film.builder()
