@@ -51,9 +51,7 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable Long id) {
         Optional<List<User>> friendsList = inMemoryUserStorage.getFriends(id);
-        if (friendsList.isPresent()) {
-            return friendsList.get();
-        } else throw new NotFoundException("У Юзера с " + id + " отсутствуют друзья.");
+        return friendsList.get();
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
