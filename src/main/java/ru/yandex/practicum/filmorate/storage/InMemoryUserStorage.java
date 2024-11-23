@@ -114,6 +114,9 @@ public class InMemoryUserStorage implements UserStorage {
             log.error("Ошибка при получении списка юзеров");
             return Optional.empty();
         }
+        if (!users.containsKey(id)) {
+            throw new NotFoundException("Юзер с id = " + id + " не найден");
+        }
         if (users.containsKey(id) && users.get(id).getFriends().size() > 0) {
             for (Long userFriendId : users.get(id).getFriends()) {
                 result.add(users.get(userFriendId));
