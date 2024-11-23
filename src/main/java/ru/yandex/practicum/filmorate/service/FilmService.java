@@ -30,6 +30,11 @@ public class FilmService {
     }
 
     public void giveLike(Long userId, Long filmId) {
+        Optional<User> user = inMemoryUserStorage.getUserById(userId);
+        if (user.isEmpty()) {
+            log.error("Ошибка при удалении из друзей");
+            throw new NotFoundException("Юзер с id " + userId + " отсутствует");
+        }
         Optional<Film> film0 = inMemoryFilmStorage.getFilmById(filmId);
         if (film0.isPresent()) {
             film0.get().addLike(userId);

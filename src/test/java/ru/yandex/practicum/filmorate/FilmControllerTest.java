@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -25,6 +26,15 @@ public class FilmControllerTest {
     InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
     FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
     FilmController filmController = new FilmController(inMemoryFilmStorage, filmService);
+
+    User user1 = User.builder()
+            .id(Long.valueOf(23))
+            .email("email0@mail.ru")
+            .login("login0")
+            .name("name0")
+            .birthday(LocalDate.of(1986,12,28))
+            .filmService(filmService)
+            .build();
 
     Film film0 = Film.builder()
             .id(Long.valueOf(23))
@@ -49,6 +59,8 @@ public class FilmControllerTest {
 
     @BeforeEach
     public void beforeEach() {
+        inMemoryUserStorage.create(user1);
+
         film00 = Film.builder()
                 .id(Long.valueOf(0))
                 .build();
@@ -270,8 +282,8 @@ public class FilmControllerTest {
     @Test
     public void removeLikeMethodWithWrongId() throws Exception {
         inMemoryFilmStorage.create(film0);
-        filmController.giveLike(Long.valueOf(01), film0.getId());
-        filmController.removeLike(Long.valueOf(01), film0.getId());
+        filmController.giveLike(user1.getId(), film0.getId());
+        filmController.removeLike(user1.getId(), film0.getId());
         assertEquals(film0.getLikes().size(), 0);
     }
 

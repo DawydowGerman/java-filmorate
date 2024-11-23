@@ -40,6 +40,10 @@ public class UserTest {
 
     @BeforeEach
     public void beforeEach() {
+    //    inMemoryUserStorage.create(user0);
+    //    inMemoryUserStorage.create(user1);
+   //     inMemoryUserStorage.create(user2);
+
         user0 = User.builder()
                 .id(Long.valueOf(23))
                 .email("email0@mail.ru")
@@ -238,6 +242,7 @@ public class UserTest {
 
     @Test
     void giveLikeMethodTest() {
+        inMemoryUserStorage.create(user0);
         inMemoryFilmStorage.create(film0);
         user0.giveLike(film0.getId());
         Assertions.assertEquals(film0.getLikes().size(), 1);
@@ -245,6 +250,7 @@ public class UserTest {
 
     @Test
     void removeLikeMethodTest() {
+        inMemoryUserStorage.create(user0);
         inMemoryFilmStorage.create(film0);
         user0.giveLike(film0.getId());
         user0.removeLike(film0.getId());
