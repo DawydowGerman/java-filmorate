@@ -12,9 +12,10 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import java.util.stream.*;
 
 @Service
 @Data
@@ -63,6 +64,21 @@ public class FilmService {
 
     public List<Film> getMostPopularFilms(Integer count) {
         List<Film> allFilmsList = new ArrayList<>(inMemoryFilmStorage.findAll());
+        Collections.sort(allFilmsList, (Film a1, Film a2) -> a1.getLikes().size()-a2.getLikes().size());
+        return allFilmsList;
+
+        /*
+        User result = users.stream()
+                .max(Comparator.comparingInt(film -> film.likes.size()))
+                .orElse(null);
+
+.stream()
+                .max(Comparator.comparingInt(film -> film.getLikes().size()));
+                .orElse(null);
+            //    .collect(Collectors.toList());
+
+
+
         int allFilmsListSize = allFilmsList.size();
         List<Film> result = new ArrayList<>();
         Film fimlWithLargestLikes;
@@ -86,5 +102,7 @@ public class FilmService {
         }
         log.trace("Возвращены наиболее популярные фильмы");
         return result;
+
+         */
     }
 }
