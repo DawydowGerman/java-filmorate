@@ -54,13 +54,6 @@ public class UserService {
             user1.get().removeFromFriends(user0.get().getId());
             log.trace("Юзеры с id: " + idUser0 + ", " + idUser1 + " удалены из друзей");
         }
-        /*
-        else {
-            log.error("Ошибка при удалении из друзей");
-            throw new NotFoundException("Один из юзеров отсутствует либо юзеры не являются друзьями");
-        }
-        */
-
     }
 
     public List<User> getMutualFriends(Long idUser0, Long idUser1) {

@@ -61,45 +61,11 @@ public class FilmService {
 
     public List<Film> getMostPopularFilms(Integer count) {
         List<Film> allFilmsList = new ArrayList<>(inMemoryFilmStorage.findAll());
-        Collections.sort(allFilmsList, (Film a1, Film a2) -> a1.getLikes().size() - a2.getLikes().size());
+        int numberToRemove = allFilmsList.size() - count;
+        Collections.sort(allFilmsList);
+        for (int i = 0; i < numberToRemove; i++) {
+             allFilmsList.removeLast();
+       }
         return allFilmsList;
-
-        /*
-        User result = users.stream()
-                .max(Comparator.comparingInt(film -> film.likes.size()))
-                .orElse(null);
-
-.stream()
-                .max(Comparator.comparingInt(film -> film.getLikes().size()));
-                .orElse(null);
-            //    .collect(Collectors.toList());
-
-
-
-        int allFilmsListSize = allFilmsList.size();
-        List<Film> result = new ArrayList<>();
-        Film fimlWithLargestLikes;
-        for (int i = 0; i < count && i < allFilmsListSize; i++) {
-            for (int j = 0; j < allFilmsList.size(); j++) {
-                boolean arrayOfFilmsWithEmptyLikes = true;
-                fimlWithLargestLikes = Film.builder().build();
-                if (allFilmsList.get(j).getLikes().size() > fimlWithLargestLikes.getLikes().size()) {
-                    fimlWithLargestLikes = allFilmsList.get(j);
-                    arrayOfFilmsWithEmptyLikes = false;
-                }
-                if (j == allFilmsList.size() - 1 && arrayOfFilmsWithEmptyLikes) {
-                    result.addAll(allFilmsList);
-                    return result;
-                }
-                if (j == allFilmsList.size() - 1) {
-                    allFilmsList.remove(fimlWithLargestLikes);
-                    result.add(fimlWithLargestLikes);
-                }
-            }
-        }
-        log.trace("Возвращены наиболее популярные фильмы");
-        return result;
-
-         */
     }
 }

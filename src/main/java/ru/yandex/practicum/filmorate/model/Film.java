@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Data
 @Builder
-public class Film {
+public class Film implements Comparable<Film> {
     @Builder.Default
     private Long id = Long.valueOf(0);
     @Builder.Default
@@ -39,5 +39,9 @@ public class Film {
                 ", releaseDate=" + releaseDate +
                 ", duration=" + duration +
                 '}';
+    }
+
+    public int compareTo(Film obj) {
+        return obj.getLikes().size() - this.getLikes().size();
     }
 }
