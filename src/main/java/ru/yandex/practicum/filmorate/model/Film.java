@@ -19,7 +19,6 @@ public class Film implements Comparable<Film> {
     @NotNull
     @Builder.Default
     private LocalDate releaseDate = LocalDate.of(2000, 12,28);
-    @Min(1)
     @Builder.Default
     private Integer duration = Integer.valueOf(110);
     @Builder.Default
