@@ -12,10 +12,8 @@ import jakarta.validation.constraints.*;
 public class Film implements Comparable<Film> {
     @Builder.Default
     private Long id = Long.valueOf(0);
-    @NotBlank
     @Builder.Default
     private String name = "Default name";
-    @Size(min = 1, max = 200)
     @Builder.Default
     private String description = "Default description";
     @NotNull

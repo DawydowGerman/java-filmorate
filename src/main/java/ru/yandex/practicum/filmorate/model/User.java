@@ -18,7 +18,6 @@ public class User {
     @NotBlank
     @Builder.Default
     private String login = "Default login";
-    @NotBlank
     @Builder.Default
     private String name = "Default name";
     @NotNull
