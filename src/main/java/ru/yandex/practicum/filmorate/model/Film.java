@@ -5,18 +5,23 @@ import lombok.Builder;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import jakarta.validation.constraints.*;
 
 @Data
 @Builder
 public class Film implements Comparable<Film> {
     @Builder.Default
     private Long id = Long.valueOf(0);
+    @NotBlank
     @Builder.Default
     private String name = "Default name";
+    @Size(min = 1, max = 200)
     @Builder.Default
     private String description = "Default description";
+    @NotNull
     @Builder.Default
     private LocalDate releaseDate = LocalDate.of(2000, 12,28);
+    @Min(1)
     @Builder.Default
     private Integer duration = Integer.valueOf(110);
     @Builder.Default

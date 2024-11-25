@@ -1,10 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
-
 import java.time.LocalDate;
 import java.util.*;
 
@@ -13,30 +12,20 @@ import java.util.*;
 public class User {
     @Builder.Default
     private Long id = Long.valueOf(0);
+    @NotBlank
     @Builder.Default
     private String email = "Default email";
+    @NotBlank
     @Builder.Default
     private String login = "Default login";
+    @NotBlank
     @Builder.Default
     private String name = "Default name";
+    @NotNull
     @Builder.Default
     private LocalDate birthday = LocalDate.of(2000, 12, 01);
     @Builder.Default
     private Set<Long> friends = new HashSet<>();
-    private UserService userService;
-    private FilmService filmService;
-
-    public void addFriend(Long addingFriendId) {
-        userService.addFriend(this.id, addingFriendId);
-    }
-
-    public void removeFriend(Long removingFriendId) {
-        userService.removeFriend(this.id, removingFriendId);
-    }
-
-    public List<User> getMutualFriends(Long mutualFriendId) {
-        return userService.getMutualFriends(this.id, mutualFriendId);
-    }
 
     public void setToFriends(Long id) {
         friends.add(id);
@@ -48,18 +37,6 @@ public class User {
 
     public boolean isFriend(Long id) {
         return friends.contains(id);
-    }
-
-    public void giveLike(Long filmId) {
-        filmService.giveLike(this.id, filmId);
-    }
-
-    public void removeLike(Long filmId) {
-        filmService.removeLike(this.id, filmId);
-    }
-
-    public List<Film> getMostPopularFilms(Integer count) {
-        return filmService.getMostPopularFilms(count);
     }
 
     @Override

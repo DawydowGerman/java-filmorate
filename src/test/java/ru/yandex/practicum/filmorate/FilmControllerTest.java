@@ -33,7 +33,6 @@ public class FilmControllerTest {
             .login("login0")
             .name("name0")
             .birthday(LocalDate.of(1986,12,28))
-            .filmService(filmService)
             .build();
 
     Film film0 = Film.builder()

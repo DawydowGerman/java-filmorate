@@ -28,7 +28,6 @@ public class UserControllerTest {
             .login("somelogin")
             .name("some name")
             .birthday(LocalDate.of(2000, 12, 28))
-            .userService(userService)
             .build();
 
     User user1 = User.builder()
@@ -37,7 +36,6 @@ public class UserControllerTest {
             .login("somelogin1")
             .name("some name1")
             .birthday(LocalDate.of(2000, 12, 28))
-            .userService(userService)
             .build();
 
     User user2 = User.builder()
@@ -46,7 +44,6 @@ public class UserControllerTest {
             .login("somelogin2")
             .name("somename2")
             .birthday(LocalDate.of(2000, 12, 28))
-            .userService(userService)
             .build();
 
     User userPostman = User.builder()
@@ -198,8 +195,8 @@ public class UserControllerTest {
         inMemoryUserStorage.create(user0);
         inMemoryUserStorage.create(user1);
         inMemoryUserStorage.create(user2);
-        user0.addFriend(user1.getId());
-        user2.addFriend(user1.getId());
+        userController.addFriend(user1.getId(), user0.getId());
+        userController.addFriend(user1.getId(), user2.getId());
         Assertions.assertEquals(userController.getMutualFriends(user0.getId(), user2.getId()).get(0), user1);
     }
 
@@ -214,8 +211,8 @@ public class UserControllerTest {
         inMemoryUserStorage.create(user0);
         inMemoryUserStorage.create(user1);
         inMemoryUserStorage.create(user2);
-        user0.addFriend(user1.getId());
-        user0.addFriend(user2.getId());
+        userController.addFriend(user0.getId(), user1.getId());
+        userController.addFriend(user0.getId(), user2.getId());
         List<User> userList = new ArrayList<>(Arrays.asList(user1, user2));
         Assertions.assertEquals(userController.getFriends(user0.getId()), userList);
     }
