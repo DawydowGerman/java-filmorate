@@ -15,9 +15,10 @@ public class UserTest {
 
     @BeforeEach
     public void beforeEach() {
+
         user0 = User.builder()
                 .id(Long.valueOf(23))
-                .email("email0")
+                .email("email0@mail.ru")
                 .login("login0")
                 .name("name0")
                 .birthday(LocalDate.of(1986,12,28))
@@ -25,7 +26,7 @@ public class UserTest {
 
         user1 = User.builder()
                 .id(Long.valueOf(44))
-                .email("email1")
+                .email("email1@mail.ru")
                 .login("login1")
                 .name("name1")
                 .birthday(LocalDate.of(2012,12,28))
@@ -33,7 +34,7 @@ public class UserTest {
 
         user2 = User.builder()
                 .id(Long.valueOf(44))
-                .email("email1")
+                .email("email1@mail.ru")
                 .login("login1")
                 .name("name1")
                 .birthday(LocalDate.of(2012,12,28))
@@ -53,7 +54,7 @@ public class UserTest {
 
     @Test
     void getEmailMethodTest() {
-        Assertions.assertEquals(user0.getEmail(), "email0");
+        Assertions.assertEquals(user0.getEmail(), "email0@mail.ru");
     }
 
     @Test
@@ -97,7 +98,7 @@ public class UserTest {
 
     @Test
     void toStringMethodTest() {
-        Assertions.assertEquals(user1.toString(),"User(id=44, email=email1, login=login1, name=name1, birthday=2012-12-28)");
+        Assertions.assertEquals(user1.toString(),"User{id=44, email='email1@mail.ru', login='login1', name='name1', birthday=2012-12-28, friends=[]}");
     }
 
     @Test
@@ -108,5 +109,24 @@ public class UserTest {
     @Test
     void hashCodeMethodTest() {
         Assertions.assertEquals(user1.hashCode(), user2.hashCode());
+    }
+
+    @Test
+    void setToFriendsMethodTest() {
+        user0.setToFriends(user1.getId());
+        Assertions.assertEquals(user0.getFriends().size(), 1);
+    }
+
+    @Test
+    void removeFromFriendsMethodTest() {
+        user0.setToFriends(user1.getId());
+        user0.removeFromFriends(user1.getId());
+        Assertions.assertEquals(user0.getFriends().size(), 0);
+    }
+
+    @Test
+    void isFriendMethodTest() {
+        user0.setToFriends(user1.getId());
+        Assertions.assertEquals(user0.isFriend(user1.getId()), true);
     }
 }
