@@ -50,3 +50,8 @@ WHERE film_id IN (SELECT film_id
                   GROUP BY film_id
                   ORDER BY COUNT(user_id) DESC
                   LIMIT 3);
+
+Getting all the films of genre with id 1:
+SELECT * 
+FROM Film_genres
+WHERE genres_id = 1;
