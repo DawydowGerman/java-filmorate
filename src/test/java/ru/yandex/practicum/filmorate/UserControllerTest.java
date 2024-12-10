@@ -1,24 +1,48 @@
 package ru.yandex.practicum.filmorate;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 @SpringBootTest
 public class UserControllerTest {
-    UserController userController = new UserController();
+    InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
+    UserService userService = new UserService(inMemoryUserStorage);
+    UserController userController = new UserController(inMemoryUserStorage, userService);
 
     User user0 = User.builder()
             .id(Long.valueOf(23))
             .email("some@mail.ru")
             .login("somelogin")
             .name("some name")
+            .birthday(LocalDate.of(2000, 12, 28))
+            .build();
+
+    User user1 = User.builder()
+            .id(Long.valueOf(12))
+            .email("some1@mail.ru")
+            .login("somelogin1")
+            .name("some name1")
+            .birthday(LocalDate.of(2000, 12, 28))
+            .build();
+
+    User user2 = User.builder()
+            .id(Long.valueOf(14))
+            .email("some2@mail.ru")
+            .login("somelogin2")
+            .name("somename2")
             .birthday(LocalDate.of(2000, 12, 28))
             .build();
 
@@ -145,5 +169,51 @@ public class UserControllerTest {
         assertEquals(user0.getLogin(),"anotherLogin");
         assertEquals(user0.getName(), "anotherName");
         assertEquals(user0.getBirthday(),LocalDate.of(2013, 12, 28));
+    }
+
+    @Test
+    public void addFriendMethodWithValidRequest() throws Exception {
+        inMemoryUserStorage.create(user0);
+        inMemoryUserStorage.create(user1);
+        userController.addFriend(user0.getId(), user1.getId());
+        assertEquals(user0.getFriends().contains(user1.getId()),  true);
+        assertEquals(user1.getFriends().contains(user0.getId()),  true);
+    }
+
+    @Test
+    public void removeFriendMethodWithValidRequest() throws Exception {
+        inMemoryUserStorage.create(user0);
+        inMemoryUserStorage.create(user1);
+        userController.addFriend(user0.getId(), user1.getId());
+        userController.removeFriend(user0.getId(), user1.getId());
+        assertEquals(user0.getFriends().contains(user1.getId()), false);
+        assertEquals(user1.getFriends().contains(user0.getId()), false);
+    }
+
+    @Test
+    void getMutualFriendsMethodTest() {
+        inMemoryUserStorage.create(user0);
+        inMemoryUserStorage.create(user1);
+        inMemoryUserStorage.create(user2);
+        userController.addFriend(user1.getId(), user0.getId());
+        userController.addFriend(user1.getId(), user2.getId());
+        Assertions.assertEquals(userController.getMutualFriends(user0.getId(), user2.getId()).get(0), user1);
+    }
+
+    @Test
+    void getUserByIdFriendsMethodTest() {
+        inMemoryUserStorage.create(user0);
+        Assertions.assertEquals(userController.getUserById(user0.getId()), user0);
+    }
+
+    @Test
+    void getFriendsMethodTest() {
+        inMemoryUserStorage.create(user0);
+        inMemoryUserStorage.create(user1);
+        inMemoryUserStorage.create(user2);
+        userController.addFriend(user0.getId(), user1.getId());
+        userController.addFriend(user0.getId(), user2.getId());
+        List<User> userList = new ArrayList<>(Arrays.asList(user1, user2));
+        Assertions.assertEquals(userController.getFriends(user0.getId()), userList);
     }
 }
