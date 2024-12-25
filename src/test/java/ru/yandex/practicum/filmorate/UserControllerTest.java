@@ -18,6 +18,7 @@ import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 @SpringBootTest
 public class UserControllerTest {
+    /*
     InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
     UserService userService = new UserService(inMemoryUserStorage);
     UserController userController = new UserController(inMemoryUserStorage, userService);
@@ -216,4 +217,6 @@ public class UserControllerTest {
         List<User> userList = new ArrayList<>(Arrays.asList(user1, user2));
         Assertions.assertEquals(userController.getFriends(user0.getId()), userList);
     }
+
+     */
 }

@@ -28,7 +28,6 @@ public class DatabaseUserStorage implements UserStorage {
         String sqlQuery =
                 "INSERT INTO users (email, login, name, birthday)" + "VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[] {"user_id"});
             stmt.setString(1, user.getEmail());
@@ -37,8 +36,22 @@ public class DatabaseUserStorage implements UserStorage {
             stmt.setObject(4, user.getBirthday());
             return stmt;
         }, keyHolder);
-
         user.setId(keyHolder.getKey().longValue());
+        return user;
+    }
+
+    @Override
+    public User update(User user) {
+        String sqlQuery = "update users set " +
+                "email = ?, login = ?, name = ?, birthday = ? " +
+                "where user_id = ?";
+
+        jdbcTemplate.update(sqlQuery
+                , user.getEmail()
+                , user.getLogin()
+                , user.getName()
+                , user.getBirthday()
+                , user.getId());
         return user;
     }
 
@@ -53,24 +66,16 @@ public class DatabaseUserStorage implements UserStorage {
         return Optional.empty();
     }
 
-    /*
-    public Optional<User> getUserById(long id) {
-        String sqlQuery = "select id, first_name, last_name, yearly_income " +
-                    "from employees where id = ?";
-
-  return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToEmployee, id);
-}
-    */
-
     @Override
     public Collection<User> findAll() {
-        return List.of();
+        String sqlQuery = "select user_id, email, login, name, birthday from users";
+        Collection<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
+        if (result.size() == 0 || result == null) {
+            return null;
+        }
+        return result;
     }
 
-    @Override
-    public User update(User newUser) {
-        return null;
-    }
 
 
 }

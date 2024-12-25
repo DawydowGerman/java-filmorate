@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -26,19 +27,22 @@ public class UserController {
         this.userStorage = userStorage;
     }
 
-    @GetMapping
-    public Collection<User> findAll() {
-        return userStorage.findAll();
-    }
-
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
-        return userStorage.create(user);
+    public UserDTO create(@Valid @RequestBody UserDTO userDto) {
+        return userService.create(userDto);
     }
 
     @PutMapping
-    public User update(@RequestBody User newUser) {
-        return userStorage.update(newUser);
+    public UserDTO update(@RequestBody UserDTO userDto) {
+        return userService.update(userDto);
+    }
+
+
+
+
+    @GetMapping
+    public Collection<User> findAll() {
+        return userStorage.findAll();
     }
 
     @PutMapping("/{id}/friends/{friendId}")
