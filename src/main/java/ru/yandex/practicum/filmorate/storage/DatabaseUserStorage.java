@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -9,34 +9,19 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
+@Repository
 @Component("DatabaseUserStorage")
 public class DatabaseUserStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public DatabaseUserStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    @Override
-    public Collection<User> findAll() {
-        return List.of();
-    }
+    private final UserRowMapper userRowMapper;
 
     @Override
     public User create(User user) {
@@ -45,7 +30,7 @@ public class DatabaseUserStorage implements UserStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[] {"id"});
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[] {"user_id"});
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getLogin());
             stmt.setString(3, user.getName());
@@ -58,12 +43,34 @@ public class DatabaseUserStorage implements UserStorage {
     }
 
     @Override
+    public Optional<User> getUserById(Long user_id) {
+        String sqlQuery = "select user_id, email, login, name, birthday " +
+                "from users where user_id = ?";
+        User user = jdbcTemplate.queryForObject(sqlQuery, userRowMapper, user_id);
+        if (user != null) {
+            return Optional.of(user);
+        }
+        return Optional.empty();
+    }
+
+    /*
+    public Optional<User> getUserById(long id) {
+        String sqlQuery = "select id, first_name, last_name, yearly_income " +
+                    "from employees where id = ?";
+
+  return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToEmployee, id);
+}
+    */
+
+    @Override
+    public Collection<User> findAll() {
+        return List.of();
+    }
+
+    @Override
     public User update(User newUser) {
         return null;
     }
 
-    @Override
-    public Optional<User> getUserById(Long id) {
-        return Optional.empty();
-    }
+
 }
