@@ -42,20 +42,20 @@ public class DatabaseUserStorage implements UserStorage {
                 "email = ?, login = ?, name = ?, birthday = ? " +
                 "where user_id = ?";
 
-        jdbcTemplate.update(sqlQuery ,
-                 user.getEmail() ,
-                 user.getLogin() ,
-                 user.getName() ,
-                 user.getBirthday() ,
+        jdbcTemplate.update(sqlQuery,
+                 user.getEmail(),
+                 user.getLogin(),
+                 user.getName(),
+                 user.getBirthday(),
                  user.getId());
         return user;
     }
 
     @Override
-    public Optional<User> getUserById(Long user_Id) {
+    public Optional<User> getUserById(Long userId) {
         String sqlQuery = "select user_id, email, login, name, birthday " +
                 "from users where user_id = ?";
-        User user = jdbcTemplate.queryForObject(sqlQuery, userRowMapper, user_Id);
+        User user = jdbcTemplate.queryForObject(sqlQuery, userRowMapper, userId);
         if (user != null) {
             return Optional.of(user);
         }
