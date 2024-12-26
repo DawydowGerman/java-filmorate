@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
 import org.postgresql.ds.PGSimpleDataSource;
-import ru.yandex.practicum.filmorate.dto.UserDTO;
-
 import java.sql.*;
 
 public class Main {

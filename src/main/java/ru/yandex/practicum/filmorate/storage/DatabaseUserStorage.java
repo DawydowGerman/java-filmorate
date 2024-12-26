@@ -7,13 +7,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
-
 import java.sql.PreparedStatement;
-
 import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
-
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -75,7 +71,4 @@ public class DatabaseUserStorage implements UserStorage {
         }
         return result;
     }
-
-
-
 }
