@@ -108,6 +108,11 @@ public class InMemoryUserStorage implements UserStorage {
         return Optional.empty();
     }
 
+    @Override
+    public boolean isUserIdExists(Long id) {
+        return false;
+    }
+
     public Optional<List<User>> getFriends(Long id) {
         List<User> result = new ArrayList<>();
         if (users.size() == 0) {

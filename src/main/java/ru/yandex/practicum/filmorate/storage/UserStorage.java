@@ -12,4 +12,6 @@ public interface UserStorage {
     User update(User newUser);
 
     Optional<User> getUserById(Long id);
+
+    boolean isUserIdExists(Long id);
 }

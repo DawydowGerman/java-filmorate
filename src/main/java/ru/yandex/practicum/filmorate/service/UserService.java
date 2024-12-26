@@ -61,8 +61,8 @@ public class UserService {
             log.error("Ошибка при обновлении данных юзера");
             throw new ValidationException("Id должен быть указан");
         }
-        Optional<User> user = userStorage.getUserById(userDto.getId());
-        if (user.isPresent()) {
+    //    Optional<User> user = userStorage.getUserById(userDto.getId());
+        if (userStorage.isUserIdExists(userDto.getId())) {
             if (userDto.getEmail() == null || userDto.getEmail().isBlank() || !userDto.getEmail().contains("@")) {
                 log.error("Ошибка при добавлении юзера");
                 throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
