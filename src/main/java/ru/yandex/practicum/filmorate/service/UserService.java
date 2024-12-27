@@ -128,7 +128,7 @@ public class UserService {
     }
 
     public List<User> getFriends(Long id) {
-        if (userStorage.isUserIdExists(id) ) {
+        if (userStorage.isUserIdExists(id)) {
             if (databaseFriendshipStorage.getFriends(id).isPresent()) {
                 return databaseFriendshipStorage.getFriends(id).get();
             } else return null;
