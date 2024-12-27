@@ -11,8 +11,8 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.DatabaseFriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-
 import ru.yandex.practicum.filmorate.dto.UserDTO;
 
 import java.time.LocalDate;
@@ -22,11 +22,13 @@ import java.util.*;
 @Data
 public class UserService {
     private UserStorage userStorage;
+    private DatabaseFriendshipStorage databaseFriendshipStorage;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    public UserService(@Qualifier("DatabaseUserStorage")UserStorage userStorage) {
+    public UserService(@Qualifier("DatabaseUserStorage")UserStorage userStorage, DatabaseFriendshipStorage databaseFriendshipStorage) {
         this.userStorage = userStorage;
+        this.databaseFriendshipStorage = databaseFriendshipStorage;
     }
 
     public UserDTO create(UserDTO userDto) {
@@ -34,6 +36,15 @@ public class UserService {
             log.error("Ошибка при добавлении юзера");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
         }
+        if (userStorage.findAll() != null && userStorage.findAll().size() > 0) {
+            for (User user0 : userStorage.findAll()) {
+                if (!user0.getId().equals(userDto.getId()) && user0.getEmail().equals(userDto.getEmail())) {
+                    log.error("Ошибка при обновлении данных юзера");
+                    throw new ValidationException("Этот имейл уже используется");
+                }
+            }
+        }
+        System.out.println("UserService class, 47 line");
         if (userDto.getLogin() == null || userDto.getLogin().isBlank() || userDto.getLogin().contains(" ")) {
             log.error("Ошибка при добавлении юзера");
             throw new ValidationException("Логин не может быть пустым и содержать пробелы");
@@ -61,7 +72,6 @@ public class UserService {
             log.error("Ошибка при обновлении данных юзера");
             throw new ValidationException("Id должен быть указан");
         }
-    //    Optional<User> user = userStorage.getUserById(userDto.getId());
         if (userStorage.isUserIdExists(userDto.getId())) {
             if (userDto.getEmail() == null || userDto.getEmail().isBlank() || !userDto.getEmail().contains("@")) {
                 log.error("Ошибка при добавлении юзера");
@@ -99,47 +109,39 @@ public class UserService {
         }
     }
 
-
-
-
-
-
-
-
-
-
-    public void addFriend(Long idUser0, Long idUser1) {
-        Optional<User> user0 = userStorage.getUserById(idUser0);
-        Optional<User> user1 = userStorage.getUserById(idUser1);
-        if (user0.isPresent() && user1.isPresent()) {
-            user0.get().setToFriends(user1.get().getId());
-            user1.get().setToFriends(user0.get().getId());
-            log.trace("Юзеры с id: " + idUser0 + ", " + idUser1 + " добавлены в друзья");
+    public void addFriend(Long id, Long friendId) {
+        if (userStorage.isUserIdExists(id) && userStorage.isUserIdExists(friendId)) {
+            databaseFriendshipStorage.addFriend(id, friendId);
         } else {
             log.error("Ошибка при добавлении в друзья");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");
         }
     }
 
-    public void removeFriend(Long idUser0, Long idUser1) {
-        Optional<User> user0 = userStorage.getUserById(idUser0);
-        Optional<User> user1 = userStorage.getUserById(idUser1);
-        if (user0.isEmpty()) {
-            log.error("Ошибка при удалении из друзей");
-            throw new NotFoundException("Юзер с id " + idUser0 + " отсутствует");
-        }
-        if (user1.isEmpty()) {
-            log.error("Ошибка при удалении из друзей");
-            throw new NotFoundException("Юзер с id " + idUser1 + " отсутствует");
-        }
-        if (user0.isPresent()
-                && user1.isPresent()
-                && user0.get().isFriend(user1.get().getId())) {
-            user0.get().removeFromFriends(user1.get().getId());
-            user1.get().removeFromFriends(user0.get().getId());
-            log.trace("Юзеры с id: " + idUser0 + ", " + idUser1 + " удалены из друзей");
+    public void removeFriend(Long id, Long friendId) {
+        if (userStorage.isUserIdExists(id) && userStorage.isUserIdExists(friendId)) {
+            databaseFriendshipStorage.removeFriend(id, friendId);
+        } else {
+            log.error("Ошибка при добавлении в друзья");
+            throw new NotFoundException("Один из юзеров либо оба отсутствуют");
         }
     }
+
+    public List<User> getFriends(Long id) {
+        if (userStorage.isUserIdExists(id) ) {
+            if (databaseFriendshipStorage.getFriends(id).isPresent()) {
+                return databaseFriendshipStorage.getFriends(id).get();
+            } else return null;
+        } else {
+            log.error("Ошибка при добавлении в друзья");
+            throw new NotFoundException("Юзер отсутствуют");
+        }
+    }
+
+
+
+
+
 
     public List<User> getMutualFriends(Long idUser0, Long idUser1) {
         Optional<User> user0 = userStorage.getUserById(idUser0);

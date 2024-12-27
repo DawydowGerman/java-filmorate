@@ -15,6 +15,41 @@ public class InMemoryUserStorage implements UserStorage {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final Map<Long, User> users = new HashMap<>();
 
+    public void removeFriend(Long id, Long friendId) {
+    }
+
+    public void addFriend(Long id, Long friendId) {
+        if (users.containsKey(id) && users.containsKey(friendId)) {
+           users.get(id).setToFriends(users.get(friendId).getId());
+            log.trace("Юзер с id: " + id + " добавил в друзья юзера с id" + friendId);
+        } else {
+            log.error("Ошибка при добавлении в друзья");
+            throw new NotFoundException("Один из юзеров либо оба отсутствуют");
+        }
+    }
+
+    /*
+        public void removeFriend(Long idUser0, Long idUser1) {
+        Optional<User> user0 = userStorage.getUserById(idUser0);
+        Optional<User> user1 = userStorage.getUserById(idUser1);
+        if (user0.isEmpty()) {
+            log.error("Ошибка при удалении из друзей");
+            throw new NotFoundException("Юзер с id " + idUser0 + " отсутствует");
+        }
+        if (user1.isEmpty()) {
+            log.error("Ошибка при удалении из друзей");
+            throw new NotFoundException("Юзер с id " + idUser1 + " отсутствует");
+        }
+        if (user0.isPresent()
+                && user1.isPresent()
+                && user0.get().isFriend(user1.get().getId())) {
+            user0.get().removeFromFriends(user1.get().getId());
+            user1.get().removeFromFriends(user0.get().getId());
+            log.trace("Юзеры с id: " + idUser0 + ", " + idUser1 + " удалены из друзей");
+        }
+    }
+    */
+
     public Collection<User> findAll() {
         if (users.size() == 0) {
             log.error("Ошибка при получении списка юзеров");

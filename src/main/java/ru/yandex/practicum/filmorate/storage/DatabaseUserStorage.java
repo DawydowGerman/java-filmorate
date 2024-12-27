@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.sql.PreparedStatement;
 import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -63,9 +64,9 @@ public class DatabaseUserStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         String sqlQuery = "select user_id, email, login, name, birthday from users";
-        Collection<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
+        List<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
         if (result.size() == 0 || result == null) {
             return null;
         }

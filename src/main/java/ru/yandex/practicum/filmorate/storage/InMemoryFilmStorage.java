@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+
 import java.time.LocalDate;
 import java.util.*;
 
@@ -109,4 +111,18 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.error("Ошибка при получении списка юзеров");
         return Optional.empty();
     }
+/*
+    public void addFriend(Long idUser0, Long idUser1) {
+        Optional<User> user0 = userStorage.getUserById(idUser0);
+        Optional<User> user1 = userStorage.getUserById(idUser1);
+        if (user0.isPresent() && user1.isPresent()) {
+            user0.get().setToFriends(user1.get().getId());
+            user1.get().setToFriends(user0.get().getId());
+            log.trace("Юзеры с id: " + idUser0 + ", " + idUser1 + " добавлены в друзья");
+        } else {
+            log.error("Ошибка при добавлении в друзья");
+            throw new NotFoundException("Один из юзеров либо оба отсутствуют");
+        }
+    }
+ */
 }

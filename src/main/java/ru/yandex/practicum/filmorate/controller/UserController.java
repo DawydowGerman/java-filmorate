@@ -36,14 +36,6 @@ public class UserController {
         return userService.update(userDto);
     }
 
-
-
-
-    @GetMapping
-    public Collection<User> findAll() {
-        return userStorage.findAll();
-    }
-
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
         userService.addFriend(id, friendId);
@@ -55,16 +47,18 @@ public class UserController {
         userService.removeFriend(id, friendId);
     }
 
-    /*
+    @GetMapping
+    public Collection<User> findAll() {
+        return userStorage.findAll();
+    }
+
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable Long id) {
-        Optional<List<User>> friendsList = inMemoryUserStorage.getFriends(id);
-        if (friendsList.isPresent()) {
-            return friendsList.get();
+        if (userService.getFriends(id) != null && userService.getFriends(id).size() > 0) {
+            return userService.getFriends(id);
         } else return Collections.emptyList();
     }
-     */
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getMutualFriends(@PathVariable Long id, @PathVariable Long otherId) {
