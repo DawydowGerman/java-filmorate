@@ -37,6 +37,27 @@ public class DatabaseUserStorage implements UserStorage {
     }
 
     @Override
+    public Optional<User> getUserById(Long userId) {
+        String sqlQuery = "select user_id, email, login, name, birthday " +
+                "from users where user_id = ?";
+        User user = jdbcTemplate.queryForObject(sqlQuery, userRowMapper, userId);
+        if (user != null) {
+            return Optional.of(user);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<List<User>> findAll() {
+        String sqlQuery = "select user_id, email, login, name, birthday from users";
+        List<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
+        if (result.size() != 0 || result != null) {
+            return Optional.of(result);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public User update(User user) {
         String sqlQuery = "update users set " +
                 "email = ?, login = ?, name = ?, birthday = ? " +
@@ -52,24 +73,9 @@ public class DatabaseUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> getUserById(Long userId) {
-        String sqlQuery = "select user_id, email, login, name, birthday " +
-                "from users where user_id = ?";
-        User user = jdbcTemplate.queryForObject(sqlQuery, userRowMapper, userId);
-        if (user != null) {
-            return Optional.of(user);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public List<User> findAll() {
-        String sqlQuery = "select user_id, email, login, name, birthday from users";
-        List<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
-        if (result.size() == 0 || result == null) {
-            return null;
-        }
-        return result;
+    public boolean remove(Long id) {
+        String sqlQuery = "DELETE FROM users WHERE user_id = ?";
+        return jdbcTemplate.update(sqlQuery, id) > 0;
     }
 
     public boolean isUserIdExists(Long id) {

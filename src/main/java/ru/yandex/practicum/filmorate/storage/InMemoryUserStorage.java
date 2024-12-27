@@ -12,6 +12,11 @@ import java.util.*;
 
 @Component("InMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
+    @Override
+    public Optional<List<User>> findAll() {
+        return Optional.empty();
+    }
+
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final Map<Long, User> users = new HashMap<>();
 
@@ -48,14 +53,16 @@ public class InMemoryUserStorage implements UserStorage {
             log.trace("Юзеры с id: " + idUser0 + ", " + idUser1 + " удалены из друзей");
         }
     }
-    */
 
-    public Collection<User> findAll() {
+
+    public Optional<List<User>> findAll() {
         if (users.size() == 0) {
             log.error("Ошибка при получении списка юзеров");
             return null;
         } else return users.values();
     }
+     */
+
 
     @Override
     public User create(User user) {
@@ -131,6 +138,11 @@ public class InMemoryUserStorage implements UserStorage {
         throw new NotFoundException("Юзер с id = " + newUser.getId() + " не найден");
     }
 
+    @Override
+    public boolean remove(Long id) {
+        return true;
+    }
+
     public Optional<User> getUserById(Long id) {
         if (users.size() == 0) {
             log.error("Ошибка при получении списка юзеров");
@@ -166,4 +178,29 @@ public class InMemoryUserStorage implements UserStorage {
         log.error("Ошибка при получении списка юзеров");
         return Optional.empty();
     }
+
+    /*
+        public List<User> getMutualFriends(Long idUser0, Long idUser1) {
+        Optional<User> user0 = userStorage.getUserById(idUser0);
+        Optional<User> user1 = userStorage.getUserById(idUser1);
+        List<User> result = new ArrayList<>();
+        if (user0.isPresent() && user1.isPresent()) {
+            for (User user : this.findAll()) {
+                if (user.getFriends().contains(user0.get().getId())
+                        && user.getFriends().contains(user1.get().getId())) {
+                    result.add(user);
+                }
+            }
+            if (result.size() == 0) {
+                log.error("Ошибка при получении общих друзей");
+                throw new NotFoundException("Юзеры не имеют общих друзей");
+            }
+            log.trace("Возвращен список общих друзей");
+            return result;
+        } else {
+            log.error("Ошибка при получении общих друзей");
+            throw new NotFoundException("Один из юзеров либо оба отсутствуют");
+        }
+    }
+    */
 }

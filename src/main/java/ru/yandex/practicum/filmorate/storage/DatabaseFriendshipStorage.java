@@ -38,4 +38,20 @@ public class DatabaseFriendshipStorage {
         }
         return Optional.empty();
     }
+
+    public Optional<List<User>> getMutualFriends(Long idUser0, Long idUser1) {
+        String sqlQuery = "select * " +
+                "from users " +
+                "where user_id IN (SELECT friend_id " +
+                                  "FROM (SELECT friend_id " +
+                                        "FROM friendship " +
+                                        "WHERE user_id = " + idUser0 + " OR user_id = " + idUser1 + ")" +
+                                  "GROUP BY friend_id " +
+                                  "HAVING COUNT(friend_id) > 1)";
+        List<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
+        if (result != null && result.size() > 0) {
+            return Optional.of(result);
+        }
+        return Optional.empty();
+    }
 }

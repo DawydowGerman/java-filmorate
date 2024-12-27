@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
@@ -10,7 +9,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
 
@@ -18,17 +16,25 @@ import java.util.*;
 @RequestMapping("/users")
 public class UserController {
     private UserService userService;
-    private UserStorage userStorage;
 
     @Autowired
-    public UserController(@Qualifier("DatabaseUserStorage")UserStorage userStorage, UserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userStorage = userStorage;
     }
 
     @PostMapping
     public UserDTO create(@Valid @RequestBody UserDTO userDto) {
         return userService.create(userDto);
+    }
+
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable Long userId) {
+        return userService.getUserById(userId);
+    }
+
+    @GetMapping
+    public List<User> findAll() {
+        return userService.findAll();
     }
 
     @PutMapping
@@ -47,11 +53,6 @@ public class UserController {
         userService.removeFriend(id, friendId);
     }
 
-    @GetMapping
-    public Collection<User> findAll() {
-        return userStorage.findAll();
-    }
-
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable Long id) {
@@ -63,14 +64,6 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getMutualFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return userService.getMutualFriends(id, otherId);
-    }
-
-    @GetMapping("/{userId}")
-    public User getUserById(@PathVariable Long userId) {
-        Optional<User> user = userStorage.getUserById(userId);
-        if (user.isPresent()) {
-            return user.get();
-        } else throw new NotFoundException("Юзер с " + userId + " отсутствует.");
     }
 
     @ExceptionHandler
