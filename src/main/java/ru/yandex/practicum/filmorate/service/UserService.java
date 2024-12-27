@@ -75,7 +75,7 @@ public class UserService {
     }
 
     public List<User> findAll() {
-        Optional <List<User>> userList = userStorage.findAll();
+        Optional<List<User>> userList = userStorage.findAll();
         if (userList.isPresent()) {
             return userList.get();
         } else throw new NotFoundException("Список юзеров пуст.");
