@@ -38,7 +38,4 @@ public class DatabaseFriendshipStorage {
         }
         return Optional.empty();
     }
-
-
-
 }

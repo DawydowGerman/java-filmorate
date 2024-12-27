@@ -138,11 +138,6 @@ public class UserService {
         }
     }
 
-
-
-
-
-
     public List<User> getMutualFriends(Long idUser0, Long idUser1) {
         Optional<User> user0 = userStorage.getUserById(idUser0);
         Optional<User> user1 = userStorage.getUserById(idUser1);
