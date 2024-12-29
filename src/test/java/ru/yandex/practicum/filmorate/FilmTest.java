@@ -20,21 +20,21 @@ class FilmTest {
                 .name("film0")
                 .description("some desc0")
                 .releaseDate(LocalDate.of(2022, 12, 28))
-                .duration(Integer.valueOf(120))
+                .duration(Long.valueOf(120))
                 .build();
         film1 = Film.builder()
                 .id(Long.valueOf(44))
                 .name("film1")
                 .description("some desc1")
                 .releaseDate(LocalDate.of(2012,12,28))
-                .duration(Integer.valueOf(134))
+                .duration(Long.valueOf(134))
                 .build();
         film2 = Film.builder()
                 .id(Long.valueOf(44))
                 .name("film1")
                 .description("some desc1")
                 .releaseDate(LocalDate.of(2012,12,28))
-                .duration(Integer.valueOf(134))
+                .duration(Long.valueOf(134))
                 .build();
     }
 
@@ -89,7 +89,7 @@ class FilmTest {
 
     @Test
     void setDurationDateMethodTest() {
-        film0.setDuration(Integer.valueOf(160));
+        film0.setDuration(Long.valueOf(160));
         Assertions.assertEquals(film0.getDuration(), Integer.valueOf(160));
     }
 
