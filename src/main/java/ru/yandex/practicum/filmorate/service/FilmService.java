@@ -29,7 +29,7 @@ public class FilmService {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Autowired
-    public FilmService( @Qualifier("DatabaseFilmStorage")FilmStorage filmStorage,
+    public FilmService(@Qualifier("DatabaseFilmStorage")FilmStorage filmStorage,
                         @Qualifier("DatabaseUserStorage")UserStorage userStorage,
                         DatabaseFilmGenresStorage databaseFilmGenresStorage) {
         this.filmStorage = filmStorage;
@@ -77,7 +77,7 @@ public class FilmService {
         }
         Film film = FilmMapper.toModel(filmDTO);
         film = filmStorage.create(film);
-        if(film.getGenres() != null && film.getGenres().size() > 0) {
+        if (film.getGenres() != null && film.getGenres().size() > 0) {
             databaseFilmGenresStorage.saveFilmGenres(film);
         }
         return FilmMapper.toDto(film);
