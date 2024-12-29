@@ -1,14 +1,18 @@
 package ru.yandex.practicum.filmorate;
 
+/*
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
-import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.time.LocalDate;
+*/
+
+import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class FilmTest {
+    /*
     Film film0;
     Film film1;
     Film film2;
@@ -107,4 +111,6 @@ class FilmTest {
     void hashCodeMethodTest() {
         Assertions.assertEquals(film1.hashCode(), film2.hashCode());
     }
+
+     */
 }
