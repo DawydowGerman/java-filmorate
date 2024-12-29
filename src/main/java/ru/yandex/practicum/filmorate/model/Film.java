@@ -3,9 +3,10 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 import lombok.Builder;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import jakarta.validation.constraints.*;
+
+import static java.lang.Long.valueOf;
 
 @Data
 @Builder
@@ -20,13 +21,18 @@ public class Film implements Comparable<Film> {
     @Builder.Default
     private LocalDate releaseDate = LocalDate.of(2000, 12,28);
     @Builder.Default
-    private Integer duration = Integer.valueOf(110);
+    private Long duration = Long.valueOf(110);
+    @Builder.Default
+  //  private Mpa mpa = new Mpa(Long.valueOf(0));
+    private Mpa mpa = new Mpa(valueOf(0));
+    @Builder.Default
+    private List<Genre> genres = new ArrayList<>();
+
+    // DECIDE TO DO:
     @Builder.Default
     private Set<Long> likes = new HashSet<>();
-    @Builder.Default
-    private Set<Genre> genres = new HashSet<>();
-    @Builder.Default
-    private MpaRating mpaRating = MpaRating.G;
+ //   @Builder.Default
+ //   private MpaRating mpaRating = MpaRating.G;
 
     public void addLike(Long userId) {
         likes.add(userId);

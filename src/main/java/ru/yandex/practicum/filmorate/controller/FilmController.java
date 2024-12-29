@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.FilmDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -24,14 +25,14 @@ public class FilmController {
         this.filmService = filmService;
     }
 
+    @PostMapping
+    public FilmDTO create(@Valid @RequestBody FilmDTO filmDTO) {
+        return filmService.create(filmDTO);
+    }
+
     @GetMapping
     public Collection<Film> findAll() {
         return inMemoryFilmStorage.findAll();
-    }
-
-    @PostMapping
-    public Film create(@Valid @RequestBody Film film) {
-        return inMemoryFilmStorage.create(film);
     }
 
     @PutMapping

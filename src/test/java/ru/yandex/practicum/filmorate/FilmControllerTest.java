@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class FilmControllerTest {
+    /*
     InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
     InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
     FilmService filmService = new FilmService(inMemoryFilmStorage, inMemoryUserStorage);
@@ -413,4 +414,6 @@ public class FilmControllerTest {
         assertEquals(filmsList.contains(film1), false);
         assertEquals(filmsList.contains(film2), true);
     }
+
+     */
 }

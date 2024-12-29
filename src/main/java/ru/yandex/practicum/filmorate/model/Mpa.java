@@ -3,21 +3,21 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 
 @Data
-public class Genre {
+public class Mpa {
     private Long id;
 
-    public Genre() {
+    public Mpa() {
     }
 
-    public Genre(Long id) {
+    public Mpa(Long id) {
         this.id = id;
     }
 
-    public Genre(String id) {
+    public Mpa(String id) {
         this.id = Long.parseLong(id);
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
