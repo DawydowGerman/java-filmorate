@@ -12,13 +12,13 @@ import java.util.*;
 
 @Component("InMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private final Map<Long, User> users = new HashMap<>();
+
     @Override
     public Optional<List<User>> findAll() {
         return Optional.empty();
     }
-
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final Map<Long, User> users = new HashMap<>();
 
     public void removeFriend(Long id, Long friendId) {
     }
