@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -38,18 +39,6 @@ public class FilmService {
     }
 
     public FilmDTO create(FilmDTO filmDTO) {
-
-        /*
-        // TEST WHAT TO COME IN create():
-        System.out.println("filmDTO: 1)NAME: " +
-                filmDTO.getName() +
-                " 2)DESC: " + filmDTO.getDescription() +
-                " 3)RELEASEDATE: " + filmDTO.getReleaseDate() +
-                " 4)DURATION: " + filmDTO.getDuration() +
-                " 5)MPA_ID " + filmDTO.getMpa().getId() +
-                " 6)GENRES_SIZE: " + filmDTO.getGenres().size());
-         */
-
         if (filmDTO.getName() == null || filmDTO.getName().isBlank()) {
             log.error("Ошибка при добавлении фильма");
             throw new ValidationException("Название не может быть пустым");
@@ -75,6 +64,16 @@ public class FilmService {
             log.error("Ошибка при добавлении фильма");
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
         }
+        if (filmDTO.getMpa().getId() > 5) {
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("MPA рэйтинг не может быть больше 5");
+        }
+        for (Genre genre : filmDTO.getGenres()) {
+            if (genre.getId() > 6) {
+                log.error("Ошибка при добавлении фильма");
+                throw new ValidationException("Жанр не может иметь ID больше 6");
+            }
+        }
         Film film = FilmMapper.toModel(filmDTO);
         film = filmStorage.create(film);
         if (film.getGenres() != null && film.getGenres().size() > 0) {
@@ -82,13 +81,6 @@ public class FilmService {
         }
         return FilmMapper.toDto(film);
     }
-
-
-
-
-
-
-
 
     public void giveLike(Long userId, Long filmId) {
         Optional<User> user = userStorage.getUserById(userId);
