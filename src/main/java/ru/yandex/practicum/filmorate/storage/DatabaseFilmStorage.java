@@ -31,7 +31,6 @@ public class DatabaseFilmStorage implements FilmStorage {
             stmt.setString(2, film.getDescription());
             stmt.setObject(3, film.getReleaseDate());
             stmt.setLong(4, film.getDuration());
-        //    stmt.setObject(5, film.getMpa());
             stmt.setLong(5, film.getMpa().getId());
             return stmt;
         }, keyHolder);
@@ -45,12 +44,28 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film newFilm) {
-        return null;
+    public Film update(Film film) {
+        String sqlQuery = "update films set " +
+                "name = ?, description = ?, releasedate = ?, duration = ?, mparating_id = ? " +
+                "where film_id = ?";
+
+        jdbcTemplate.update(sqlQuery,
+                film.getName(),
+                film.getDescription(),
+                film.getReleaseDate(),
+                film.getDuration(),
+                film.getMpa().getId());
+        return film;
     }
 
     @Override
     public Optional<Film> getFilmById(Long id) {
         return Optional.empty();
+    }
+
+    public boolean isFilmIdExists(Long id) {
+        String sql = "SELECT count(*) FROM films WHERE film_id = ?";
+        int count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
+        return count > 0;
     }
 }

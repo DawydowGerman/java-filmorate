@@ -23,7 +23,6 @@ public class Film implements Comparable<Film> {
     @Builder.Default
     private Long duration = Long.valueOf(110);
     @Builder.Default
-  //  private Mpa mpa = new Mpa(Long.valueOf(0));
     private Mpa mpa = new Mpa(valueOf(0));
     @Builder.Default
     private List<Genre> genres = new ArrayList<>();

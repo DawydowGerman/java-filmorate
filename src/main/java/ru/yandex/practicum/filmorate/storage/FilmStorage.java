@@ -12,4 +12,6 @@ public interface FilmStorage {
     Film update(Film newFilm);
 
     Optional<Film> getFilmById(Long id);
+
+    public boolean isFilmIdExists(Long id);
 }

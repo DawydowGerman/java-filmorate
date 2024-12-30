@@ -12,6 +12,11 @@ import java.util.*;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
+    @Override
+    public boolean isFilmIdExists(Long id) {
+        return false;
+    }
+
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Long, Film> films = new HashMap<>();
 
