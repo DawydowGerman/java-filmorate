@@ -7,11 +7,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.jdbc.support.KeyHolder;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
 
 import java.sql.PreparedStatement;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,7 +81,7 @@ public class DatabaseFilmStorage implements FilmStorage {
                 "                                  FROM LIKES\n" +
                 "                                  GROUP BY FILM_ID\n" +
                 "                                  ORDER BY count_value desc))\n" +
-                "ORDER BY FILM_ID asc";
+                "ORDER BY FILM_ID desc";
         List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
         return result;
     }
