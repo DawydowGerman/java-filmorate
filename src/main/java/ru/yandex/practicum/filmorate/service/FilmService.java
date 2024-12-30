@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
+import ru.yandex.practicum.filmorate.storage.DatabaseLikesStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -27,15 +28,18 @@ public class FilmService {
     private FilmStorage filmStorage;
     private DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private UserStorage userStorage;
+    private DatabaseLikesStorage databaseLikesStorage;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Autowired
     public FilmService(@Qualifier("DatabaseFilmStorage")FilmStorage filmStorage,
                         @Qualifier("DatabaseUserStorage")UserStorage userStorage,
-                        DatabaseFilmGenresStorage databaseFilmGenresStorage) {
+                        DatabaseFilmGenresStorage databaseFilmGenresStorage,
+                        DatabaseLikesStorage databaseLikesStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.databaseFilmGenresStorage = databaseFilmGenresStorage;
+        this.databaseLikesStorage = databaseLikesStorage;
     }
 
     public FilmDTO create(FilmDTO filmDTO) {
@@ -80,6 +84,13 @@ public class FilmService {
             databaseFilmGenresStorage.saveFilmGenres(film);
         }
         return FilmMapper.toDto(film);
+    }
+
+    public List<Film> findAll() {
+        Optional<List<Film>> filmList = filmStorage.findAll();
+        if (filmList.isPresent()) {
+            return filmList.get();
+        } else throw new NotFoundException("Список фильмов пуст.");
     }
 
     public FilmDTO update(FilmDTO filmDTO) {
@@ -136,18 +147,12 @@ public class FilmService {
     }
 
     public void giveLike(Long userId, Long filmId) {
-        Optional<User> user = userStorage.getUserById(userId);
-        if (user.isEmpty()) {
-            log.error("Ошибка при удалении из друзей");
-            throw new NotFoundException("Юзер с id " + userId + " отсутствует");
-        }
-        Optional<Film> film0 = filmStorage.getFilmById(filmId);
-        if (film0.isPresent()) {
-            film0.get().addLike(userId);
+        if (userStorage.isUserIdExists(userId) && filmStorage.isFilmIdExists(filmId)) {
+            databaseLikesStorage.saveFilmLikes(userId, filmId);
             log.trace("Фильму с Id {} поставлен лайк", filmId);
         } else {
             log.error("Ошибка при добавлении лайка");
-            throw new NotFoundException("Фильм с " + filmId + " отсутствует.");
+            throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
         }
     }
 
@@ -168,12 +173,16 @@ public class FilmService {
     }
 
     public List<Film> getMostPopularFilms(Integer count) {
-        List<Film> allFilmsList = new ArrayList<>(filmStorage.findAll());
-        int numberToRemove = allFilmsList.size() - count;
-        Collections.sort(allFilmsList);
-        for (int i = 0; i < numberToRemove; i++) {
-            allFilmsList.removeLast();
+        if (filmStorage.findAll().isPresent()) {
+            List<Film> allFilmsList = filmStorage.getMostPopularFilms();
+            int numberToRemove = allFilmsList.size() - count;
+            for (int i = 0; i < numberToRemove; i++) {
+                allFilmsList.removeLast();
+            }
+            return allFilmsList;
+        } else {
+            log.error("Ошибка при удалении лайка");
+            throw new NotFoundException("Список фильмов пуст");
         }
-        return allFilmsList;
     }
 }

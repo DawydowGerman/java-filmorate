@@ -13,19 +13,31 @@ import java.util.*;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     @Override
-    public boolean isFilmIdExists(Long id) {
-        return false;
+    public List<Film> getMostPopularFilms() {
+        return List.of();
+    }
+
+    @Override
+    public Optional<List<Film>> findAll() {
+        return Optional.empty();
     }
 
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Long, Film> films = new HashMap<>();
 
-    public Collection<Film> findAll() {
+    @Override
+    public boolean isFilmIdExists(Long id) {
+        return false;
+    }
+
+    /*
+    public Optional<Film> findAll() {
         if (films.size() == 0) {
             log.error("Ошибка при получении списка фильмов");
             return null;
         } else return films.values();
     }
+    */
 
     public Film create(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {

@@ -31,8 +31,8 @@ public class FilmController {
     }
 
     @GetMapping
-    public Collection<Film> findAll() {
-        return inMemoryFilmStorage.findAll();
+    public List<Film> findAll() {
+        return filmService.findAll();
     }
 
     @PutMapping

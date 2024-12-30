@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.jdbc.support.KeyHolder;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
 
 import java.sql.PreparedStatement;
 import java.util.Collection;
@@ -18,6 +20,7 @@ import java.util.Optional;
 @Component("DatabaseFilmStorage")
 public class DatabaseFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final FilmRowMapper filmRowMapper;
 
     @Override
     public Film create(Film film) {
@@ -39,8 +42,14 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> findAll() {
-        return List.of();
+    public Optional<List<Film>> findAll() {
+        String sqlQuery = "select film_id, name, description, releasedate, duration, mparating_id " +
+                "from films";
+         List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
+        if (result.size() != 0 || result != null) {
+            return Optional.of(result);
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -62,6 +71,21 @@ public class DatabaseFilmStorage implements FilmStorage {
     @Override
     public Optional<Film> getFilmById(Long id) {
         return Optional.empty();
+    }
+
+    public List<Film> getMostPopularFilms() {
+        String sqlQuery = "SELECT *\n" +
+                "FROM FILMS\n" +
+                "WHERE FILM_ID IN\n" +
+                "               (SELECT FILM_ID\n" +
+                "                             FROM (SELECT FILM_ID,\n" +
+                "                                  COUNT (FILM_ID) as count_value\n" +
+                "                                  FROM LIKES\n" +
+                "                                  GROUP BY FILM_ID\n" +
+                "                                  ORDER BY count_value desc))\n" +
+                "ORDER BY FILM_ID asc";
+        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
+        return result;
     }
 
     public boolean isFilmIdExists(Long id) {
