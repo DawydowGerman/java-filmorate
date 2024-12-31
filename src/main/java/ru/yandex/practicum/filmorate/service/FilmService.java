@@ -157,18 +157,12 @@ public class FilmService {
     }
 
     public void removeLike(Long userId, Long filmId) {
-        Optional<User> user = userStorage.getUserById(userId);
-        if (user.isEmpty()) {
-            log.error("Ошибка при удалении из друзей");
-            throw new NotFoundException("Юзер с id " + userId + " отсутствует");
-        }
-        Optional<Film> film0 = filmStorage.getFilmById(filmId);
-        if (film0.isPresent()) {
-            film0.get().removeLike(userId);
-            log.trace("Фильму с Id {} удален лайк", filmId);
+        if (userStorage.isUserIdExists(userId) && filmStorage.isFilmIdExists(filmId)) {
+            databaseLikesStorage.removeFilmLikes(userId, filmId);
+            log.trace("Для фильма с Id {} удален лайк", filmId);
         } else {
-            log.error("Ошибка при удалении лайка");
-            throw new NotFoundException("Фильм с " + filmId + " отсутствует.");
+            log.error("Ошибка при удаленнии лайка");
+            throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
         }
     }
 

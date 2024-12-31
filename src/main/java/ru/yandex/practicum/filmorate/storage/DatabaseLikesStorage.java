@@ -16,4 +16,9 @@ public class DatabaseLikesStorage {
                 "values (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }
+
+    public void removeFilmLikes(Long userId, Long filmId) {
+        String sqlQuery = "delete from likes where user_id = ? and film_id = ?";
+        jdbcTemplate.update(sqlQuery, userId, filmId);
+    }
 }
