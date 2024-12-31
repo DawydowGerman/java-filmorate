@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
 import ru.yandex.practicum.filmorate.storage.DatabaseLikesStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
