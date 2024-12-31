@@ -6,7 +6,8 @@ import ru.yandex.practicum.filmorate.model.enums.MpaRating;
 @Data
 public class Mpa {
     private Long id;
-    private MpaRating mpaRating;
+//    private MpaRating mpaRating;
+    private String name;
 
     public Mpa() {
     }
@@ -21,7 +22,8 @@ public class Mpa {
 
     public Mpa(Long id, String mpaRating) {
         this.id = id;
-        this.mpaRating = MpaRating.valueOf(mpaRating);
+        this.name = mpaRating;
+        // this.mpaRating = MpaRating.valueOf(mpaRating);
     }
 
     public long getId() {
@@ -32,6 +34,16 @@ public class Mpa {
         this.id = id;
     }
 
+    public String getMpaRating() {
+        return name;
+    }
+
+    public void setMpaRating(String mpaRating) {
+        this.name = mpaRating;
+    }
+
+
+    /*
     public MpaRating getMpaRating() {
         return mpaRating;
     }
@@ -39,4 +51,6 @@ public class Mpa {
     public void setMpaRating(MpaRating mpaRating) {
         this.mpaRating = mpaRating;
     }
+
+     */
 }

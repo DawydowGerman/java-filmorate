@@ -19,6 +19,8 @@ import ru.yandex.practicum.filmorate.storage.*;
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.lang.Long.valueOf;
+
 @Service
 @Data
 public class FilmService {
@@ -180,19 +182,38 @@ public class FilmService {
         }
     }
 
-    public Mpa getMpaById(Long mpaId) {
-        Optional<Mpa> mpa = databaseMpaStorage.getMpaById(mpaId);
-        if (mpa.isPresent()) {
-            return mpa.get();
-        } else {
-            throw new NotFoundException("Mpa с " + mpaId + " отсутствует.");
+    public Mpa getMpaById(Integer mpaId) {
+        if (mpaId > 5 || mpaId < 1) {
+            throw new NotFoundException("MPA с " + mpaId + " отсутствует.");
         }
+        Mpa mpa = new Mpa();
+        switch (mpaId) {
+            case 1:
+                mpa = new Mpa(valueOf(1), "G");
+                break;
+            case 2:
+                mpa = new Mpa(valueOf(2), "PG");
+                break;
+            case 3:
+                mpa = new Mpa(valueOf(3), "PG-13");
+                break;
+            case 4:
+                mpa = new Mpa(valueOf(4), "R");
+                break;
+            case 5:
+                mpa = new Mpa(valueOf(5), "NC-17");
+                break;
+        }
+        return mpa;
     }
 
     public List<Mpa> getAllMpa() {
-        Optional<List<Mpa>> mpaList = databaseMpaStorage.findAll();
-        if (mpaList.isPresent()) {
-            return mpaList.get();
-        } else throw new NotFoundException("Список mpa пуст.");
+        List<Mpa> mpaList = new ArrayList<>();
+        mpaList.add(new Mpa(valueOf(1), "G"));
+        mpaList.add(new Mpa(valueOf(2), "PG"));
+        mpaList.add(new Mpa(valueOf(3), "PG-13"));
+        mpaList.add(new Mpa(valueOf(4), "R"));
+        mpaList.add(new Mpa(valueOf(5), "NC-17"));
+        return mpaList;
     }
 }

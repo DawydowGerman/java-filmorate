@@ -5,5 +5,5 @@ public enum MpaRating {
     PG,
     PG_13,
     R,
-    NC
+    NC_17
 }
