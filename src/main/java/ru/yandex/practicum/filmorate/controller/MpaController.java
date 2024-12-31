@@ -19,7 +19,6 @@ public class MpaController {
     public MpaController(FilmService filmService) {
         this.filmService = filmService;
     }
-    // GET http://localhost:8080/mpa/2
 
     @GetMapping("/{mpaId}")
     public Mpa getMpaById(@PathVariable Long mpaId) {

@@ -184,7 +184,9 @@ public class FilmService {
         Optional<Mpa> mpa = databaseMpaStorage.getMpaById(mpaId);
         if (mpa.isPresent()) {
             return mpa.get();
-        } else throw new NotFoundException("Mpa с " + mpaId + " отсутствует.");
+        } else {
+            throw new NotFoundException("Mpa с " + mpaId + " отсутствует.");
+        }
     }
 
     public List<Mpa> getAllMpa() {
