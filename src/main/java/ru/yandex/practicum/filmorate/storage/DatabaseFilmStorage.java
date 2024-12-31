@@ -72,16 +72,28 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     public List<Film> getMostPopularFilms() {
-        String sqlQuery = "SELECT *\n" +
-                "FROM FILMS\n" +
-                "WHERE FILM_ID IN\n" +
-                "               (SELECT FILM_ID\n" +
-                "                             FROM (SELECT FILM_ID,\n" +
-                "                                  COUNT (FILM_ID) as count_value\n" +
-                "                                  FROM LIKES\n" +
-                "                                  GROUP BY FILM_ID\n" +
-                "                                  ORDER BY count_value desc))\n" +
-                "ORDER BY FILM_ID desc";
+        String sqlQuery = "SELECT FILM_ID,\n" +
+                "       NAME,\n" +
+                "       DESCRIPTION,\n" +
+                "       RELEASEDATE,\n" +
+                "       DURATION,\n" +
+                "       MPARATING_ID\n" +
+                "FROM (\n" +
+                "\n" +
+                "select f.FILM_ID,\n" +
+                "       f.NAME,\n" +
+                "       f.DESCRIPTION,\n" +
+                "       f.RELEASEDATE,\n" +
+                "       f.DURATION,\n" +
+                "       f.MPARATING_ID,\n" +
+                "       \n" +
+                "       COUNT (f.FILM_ID) as count_value\n" +
+                "       \n" +
+                "from likes as l\n" +
+                "INNER JOIN films as f ON f.film_id = l.film_id\n" +
+                "\n" +
+                "GROUP BY f.FILM_ID\n" +
+                "ORDER BY count_value desc )";
         List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
         return result;
     }
