@@ -13,10 +13,8 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
-import ru.yandex.practicum.filmorate.storage.DatabaseLikesStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -28,17 +26,20 @@ public class FilmService {
     private DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private UserStorage userStorage;
     private DatabaseLikesStorage databaseLikesStorage;
+    private DatabaseMpaStorage databaseMpaStorage;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Autowired
     public FilmService(@Qualifier("DatabaseFilmStorage")FilmStorage filmStorage,
                         @Qualifier("DatabaseUserStorage")UserStorage userStorage,
                         DatabaseFilmGenresStorage databaseFilmGenresStorage,
-                        DatabaseLikesStorage databaseLikesStorage) {
+                        DatabaseLikesStorage databaseLikesStorage,
+                        DatabaseMpaStorage databaseMpaStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.databaseFilmGenresStorage = databaseFilmGenresStorage;
         this.databaseLikesStorage = databaseLikesStorage;
+        this.databaseMpaStorage = databaseMpaStorage;
     }
 
     public FilmDTO create(FilmDTO filmDTO) {
@@ -177,5 +178,19 @@ public class FilmService {
             log.error("Ошибка при удалении лайка");
             throw new NotFoundException("Список фильмов пуст");
         }
+    }
+
+    public Mpa getMpaById(Long mpaId) {
+        Optional<Mpa> mpa = databaseMpaStorage.getMpaById(mpaId);
+        if (mpa.isPresent()) {
+            return mpa.get();
+        } else throw new NotFoundException("Mpa с " + mpaId + " отсутствует.");
+    }
+
+    public List<Mpa> getAllMpa() {
+        Optional<List<Mpa>> mpaList = databaseMpaStorage.findAll();
+        if (mpaList.isPresent()) {
+            return mpaList.get();
+        } else throw new NotFoundException("Список mpa пуст.");
     }
 }
