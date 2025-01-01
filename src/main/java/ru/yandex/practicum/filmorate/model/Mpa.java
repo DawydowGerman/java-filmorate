@@ -5,7 +5,6 @@ import lombok.Data;
 @Data
 public class Mpa {
     private Long id;
-//    private MpaRating mpaRating;
     private String name;
 
     public Mpa() {
@@ -22,7 +21,6 @@ public class Mpa {
     public Mpa(Long id, String mpaRating) {
         this.id = id;
         this.name = mpaRating;
-        // this.mpaRating = MpaRating.valueOf(mpaRating);
     }
 
     public long getId() {
@@ -33,23 +31,11 @@ public class Mpa {
         this.id = id;
     }
 
-    public String getMpaRating() {
+    public String getName() {
         return name;
     }
 
-    public void setMpaRating(String mpaRating) {
+    public void setName(String mpaRating) {
         this.name = mpaRating;
     }
-
-
-    /*
-    public MpaRating getMpaRating() {
-        return mpaRating;
-    }
-
-    public void setMpaRating(MpaRating mpaRating) {
-        this.mpaRating = mpaRating;
-    }
-
-     */
 }

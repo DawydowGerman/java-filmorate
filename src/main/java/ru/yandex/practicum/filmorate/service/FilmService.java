@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.*;
-
 import java.time.LocalDate;
 import java.util.*;
 
@@ -215,5 +214,44 @@ public class FilmService {
         mpaList.add(new Mpa(valueOf(4), "R"));
         mpaList.add(new Mpa(valueOf(5), "NC-17"));
         return mpaList;
+    }
+
+    public Genre getGenreById(Integer genreId) {
+        if (genreId > 6 || genreId < 1) {
+            throw new NotFoundException("Жанр с " + genreId + " отсутствует.");
+        }
+        Genre genre = new Genre();
+        switch (genreId) {
+            case 1:
+                genre = new Genre(valueOf(1), "Комедия");
+                break;
+            case 2:
+                genre = new Genre(valueOf(2), "Драма");
+                break;
+            case 3:
+                genre = new Genre(valueOf(3), "Мультфильм");
+                break;
+            case 4:
+                genre = new Genre(valueOf(4), "Триллер");
+                break;
+            case 5:
+                genre = new Genre(valueOf(5), "Документальный");
+                break;
+            case 6:
+                genre = new Genre(valueOf(5), "Боевик");
+                break;
+        }
+        return genre;
+    }
+
+    public List<Genre> getAllGenres() {
+        List<Genre> genreList = new ArrayList<>();
+        genreList.add(new Genre(valueOf(1), "Комедия"));
+        genreList.add(new Genre(valueOf(2), "Драма"));
+        genreList.add(new Genre(valueOf(3), "Мультфильм"));
+        genreList.add(new Genre(valueOf(4), "Триллер"));
+        genreList.add(new Genre(valueOf(5), "Документальный"));
+        genreList.add(new Genre(valueOf(6), "Боевик"));
+        return genreList;
     }
 }
