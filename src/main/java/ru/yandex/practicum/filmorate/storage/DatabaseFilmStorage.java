@@ -7,11 +7,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.jdbc.support.KeyHolder;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
 
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
+
+import static java.lang.Long.valueOf;
 
 @RequiredArgsConstructor
 @Repository
@@ -40,6 +43,34 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Optional<Film> getFilmById(Long filmId) {
+        String sqlQuery = "select film_id, name, description, releasedate, duration, mparating_id " +
+                "from films where film_id = ?";
+        Film film = jdbcTemplate.queryForObject(sqlQuery, filmRowMapper, filmId);
+        if (film != null) {
+            switch ((int)film.getMpa().getId()) {
+                case 1:
+                    film.getMpa().setName("G");
+                    break;
+                case 2:
+                    film.getMpa().setName("PG");
+                    break;
+                case 3:
+                    film.getMpa().setName("PG-13");
+                    break;
+                case 4:
+                    film.getMpa().setName("R");
+                    break;
+                case 5:
+                    film.getMpa().setName("NC-17");
+                    break;
+            }
+            return Optional.of(film);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<List<Film>> findAll() {
         String sqlQuery = "select film_id, name, description, releasedate, duration, mparating_id " +
                 "from films";
@@ -64,11 +95,6 @@ public class DatabaseFilmStorage implements FilmStorage {
                 film.getMpa().getId(),
                 film.getId());
         return film;
-    }
-
-    @Override
-    public Optional<Film> getFilmById(Long id) {
-        return Optional.empty();
     }
 
     public List<Film> getMostPopularFilms() {

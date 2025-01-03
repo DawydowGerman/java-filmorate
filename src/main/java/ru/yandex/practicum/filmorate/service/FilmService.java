@@ -94,6 +94,40 @@ public class FilmService {
         } else throw new NotFoundException("Список фильмов пуст.");
     }
 
+    public Film getFilmById(Long filmId) {
+        Optional<Film> film = filmStorage.getFilmById(filmId);
+        if (film.isPresent()) {
+            if (databaseFilmGenresStorage.isFilmHasGenre(film.get().getId())) {
+                List<Genre> filmGenresList = new ArrayList<>();
+                List<Integer> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.get().getId());
+                for(int i = 0; i < genresList.size(); i++) {
+                     switch (genresList.get(i)) {
+                         case 1:
+                             filmGenresList.add(new Genre(valueOf(1), "Комедия"));
+                             break;
+                         case 2:
+                             filmGenresList.add(new Genre(valueOf(2), "Драма"));
+                             break;
+                         case 3:
+                             filmGenresList.add(new Genre(valueOf(3), "Мультфильм"));
+                             break;
+                         case 4:
+                             filmGenresList.add(new Genre(valueOf(4), "Триллер"));
+                             break;
+                         case 5:
+                             filmGenresList.add(new Genre(valueOf(5), "Документальный"));
+                             break;
+                         case 6:
+                             filmGenresList.add(new Genre(valueOf(6), "Боевик"));
+                             break;
+                     }
+                }
+                film.get().setGenres(filmGenresList);
+            }
+            return film.get();
+        } else throw new NotFoundException("Фильм с " + filmId + " отсутствует.");
+    }
+
     public FilmDTO update(FilmDTO filmDTO) {
         if (filmDTO.getId() == null) {
             log.error("Ошибка при обновлении фильма");
@@ -176,8 +210,8 @@ public class FilmService {
             }
             return allFilmsList;
         } else {
-            log.error("Ошибка при удалении лайка");
-            throw new NotFoundException("Список фильмов пуст");
+            log.error("Ошибка при получении списка самых популярных фильмов.");
+            throw new NotFoundException("Список фильмов пуст.");
         }
     }
 
@@ -238,7 +272,7 @@ public class FilmService {
                 genre = new Genre(valueOf(5), "Документальный");
                 break;
             case 6:
-                genre = new Genre(valueOf(5), "Боевик");
+                genre = new Genre(valueOf(6), "Боевик");
                 break;
         }
         return genre;

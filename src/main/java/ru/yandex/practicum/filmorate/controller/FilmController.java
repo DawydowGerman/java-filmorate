@@ -35,6 +35,11 @@ public class FilmController {
         return filmService.findAll();
     }
 
+    @GetMapping("/{filmId}")
+    public Film getFilmById(@PathVariable Long filmId) {
+        return filmService.getFilmById(filmId);
+    }
+
     @PutMapping
     public FilmDTO update(@RequestBody FilmDTO filmDTO) {
         return filmService.update(filmDTO);
@@ -56,14 +61,6 @@ public class FilmController {
             return filmService.getMostPopularFilms(count.get());
         }
         return filmService.getMostPopularFilms(Integer.valueOf(10));
-    }
-
-    @GetMapping("/{filmId}")
-    public Film getFilmById(@PathVariable Long filmId) {
-        Optional<Film> film0 = inMemoryFilmStorage.getFilmById(filmId);
-        if (film0.isPresent()) {
-            return film0.get();
-        } else throw new NotFoundException("Фильм с " + filmId + " отсутствует.");
     }
 
     @ExceptionHandler

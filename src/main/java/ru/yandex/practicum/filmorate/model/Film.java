@@ -40,6 +40,14 @@ public class Film implements Comparable<Film> {
         likes.remove(userId);
     }
 
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
+    }
+
     @Override
     public String toString() {
         return "Film{" +

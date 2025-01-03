@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Repository
 @Component("DatabaseFilmGenresStorage")
@@ -20,5 +22,19 @@ public class DatabaseFilmGenresStorage {
                 jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(i).getId());
             }
         } else jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(0).getId());
+    }
+
+    public boolean isFilmHasGenre(Long filmId) {
+        String sql = "SELECT count(*) FROM film_genres WHERE film_id = ?";
+        int count = jdbcTemplate.queryForObject(sql, new Object[] { filmId }, Integer.class);
+        return count > 0;
+    }
+
+    public List<Integer> getGenresIdsOfFilm(Long filmId) {
+        String sqlQuery = "SELECT GENRES_ID \n" +
+                "FROM FILM_GENRES\n" +
+                "where FILM_ID = ?";
+        List<Integer> resultList = jdbcTemplate.queryForList(sqlQuery, Integer.class, filmId);
+        return resultList;
     }
 }
