@@ -100,7 +100,7 @@ public class FilmService {
             if (databaseFilmGenresStorage.isFilmHasGenre(film.get().getId())) {
                 List<Genre> filmGenresList = new ArrayList<>();
                 List<Integer> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.get().getId());
-                for(int i = 0; i < genresList.size(); i++) {
+                for (int i = 0; i < genresList.size(); i++) {
                      switch (genresList.get(i)) {
                          case 1:
                              filmGenresList.add(new Genre(valueOf(1), "Комедия"));
