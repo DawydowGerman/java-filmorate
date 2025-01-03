@@ -7,14 +7,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.jdbc.support.KeyHolder;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
-
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
-
-import static java.lang.Long.valueOf;
 
 @RequiredArgsConstructor
 @Repository
