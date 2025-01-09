@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Long.valueOf;
 
@@ -79,6 +80,7 @@ public class FilmService {
                 throw new ValidationException("Жанр не может иметь ID больше 6");
             }
         }
+        filmDTO.setGenres(filmDTO.getGenres().stream().distinct().collect(Collectors.toList()));
         Film film = FilmMapper.toModel(filmDTO);
         film = filmStorage.create(film);
         if (film.getGenres() != null && film.getGenres().size() > 0) {
