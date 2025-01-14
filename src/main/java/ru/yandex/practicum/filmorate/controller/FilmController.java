@@ -7,21 +7,16 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-
 import java.util.*;
 
 @RestController
 @RequestMapping("/films")
 public class FilmController {
     private FilmService filmService;
-    private InMemoryFilmStorage inMemoryFilmStorage;
 
     @Autowired
-    public FilmController(InMemoryFilmStorage inMemoryFilmStorage, FilmService filmService) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
@@ -31,12 +26,12 @@ public class FilmController {
     }
 
     @GetMapping
-    public List<Film> findAll() {
+    public List<FilmDTO> findAll() {
         return filmService.findAll();
     }
 
     @GetMapping("/{filmId}")
-    public Film getFilmById(@PathVariable Long filmId) {
+    public FilmDTO getFilmById(@PathVariable Long filmId) {
         return filmService.getFilmById(filmId);
     }
 
@@ -56,7 +51,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
+    public List<FilmDTO> getMostPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
         if (count.isPresent()) {
             return filmService.getMostPopularFilms(count.get());
         }

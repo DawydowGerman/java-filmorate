@@ -44,23 +44,6 @@ public class DatabaseFilmStorage implements FilmStorage {
                 "from films where film_id = ?";
         Film film = jdbcTemplate.queryForObject(sqlQuery, filmRowMapper, filmId);
         if (film != null) {
-            switch ((int)film.getMpa().getId()) {
-                case 1:
-                    film.getMpa().setName("G");
-                    break;
-                case 2:
-                    film.getMpa().setName("PG");
-                    break;
-                case 3:
-                    film.getMpa().setName("PG-13");
-                    break;
-                case 4:
-                    film.getMpa().setName("R");
-                    break;
-                case 5:
-                    film.getMpa().setName("NC-17");
-                    break;
-            }
             return Optional.of(film);
         }
         return Optional.empty();

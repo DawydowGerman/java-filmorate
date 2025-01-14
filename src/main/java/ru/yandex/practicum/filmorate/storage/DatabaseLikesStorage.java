@@ -8,16 +8,16 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 @Repository
 @Component("DatabaseLikesStorage")
-public class DatabaseLikesStorage {
+public class DatabaseLikesStorage implements LikesStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public void saveFilmLikes(Long userId, Long filmId) {
+    public void giveLike(Long userId, Long filmId) {
         String sqlQuery = "insert into likes (user_id, film_id) " +
                 "values (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }
 
-    public void removeFilmLikes(Long userId, Long filmId) {
+    public void removeLike(Long userId, Long filmId) {
         String sqlQuery = "delete from likes where user_id = ? and film_id = ?";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }

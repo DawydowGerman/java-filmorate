@@ -5,9 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.dto.MpaDTO;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.model.Mpa;
-
 import java.util.List;
 
 @RestController
@@ -21,12 +20,12 @@ public class MpaController {
     }
 
     @GetMapping("/{mpaId}")
-    public Mpa getMpaById(@PathVariable Integer mpaId) {
+    public MpaDTO getMpaById(@PathVariable Integer mpaId) {
         return filmService.getMpaById(mpaId);
     }
 
     @GetMapping
-    public List<Mpa> findAll() {
+    public List<MpaDTO> findAll() {
         return filmService.getAllMpa();
     }
 }

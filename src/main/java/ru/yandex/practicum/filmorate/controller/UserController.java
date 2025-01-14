@@ -7,9 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-
 import java.util.*;
 
 @RestController
@@ -28,12 +26,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User getUserById(@PathVariable Long userId) {
+    public UserDTO getUserById(@PathVariable Long userId) {
         return userService.getUserById(userId);
     }
 
     @GetMapping
-    public List<User> findAll() {
+    public List<UserDTO> findAll() {
         return userService.findAll();
     }
 
@@ -55,14 +53,12 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable Long id) {
-        if (userService.getFriends(id) != null && userService.getFriends(id).size() > 0) {
-            return userService.getFriends(id);
-        } else return Collections.emptyList();
+    public List<UserDTO> getFriends(@PathVariable Long id) {
+        return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getMutualFriends(@PathVariable Long id, @PathVariable Long otherId) {
+    public List<UserDTO> getMutualFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return userService.getMutualFriends(id, otherId);
     }
 

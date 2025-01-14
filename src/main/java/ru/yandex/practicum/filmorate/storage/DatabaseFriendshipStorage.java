@@ -12,10 +12,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Repository
 @Component("DatabaseFriendshipStorage")
-public class DatabaseFriendshipStorage {
+public class DatabaseFriendshipStorage implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
     private final UserRowMapper userRowMapper;
 
+    @Override
     public void addFriend(Long id, Long friendId) {
         String sqlQuery0 = "INSERT INTO friendship (user_id, friend_id)" + "VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery0,
@@ -23,12 +24,14 @@ public class DatabaseFriendshipStorage {
                 friendId);
     }
 
+    @Override
     public void removeFriend(Long id, Long friendId) {
         String sqlQuery = "DELETE FROM friendship WHERE USER_ID = " + id
                 + " AND FRIEND_ID = " + friendId;
         jdbcTemplate.update(sqlQuery);
     }
 
+    @Override
     public Optional<List<User>> getFriends(Long id) {
         String sqlQuery = "SELECT * FROM users WHERE user_id IN " +
                 "(select friend_id from friendship where user_id = " + id + ")";
@@ -39,6 +42,7 @@ public class DatabaseFriendshipStorage {
         return Optional.empty();
     }
 
+    @Override
     public Optional<List<User>> getMutualFriends(Long idUser0, Long idUser1) {
         String sqlQuery = "select * " +
                 "from users " +

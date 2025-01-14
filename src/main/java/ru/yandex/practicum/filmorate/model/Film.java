@@ -25,12 +25,8 @@ public class Film implements Comparable<Film> {
     private Mpa mpa = new Mpa(valueOf(0));
     @Builder.Default
     private List<Genre> genres = new ArrayList<>();
-
-    // DECIDE TO DO:
     @Builder.Default
     private Set<Long> likes = new HashSet<>();
- //   @Builder.Default
- //   private MpaRating mpaRating = MpaRating.G;
 
     public void addLike(Long userId) {
         likes.add(userId);
