@@ -16,7 +16,6 @@ import java.util.Optional;
 import static java.lang.Long.valueOf;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import ru.yandex.practicum.filmorate.storage.*;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
 import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
@@ -131,7 +130,7 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testIsUserIdExists() {
-        User testUser = userStorage.create( user0);
+        User testUser = userStorage.create(user0);
         assertEquals(userStorage.isUserIdExists(testUser.getId()), true);
     }
 
@@ -253,10 +252,6 @@ class FilmoRateApplicationTests {
         databaseFriendshipStorage.addFriend(user0.getId(), user1.getId());
         databaseFriendshipStorage.addFriend(user2.getId(), user1.getId());
         Optional<List<User>> mutualFriendList = databaseFriendshipStorage.getMutualFriends(user0.getId(), user2.getId());
-
         assertEquals(mutualFriendList.get().get(0).getId(), user1.getId());
     }
-
-
-
 }
