@@ -175,8 +175,7 @@ public class UserService {
                         .map(user -> UserMapper.toDto(user))
                         .collect(Collectors.toList());
                 return dtoList;
-            }
-            else throw new NotFoundException("У юзера с " + idUser0 + " "
+            } else throw new NotFoundException("У юзера с " + idUser0 + " "
                     + idUser1 + " отсутствует общие друзья.");
         } else {
             log.error("Ошибка при удалении из друзей");
