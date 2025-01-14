@@ -153,6 +153,7 @@ public class UserService {
     }
 
     public List<UserDTO> getFriends(Long id) {
+        List<UserDTO> result = new ArrayList<>();
         if (userStorage.isUserIdExists(id)) {
             if (friendshipStorage.getFriends(id).isPresent()) {
                 List<UserDTO> dtoList = friendshipStorage.getFriends(id).get()
@@ -160,7 +161,7 @@ public class UserService {
                         .map(user -> UserMapper.toDto(user))
                         .collect(Collectors.toList());
                 return dtoList;
-            } else throw new NotFoundException("У юзера с " + id + " отсутствует друзья.");
+            } else return result;
         } else {
             log.error("Ошибка при добавлении в друзья");
             throw new NotFoundException("Юзер с " + id + " отсутствует.");
