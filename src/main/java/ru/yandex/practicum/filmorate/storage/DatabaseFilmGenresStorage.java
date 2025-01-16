@@ -27,11 +27,14 @@ public class DatabaseFilmGenresStorage {
                 preparedStatement.setLong(1, film.getId());
                 preparedStatement.setLong(2, film.getGenres().get(i).getId());
             }
+
             @Override
             public int getBatchSize() {
                 return film.getGenres().size();
             }
-        });} else jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(0).getId());
+        }
+        ); }
+        else jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(0).getId());
     }
 
     public boolean isFilmHasGenre(Long filmId) {
