@@ -21,20 +21,20 @@ public class DatabaseFilmGenresStorage {
         String sqlQuery = "insert into film_genres (film_id, genres_id) " +
                 "values (?, ?)";
         if (film.getGenres().size() > 1) {
-        jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                preparedStatement.setLong(1, film.getId());
-                preparedStatement.setLong(2, film.getGenres().get(i).getId());
-            }
+            jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
+                        @Override
+                        public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                            preparedStatement.setLong(1, film.getId());
+                            preparedStatement.setLong(2, film.getGenres().get(i).getId());
+                        }
 
-            @Override
-            public int getBatchSize() {
-                return film.getGenres().size();
-            }
-        }
-        ); }
-        else jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(0).getId());
+                        @Override
+                        public int getBatchSize() {
+                            return film.getGenres().size();
+                        }
+                    }
+            );
+        } else jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(0).getId());
     }
 
     public boolean isFilmHasGenre(Long filmId) {
