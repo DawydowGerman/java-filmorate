@@ -2,11 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDTO;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.*;
 
@@ -56,24 +53,5 @@ public class FilmController {
             return filmService.getMostPopularFilms(count.get());
         }
         return filmService.getMostPopularFilms(Integer.valueOf(10));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleThrowable(final Throwable e) {
-        return Map.of(
-                "errorMessage", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationException(final ValidationException e) {
-        return Map.of("errorMessage", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFoundException(final NotFoundException e) {
-        return Map.of("errorMessage", e.getMessage());
     }
 }

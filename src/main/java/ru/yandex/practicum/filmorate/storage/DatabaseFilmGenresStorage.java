@@ -1,11 +1,14 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -18,10 +21,17 @@ public class DatabaseFilmGenresStorage {
         String sqlQuery = "insert into film_genres (film_id, genres_id) " +
                 "values (?, ?)";
         if (film.getGenres().size() > 1) {
-            for (int i = 0; i < film.getGenres().size(); i++) {
-                jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(i).getId());
+        jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                preparedStatement.setLong(1, film.getId());
+                preparedStatement.setLong(2, film.getGenres().get(i).getId());
             }
-        } else jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(0).getId());
+            @Override
+            public int getBatchSize() {
+                return film.getGenres().size();
+            }
+        });} else jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(0).getId());
     }
 
     public boolean isFilmHasGenre(Long filmId) {
