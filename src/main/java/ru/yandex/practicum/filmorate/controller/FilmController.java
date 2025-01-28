@@ -2,41 +2,39 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.dto.FilmDTO;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-
 import java.util.*;
 
 @RestController
 @RequestMapping("/films")
 public class FilmController {
     private FilmService filmService;
-    private InMemoryFilmStorage inMemoryFilmStorage;
 
     @Autowired
-    public FilmController(InMemoryFilmStorage inMemoryFilmStorage, FilmService filmService) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
-    @GetMapping
-    public Collection<Film> findAll() {
-        return inMemoryFilmStorage.findAll();
+    @PostMapping
+    public FilmDTO create(@Valid @RequestBody FilmDTO filmDTO) {
+        return filmService.create(filmDTO);
     }
 
-    @PostMapping
-    public Film create(@Valid @RequestBody Film film) {
-        return inMemoryFilmStorage.create(film);
+    @GetMapping
+    public List<FilmDTO> findAll() {
+        return filmService.findAll();
+    }
+
+    @GetMapping("/{filmId}")
+    public FilmDTO getFilmById(@PathVariable Long filmId) {
+        return filmService.getFilmById(filmId);
     }
 
     @PutMapping
-    public Film update(@RequestBody Film newFilm) {
-        return inMemoryFilmStorage.update(newFilm);
+    public FilmDTO update(@RequestBody FilmDTO filmDTO) {
+        return filmService.update(filmDTO);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -50,37 +48,10 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
+    public List<FilmDTO> getMostPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
         if (count.isPresent()) {
             return filmService.getMostPopularFilms(count.get());
         }
         return filmService.getMostPopularFilms(Integer.valueOf(10));
-    }
-
-    @GetMapping("/{filmId}")
-    public Film getFilmById(@PathVariable Long filmId) {
-        Optional<Film> film0 = inMemoryFilmStorage.getFilmById(filmId);
-        if (film0.isPresent()) {
-            return film0.get();
-        } else throw new NotFoundException("Фильм с " + filmId + " отсутствует.");
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleThrowable(final Throwable e) {
-        return Map.of(
-            "errorMessage", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationException(final ValidationException e) {
-        return Map.of("errorMessage", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFoundException(final NotFoundException e) {
-        return Map.of("errorMessage", e.getMessage());
     }
 }

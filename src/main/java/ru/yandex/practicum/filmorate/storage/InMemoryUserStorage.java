@@ -4,98 +4,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-
 import java.time.LocalDate;
 import java.util.*;
 
-@Component
+@Component("InMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final Map<Long, User> users = new HashMap<>();
 
-    public Collection<User> findAll() {
-        if (users.size() == 0) {
-            log.error("Ошибка при получении списка юзеров");
-            return null;
-        } else return users.values();
-    }
-
+    @Override
     public User create(User user) {
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
-        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-        }
-        if (user.getBirthday() == null) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Дата рождения должна быть указана");
-        } else if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        if (user.getFriends() == null) {
-            user.setFriends(new HashSet<>());
-        }
         user.setId(getNextId());
         users.put(user.getId(), user);
         log.debug("Добавлен юзер с Id {}", user.getId());
         return user;
     }
 
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
-    }
-
-    public User update(User newUser) {
-        if (newUser.getId() == null) {
-            log.error("Ошибка при обновлении данных юзера");
-            throw new ValidationException("Id должен быть указан");
-        }
-        if (users.containsKey(newUser.getId())) {
-            User oldUser = users.get(newUser.getId());
-            for (User user0 : users.values()) {
-                if (!user0.getId().equals(newUser.getId()) && user0.getEmail().equals(newUser.getEmail())) {
-                    log.error("Ошибка при обновлении данных юзера");
-                    throw new ValidationException("Этот имейл уже используется");
-                }
-            }
-            if (newUser.getEmail() != null && !newUser.getEmail().isEmpty()) {
-                log.trace("Изменен имейл юзера с Id {}", newUser.getId());
-                oldUser.setEmail(newUser.getEmail());
-            }
-            if (newUser.getLogin() != null && !newUser.getLogin().isEmpty()) {
-                log.trace("Изменен логин юзера с Id {}", newUser.getId());
-                oldUser.setLogin(newUser.getLogin());
-            }
-            if (newUser.getName() != null && !newUser.getName().isEmpty()) {
-                log.trace("Изменено имя юзера с Id {}", newUser.getId());
-                oldUser.setName(newUser.getName());
-            }
-            if (newUser.getBirthday() != null && !newUser.getBirthday().isAfter(LocalDate.now())) {
-                log.trace("Изменена дата рождения юзера с Id {}", newUser.getId());
-                oldUser.setBirthday(newUser.getBirthday());
-            }
-            log.debug("Обновлен юзер с Id {}", newUser.getId());
-            return oldUser;
-        }
-        log.error("Ошибка при добавлении юзера");
-        throw new NotFoundException("Юзер с id = " + newUser.getId() + " не найден");
-    }
-
+    @Override
     public Optional<User> getUserById(Long id) {
         if (users.size() == 0) {
             log.error("Ошибка при получении списка юзеров");
@@ -108,22 +34,56 @@ public class InMemoryUserStorage implements UserStorage {
         return Optional.empty();
     }
 
-    public Optional<List<User>> getFriends(Long id) {
-        List<User> result = new ArrayList<>();
+    @Override
+    public Optional<List<User>> findAll() {
         if (users.size() == 0) {
             log.error("Ошибка при получении списка юзеров");
             return Optional.empty();
+        } else return Optional.of((List<User>) users.values());
+    }
+
+    @Override
+    public User update(User newUser) {
+        User oldUser = users.get(newUser.getId());
+        if (newUser.getEmail() != null && !newUser.getEmail().isEmpty()) {
+            log.trace("Изменен имейл юзера с Id {}", newUser.getId());
+            oldUser.setEmail(newUser.getEmail());
         }
-        if (!users.containsKey(id)) {
-            throw new NotFoundException("Юзер с id = " + id + " не найден");
+        if (newUser.getLogin() != null && !newUser.getLogin().isEmpty()) {
+            log.trace("Изменен логин юзера с Id {}", newUser.getId());
+            oldUser.setLogin(newUser.getLogin());
         }
-        if (users.containsKey(id) && users.get(id).getFriends().size() > 0) {
-            for (Long userFriendId : users.get(id).getFriends()) {
-                result.add(users.get(userFriendId));
-            }
-            return Optional.of(result);
+        if (newUser.getName() != null && !newUser.getName().isEmpty()) {
+            log.trace("Изменено имя юзера с Id {}", newUser.getId());
+            oldUser.setName(newUser.getName());
         }
-        log.error("Ошибка при получении списка юзеров");
-        return Optional.empty();
+        if (newUser.getBirthday() != null && !newUser.getBirthday().isAfter(LocalDate.now())) {
+            log.trace("Изменена дата рождения юзера с Id {}", newUser.getId());
+            oldUser.setBirthday(newUser.getBirthday());
+        }
+        if (newUser.getFriends() != null) {
+            oldUser.setFriends(newUser.getFriends());
+        }
+        log.debug("Обновлен юзер с Id {}", newUser.getId());
+        return oldUser;
+    }
+
+    private long getNextId() {
+        long currentMaxId = users.keySet()
+                .stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
+    }
+
+    @Override
+    public boolean remove(Long id) {
+        return users.get(id).equals(users.remove(id));
+    }
+
+    @Override
+    public boolean isUserIdExists(Long id) {
+        return users.containsKey(id);
     }
 }
