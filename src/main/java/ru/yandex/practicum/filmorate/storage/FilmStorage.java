@@ -19,4 +19,6 @@ public interface FilmStorage {
     public List<Film> getMostPopularFilms();
 
     List<Film> getCommonFilms(Long userId, Long friendId);
+
+    public Optional<List<Film>> getRecommendations(Long id);
 }

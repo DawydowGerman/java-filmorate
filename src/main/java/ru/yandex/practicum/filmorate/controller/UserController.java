@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.FilmDTO;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -59,5 +60,10 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<UserDTO> getMutualFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return userService.getMutualFriends(id, otherId);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public List<FilmDTO> getRecommendations(@PathVariable Long id) {
+        return userService.getRecommendations(id);
     }
 }

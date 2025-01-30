@@ -7,11 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.dto.FilmDTO;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -22,17 +28,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.lang.Long.valueOf;
+
 @Service
 @Data
 public class UserService {
+    private FilmStorage filmStorage;
     private UserStorage userStorage;
+    private DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private FriendshipStorage friendshipStorage;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    public UserService(@Qualifier("DatabaseUserStorage") UserStorage userStorage,
+    public UserService(@Qualifier("DatabaseFilmStorage") FilmStorage filmStorage,
+                       @Qualifier("DatabaseUserStorage") UserStorage userStorage,
+                       DatabaseFilmGenresStorage databaseFilmGenresStorage,
                        @Qualifier("DatabaseFriendshipStorage") FriendshipStorage friendshipStorage) {
+        this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.databaseFilmGenresStorage = databaseFilmGenresStorage;
         this.friendshipStorage = friendshipStorage;
     }
 
@@ -188,6 +202,27 @@ public class UserService {
         }
     }
 
+    public List<FilmDTO> getRecommendations(Long userId) {
+        Optional<List<Film>> filmList = filmStorage.getRecommendations(userId);
+        if (filmList.isPresent()) {
+            filmList.get()
+                    .stream()
+                    .forEach(film -> {
+                        if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
+                            this.assignGenres(film);
+                        }
+                        this.assignMpa(film);
+                        FilmMapper.toDto(film);
+                    });
+
+            List<FilmDTO> dtoList = filmList.get()
+                    .stream()
+                    .map(film -> FilmMapper.toDto(film))
+                    .collect(Collectors.toList());
+            return dtoList;
+        } else throw new NotFoundException("Список фильмов пуст.");
+    }
+
     public boolean remove(Long id) {
         if (userStorage.isUserIdExists(id)) {
             return userStorage.remove(id);
@@ -195,5 +230,55 @@ public class UserService {
             log.error("Ошибка при удалении юзера");
             throw new NotFoundException("Юзер отсутствует");
         }
+    }
+
+    private Film assignGenres(Film film) {
+        List<Genre> filmGenresList = new ArrayList<>();
+        List<Integer> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.getId());
+        for (int i = 0; i < genresList.size(); i++) {
+            switch (genresList.get(i)) {
+                case 1:
+                    filmGenresList.add(new Genre(valueOf(1), "Комедия"));
+                    break;
+                case 2:
+                    filmGenresList.add(new Genre(valueOf(2), "Драма"));
+                    break;
+                case 3:
+                    filmGenresList.add(new Genre(valueOf(3), "Мультфильм"));
+                    break;
+                case 4:
+                    filmGenresList.add(new Genre(valueOf(4), "Триллер"));
+                    break;
+                case 5:
+                    filmGenresList.add(new Genre(valueOf(5), "Документальный"));
+                    break;
+                case 6:
+                    filmGenresList.add(new Genre(valueOf(6), "Боевик"));
+                    break;
+            }
+        }
+        film.setGenres(filmGenresList);
+        return film;
+    }
+
+    private Film assignMpa(Film film) {
+        switch ((int) film.getMpa().getId()) {
+            case 1:
+                film.getMpa().setName("G");
+                break;
+            case 2:
+                film.getMpa().setName("PG");
+                break;
+            case 3:
+                film.getMpa().setName("PG-13");
+                break;
+            case 4:
+                film.getMpa().setName("R");
+                break;
+            case 5:
+                film.getMpa().setName("NC-17");
+                break;
+        }
+        return film;
     }
 }

@@ -124,6 +124,42 @@ public class DatabaseFilmStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, filmRowMapper, userId, friendId);
     }
 
+    @Override
+    public Optional<List<Film>> getRecommendations(Long userId) {
+        String sqlQuery = "SELECT *\n" +
+                "FROM (\n" +
+                "\n" +
+                "SELECT *\n" +
+                "FROM FILMS\n" +
+                "WHERE FILM_ID in (\n" +
+                "\n" +
+                "SELECT FILM_ID\n" +
+                "FROM LIKES\n" +
+                "WHERE USER_ID in (\n" +
+                "\n" +
+                "SELECT USER_ID\n" +
+                "FROM LIKES\n" +
+                "WHERE FILM_ID in (\n" +
+                "                  SELECT FILM_ID \n" +
+                "                  FROM LIKES\n" +
+                "                  WHERE USER_ID = ?\n" +
+                "                 ) \n" +
+                "              AND NOT USER_ID = ?\n" +
+                "                  )\n" +
+                ")\n" +
+                "\n" +
+                ") WHERE NOT FILM_ID in (SELECT FILM_ID\n" +
+                "FROM LIKES\n" +
+                "WHERE USER_ID = ?\n" +
+                ") ";
+
+        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper, userId, userId, userId);
+        if (result.size() != 0 || result != null) {
+            return Optional.of(result);
+        }
+        return Optional.empty();
+    }
+
     public boolean isFilmIdExists(Long id) {
         String sql = "SELECT count(*) FROM films WHERE film_id = ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
