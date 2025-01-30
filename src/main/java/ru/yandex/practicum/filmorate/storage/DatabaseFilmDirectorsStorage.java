@@ -37,7 +37,7 @@ public class DatabaseFilmDirectorsStorage {
 
     public boolean isFilmHasDirector(final Long filmId) {
         return jdbcTemplate.queryForObject(
-                "SELECT id FROM film_directors WHERE film_id = ?",
+                "SELECT director_id FROM film_directors WHERE film_id = ?",
                 Long.class,
                 filmId
         ) > 0;
