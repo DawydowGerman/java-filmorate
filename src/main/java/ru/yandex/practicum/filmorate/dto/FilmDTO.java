@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dto;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

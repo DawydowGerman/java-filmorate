@@ -1,10 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import lombok.Data;
+
 import java.time.LocalDate;
-import java.util.*;
-import jakarta.validation.constraints.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import static java.lang.Long.valueOf;
 
 @Data
@@ -18,7 +23,7 @@ public class Film implements Comparable<Film> {
     private String description = "Default description";
     @NotNull
     @Builder.Default
-    private LocalDate releaseDate = LocalDate.of(2000, 12,28);
+    private LocalDate releaseDate = LocalDate.of(2000, 12, 28);
     @Builder.Default
     private Long duration = Long.valueOf(110);
     @Builder.Default

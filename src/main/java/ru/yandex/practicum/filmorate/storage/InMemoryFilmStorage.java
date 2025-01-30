@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
+
 import java.util.*;
 
 @Component
@@ -30,7 +31,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (films.size() == 0) {
             log.error("Ошибка при получении списка фильмов");
             return Optional.empty();
-        } else return Optional.of((List<Film>)films.values());
+        } else return Optional.of((List<Film>) films.values());
     }
 
     public Optional<Film> getFilmById(Long filmId) {
@@ -81,6 +82,24 @@ public class InMemoryFilmStorage implements FilmStorage {
         List<Film> allFilmsList = this.findAll().get();
         Collections.sort(allFilmsList);
         return allFilmsList;
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        List<Film> userFilms = films.values()
+                .stream()
+                .filter(film -> film.getLikes().contains(userId))
+                .toList();
+        List<Film> friendFilms = films.values()
+                .stream()
+                .filter(film -> film.getLikes().contains(friendId))
+                .toList();
+
+        List<Film> commonFilms = new ArrayList<>(userFilms);
+        commonFilms.retainAll(friendFilms);
+        Collections.sort(commonFilms);
+
+        return commonFilms;
     }
 
     @Override

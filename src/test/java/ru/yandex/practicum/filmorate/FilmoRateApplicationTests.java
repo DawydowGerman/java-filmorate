@@ -9,16 +9,18 @@ import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.*;
+import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
+import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import static java.lang.Long.valueOf;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import ru.yandex.practicum.filmorate.storage.*;
-import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
-import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
 
 @JdbcTest
 @AutoConfigureTestDatabase
@@ -30,7 +32,6 @@ import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
         DatabaseLikesStorage.class,
         DatabaseFilmGenresStorage.class,
         DatabaseFriendshipStorage.class})
-
 class FilmoRateApplicationTests {
     private final DatabaseUserStorage userStorage;
     private final DatabaseFilmStorage filmStorage;
@@ -66,7 +67,7 @@ class FilmoRateApplicationTests {
             .id(Long.valueOf(23))
             .name("film0")
             .description("some desc0")
-            .releaseDate(LocalDate.of(2022, 12,28))
+            .releaseDate(LocalDate.of(2022, 12, 28))
             .duration(Long.valueOf(120))
             .build();
 
@@ -74,7 +75,7 @@ class FilmoRateApplicationTests {
             .id(Long.valueOf(98))
             .name("film1")
             .description("some desc0")
-            .releaseDate(LocalDate.of(2022, 12,28))
+            .releaseDate(LocalDate.of(2022, 12, 28))
             .duration(Long.valueOf(120))
             .build();
 
@@ -82,14 +83,14 @@ class FilmoRateApplicationTests {
             .id(Long.valueOf(15))
             .name("film2")
             .description("some desc0")
-            .releaseDate(LocalDate.of(2022, 12,28))
+            .releaseDate(LocalDate.of(2022, 12, 28))
             .duration(Long.valueOf(120))
             .build();
 
     @Test
     public void testCreateUserStorage() {
         User testUser = userStorage.create(user0);
-         assertEquals(userStorage.isUserIdExists(testUser.getId()), true);
+        assertEquals(userStorage.isUserIdExists(testUser.getId()), true);
     }
 
     @Test
@@ -116,7 +117,7 @@ class FilmoRateApplicationTests {
     public void testUpdateUserStorage() {
         user1.setName("updateMethodTestObjectName");
         User testUser = userStorage.update(user1);
-        assertEquals(testUser.getName(),user1.getName());
+        assertEquals(testUser.getName(), user1.getName());
     }
 
     @Test
@@ -164,7 +165,7 @@ class FilmoRateApplicationTests {
     public void testUpdateFilmStorage() {
         film1.setName("updateMethodTestObjectName");
         Film testFilm = filmStorage.update(film1);
-        assertEquals(testFilm.getName(),film1.getName());
+        assertEquals(testFilm.getName(), film1.getName());
     }
 
     @Test
@@ -178,6 +179,30 @@ class FilmoRateApplicationTests {
         List<Film> mostPopularFilmsList = filmStorage.getMostPopularFilms();
         assertEquals(mostPopularFilmsList.get(0).getName(), "film2");
         assertEquals(mostPopularFilmsList.get(1).getName(), "film1");
+    }
+
+    @Test
+    public void testGetCommonFilms() {
+        filmStorage.create(film0);
+        filmStorage.create(film1);
+        filmStorage.create(film2);
+        databaseLikesStorage.giveLike(user0.getId(), film1.getId());
+        databaseLikesStorage.giveLike(user0.getId(), film2.getId());
+
+        List<Film> commonFilmsList = filmStorage.getCommonFilms(user0.getId(), user1.getId());
+        assertEquals(0, commonFilmsList.size());
+
+        databaseLikesStorage.giveLike(user1.getId(), film2.getId());
+        commonFilmsList = filmStorage.getCommonFilms(user0.getId(), user1.getId());
+        assertEquals(1, commonFilmsList.size());
+        assertEquals("film2", commonFilmsList.getFirst().getName());
+
+        databaseLikesStorage.giveLike(user1.getId(), film1.getId());
+        databaseLikesStorage.giveLike(user2.getId(), film2.getId());
+        commonFilmsList = filmStorage.getCommonFilms(user0.getId(), user1.getId());
+        assertEquals(2, commonFilmsList.size());
+        assertEquals("film2", commonFilmsList.getFirst().getName());
+        assertEquals("film1", commonFilmsList.getLast().getName());
     }
 
     @Test

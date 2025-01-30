@@ -18,10 +18,17 @@ import ru.yandex.practicum.filmorate.mapper.MpaMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.*;
+import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.LikesStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
+
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
 import static java.lang.Long.valueOf;
 
 @Service
@@ -72,12 +79,12 @@ public class FilmService {
         }
         if (filmDTO.getMpa().getId() > 5) {
             log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("MPA рэйтинг не может быть больше 5");
+            throw new NotFoundException("MPA рэйтинг не может быть больше 5");
         }
         for (Genre genre : filmDTO.getGenres()) {
             if (genre.getId() > 6) {
                 log.error("Ошибка при добавлении фильма");
-                throw new ValidationException("Жанр не может иметь ID больше 6");
+                throw new NotFoundException("Жанр не может иметь ID больше 6");
             }
         }
         filmDTO.setGenres(filmDTO.getGenres().stream().distinct().collect(Collectors.toList()));
@@ -92,7 +99,7 @@ public class FilmService {
     public List<FilmDTO> findAll() {
         Optional<List<Film>> filmList = filmStorage.findAll();
         if (filmList.isPresent()) {
-           filmList.get()
+            filmList.get()
                     .stream()
                     .forEach(film -> {
                         if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
@@ -159,7 +166,7 @@ public class FilmService {
             for (Genre genre : filmDTO.getGenres()) {
                 if (genre.getId() > 6) {
                     log.error("Ошибка при добавлении фильма");
-                    throw new ValidationException("Жанр не может иметь ID больше 6");
+                    throw new NotFoundException("Жанр не может иметь ID больше 6");
                 }
             }
             Film film = FilmMapper.toModel(filmDTO);
@@ -210,6 +217,29 @@ public class FilmService {
             log.error("Ошибка при получении списка самых популярных фильмов.");
             throw new NotFoundException("Список фильмов пуст.");
         }
+    }
+
+    public List<FilmDTO> getCommonFilms(Long userId, Long friendId) {
+        if (!userStorage.isUserIdExists(userId)) {
+            throw new NotFoundException("Пользователь не найден с id = " + userId);
+        }
+        if (!userStorage.isUserIdExists(friendId)) {
+            throw new NotFoundException("Пользователь не найден с id = " + friendId);
+        }
+
+        List<Film> commonFilms = filmStorage.getCommonFilms(userId, friendId);
+        commonFilms.forEach(film -> {
+            if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
+                this.assignGenres(film);
+            }
+            this.assignMpa(film);
+            FilmMapper.toDto(film);
+        });
+
+        return commonFilms
+                .stream()
+                .map(FilmMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     public MpaDTO getMpaById(Integer mpaId) {

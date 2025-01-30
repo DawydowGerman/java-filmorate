@@ -39,7 +39,7 @@ public class DatabaseFilmGenresStorage {
 
     public boolean isFilmHasGenre(Long filmId) {
         String sql = "SELECT count(*) FROM film_genres WHERE film_id = ?";
-        int count = jdbcTemplate.queryForObject(sql, new Object[] { filmId }, Integer.class);
+        int count = jdbcTemplate.queryForObject(sql, new Object[]{filmId}, Integer.class);
         return count > 0;
     }
 

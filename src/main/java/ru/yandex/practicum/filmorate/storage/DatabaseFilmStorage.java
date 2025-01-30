@@ -3,11 +3,12 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
-import org.springframework.jdbc.support.KeyHolder;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
+
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +23,11 @@ public class DatabaseFilmStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         String sqlQuery =
-               "INSERT INTO films (name, description, releasedate, duration, mparating_id)"
-               + "VALUES (?, ?, ?, ?, ?)";
+                "INSERT INTO films (name, description, releasedate, duration, mparating_id)"
+                        + "VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[] {"film_id"});
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"film_id"});
             stmt.setString(1, film.getName());
             stmt.setString(2, film.getDescription());
             stmt.setObject(3, film.getReleaseDate());
@@ -53,7 +54,7 @@ public class DatabaseFilmStorage implements FilmStorage {
     public Optional<List<Film>> findAll() {
         String sqlQuery = "select film_id, name, description, releasedate, duration, mparating_id " +
                 "from films";
-         List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
+        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
         if (result.size() != 0 || result != null) {
             return Optional.of(result);
         }
@@ -101,6 +102,26 @@ public class DatabaseFilmStorage implements FilmStorage {
                 "ORDER BY count_value desc )";
         List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
         return result;
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        String sqlQuery = "select сf.*\n" +
+                "from  (select f.*\n" +
+                "       from likes l1\n" +
+                "       inner join films f\n" +
+                "           on f.film_id = l1.film_id\n" +
+                "       inner join likes l2\n" +
+                "           on l2.film_id = l1.film_id\n" +
+                "           and l2.user_id = ?\n" +
+                "       where l1.user_id = ?) сf\n" +
+                "inner join (select l.film_id, count(l.user_id) as cnt\n" +
+                "           from likes l\n" +
+                "           group by l.film_id) сl\n" +
+                "   on сl.film_id = сf.film_id\n" +
+                "order by сl.cnt desc";
+
+        return jdbcTemplate.query(sqlQuery, filmRowMapper, userId, friendId);
     }
 
     public boolean isFilmIdExists(Long id) {

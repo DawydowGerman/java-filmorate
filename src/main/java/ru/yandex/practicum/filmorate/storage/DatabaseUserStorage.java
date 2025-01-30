@@ -7,8 +7,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
-import java.sql.PreparedStatement;
 import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
+
+import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ public class DatabaseUserStorage implements UserStorage {
                 "INSERT INTO users (email, login, name, birthday)" + "VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[] {"user_id"});
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"user_id"});
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getLogin());
             stmt.setString(3, user.getName());
@@ -64,11 +65,11 @@ public class DatabaseUserStorage implements UserStorage {
                 "where user_id = ?";
 
         jdbcTemplate.update(sqlQuery,
-                 user.getEmail(),
-                 user.getLogin(),
-                 user.getName(),
-                 user.getBirthday(),
-                 user.getId());
+                user.getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getBirthday(),
+                user.getId());
         return user;
     }
 
@@ -80,7 +81,7 @@ public class DatabaseUserStorage implements UserStorage {
 
     public boolean isUserIdExists(Long id) {
         String sql = "SELECT count(*) FROM users WHERE user_id = ?";
-        int count = jdbcTemplate.queryForObject(sql, new Object[] { id }, Integer.class);
+        int count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
         return count > 0;
     }
 }
