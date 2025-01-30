@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDTO;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import java.util.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/films")
@@ -53,5 +55,10 @@ public class FilmController {
             return filmService.getMostPopularFilms(count.get());
         }
         return filmService.getMostPopularFilms(Integer.valueOf(10));
+    }
+
+    @GetMapping("/common")
+    public List<FilmDTO> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
     }
 }

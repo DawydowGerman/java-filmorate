@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +17,6 @@ public interface FilmStorage {
     public boolean isFilmIdExists(Long id);
 
     public List<Film> getMostPopularFilms();
+
+    List<Film> getCommonFilms(Long userId, Long friendId);
 }

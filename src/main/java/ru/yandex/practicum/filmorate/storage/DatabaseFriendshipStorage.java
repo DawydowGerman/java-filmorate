@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -47,11 +48,11 @@ public class DatabaseFriendshipStorage implements FriendshipStorage {
         String sqlQuery = "select * " +
                 "from users " +
                 "where user_id IN (SELECT friend_id " +
-                                  "FROM (SELECT friend_id " +
-                                        "FROM friendship " +
-                                        "WHERE user_id = " + idUser0 + " OR user_id = " + idUser1 + ")" +
-                                  "GROUP BY friend_id " +
-                                  "HAVING COUNT(friend_id) > 1)";
+                "FROM (SELECT friend_id " +
+                "FROM friendship " +
+                "WHERE user_id = " + idUser0 + " OR user_id = " + idUser1 + ")" +
+                "GROUP BY friend_id " +
+                "HAVING COUNT(friend_id) > 1)";
         List<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
         if (result != null && result.size() > 0) {
             return Optional.of(result);
