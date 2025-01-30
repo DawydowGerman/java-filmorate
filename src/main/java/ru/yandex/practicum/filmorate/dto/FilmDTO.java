@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dto;
 
 import lombok.Data;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
@@ -17,12 +18,21 @@ public class FilmDTO {
     private Long duration;
     private Mpa mpa;
     private List<Genre> genres = new ArrayList<>();
+    private List<Director> directors = new ArrayList<>();
 
     public FilmDTO() {
     }
 
-    public FilmDTO(Long id, String name, String description,
-                   LocalDate releaseDate, Long duration, Mpa mpa, List<Genre> genres) {
+    public FilmDTO(
+            Long id,
+            String name,
+            String description,
+            LocalDate releaseDate,
+            Long duration,
+            Mpa mpa,
+            List<Genre> genres,
+            List<Director> directors
+    ) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -30,5 +40,6 @@ public class FilmDTO {
         this.duration = duration;
         this.mpa = mpa;
         this.genres = genres;
+        this.directors = directors;
     }
 }

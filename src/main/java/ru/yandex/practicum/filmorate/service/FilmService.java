@@ -19,6 +19,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
+import ru.yandex.practicum.filmorate.storage.DatabaseFilmDirectorsStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -34,20 +35,25 @@ import static java.lang.Long.valueOf;
 @Service
 @Data
 public class FilmService {
-    private FilmStorage filmStorage;
-    private UserStorage userStorage;
-    private DatabaseFilmGenresStorage databaseFilmGenresStorage;
-    private LikesStorage likesStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
+    private final DatabaseFilmGenresStorage databaseFilmGenresStorage;
+    private final DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage;
+    private final LikesStorage likesStorage;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Autowired
-    public FilmService(@Qualifier("DatabaseFilmStorage") FilmStorage filmStorage,
-                       @Qualifier("DatabaseUserStorage") UserStorage userStorage,
-                       DatabaseFilmGenresStorage databaseFilmGenresStorage,
-                       @Qualifier("DatabaseLikesStorage") LikesStorage likesStorage) {
+    public FilmService(
+            @Qualifier("DatabaseFilmStorage") FilmStorage filmStorage,
+            @Qualifier("DatabaseUserStorage") UserStorage userStorage,
+            DatabaseFilmGenresStorage databaseFilmGenresStorage,
+            DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage,
+            @Qualifier("DatabaseLikesStorage") LikesStorage likesStorage
+    ) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.databaseFilmGenresStorage = databaseFilmGenresStorage;
+        this.databaseFilmDirectorsStorage = databaseFilmDirectorsStorage;
         this.likesStorage = likesStorage;
     }
 
@@ -87,45 +93,61 @@ public class FilmService {
                 throw new NotFoundException("Жанр не может иметь ID больше 6");
             }
         }
-        filmDTO.setGenres(filmDTO.getGenres().stream().distinct().collect(Collectors.toList()));
+        filmDTO.setGenres(filmDTO.getGenres().stream().distinct().toList());
+        filmDTO.setDirectors(filmDTO.getDirectors().stream().distinct().toList());
+
         Film film = FilmMapper.toModel(filmDTO);
         film = filmStorage.create(film);
-        if (film.getGenres() != null && film.getGenres().size() > 0) {
+
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             databaseFilmGenresStorage.saveFilmGenres(film);
         }
+
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            databaseFilmDirectorsStorage.saveFilmDirectors(film);
+        }
+
         return FilmMapper.toDto(film);
     }
 
     public List<FilmDTO> findAll() {
         Optional<List<Film>> filmList = filmStorage.findAll();
-        if (filmList.isPresent()) {
-            filmList.get()
-                    .stream()
-                    .forEach(film -> {
-                        if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
-                            this.assignGenres(film);
-                        }
-                        this.assignMpa(film);
-                        FilmMapper.toDto(film);
-                    });
 
-            List<FilmDTO> dtoList = filmList.get()
-                    .stream()
-                    .map(film -> FilmMapper.toDto(film))
-                    .collect(Collectors.toList());
-            return dtoList;
-        } else throw new NotFoundException("Список фильмов пуст.");
+        if (filmList.isEmpty()) {
+            throw new NotFoundException("Список фильмов пуст.");
+        }
+
+        filmList.get()
+                .stream()
+                .forEach(film -> {
+                    if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
+                        this.assignGenres(film);
+                    }
+                    if (databaseFilmDirectorsStorage.isFilmHasDirector(film.getId())) {
+                        this.assignDirectors(film);
+                    }
+                    this.assignMpa(film);
+                    FilmMapper.toDto(film);
+                });
+
+        return filmList.get()
+                       .stream()
+                       .map(FilmMapper::toDto)
+                       .toList();
     }
 
     public FilmDTO getFilmById(Long filmId) {
         Optional<Film> film = filmStorage.getFilmById(filmId);
-        if (film.isPresent()) {
-            if (databaseFilmGenresStorage.isFilmHasGenre(film.get().getId())) {
-                this.assignGenres(film.get());
-            }
-            this.assignMpa(film.get());
-            return FilmMapper.toDto(film.get());
-        } else throw new NotFoundException("Фильм с " + filmId + " отсутствует.");
+        if (film.isEmpty()) {
+            throw new NotFoundException("Фильм с " + filmId + " отсутствует.");
+        }
+
+        if (databaseFilmGenresStorage.isFilmHasGenre(film.get().getId())) {
+            this.assignGenres(film.get());
+        }
+
+        this.assignMpa(film.get());
+        return FilmMapper.toDto(film.get());
     }
 
     public FilmDTO update(FilmDTO filmDTO) {
@@ -133,6 +155,7 @@ public class FilmService {
             log.error("Ошибка при обновлении фильма");
             throw new ValidationException("Id должен быть указан");
         }
+
         if (filmStorage.isFilmIdExists(filmDTO.getId())) {
             if (filmDTO.getName() == null || filmDTO.getName().isBlank()) {
                 log.error("Ошибка при обновлении фильма");
@@ -185,38 +208,42 @@ public class FilmService {
         if (userStorage.isUserIdExists(userId) && filmStorage.isFilmIdExists(filmId)) {
             likesStorage.giveLike(userId, filmId);
             log.trace("Фильму с Id {} поставлен лайк", filmId);
-        } else {
-            log.error("Ошибка при добавлении лайка");
-            throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
+
+            return;
         }
+
+        log.error("Ошибка при добавлении лайка");
+        throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
     }
 
     public void removeLike(Long userId, Long filmId) {
         if (userStorage.isUserIdExists(userId) && filmStorage.isFilmIdExists(filmId)) {
             likesStorage.removeLike(userId, filmId);
             log.trace("Для фильма с Id {} удален лайк", filmId);
-        } else {
-            log.error("Ошибка при удаленнии лайка");
-            throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
+
+            return;
         }
+
+        log.error("Ошибка при удаленнии лайка");
+        throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
     }
 
     public List<FilmDTO> getMostPopularFilms(Integer count) {
-        if (filmStorage.findAll().isPresent()) {
-            List<Film> allFilmsList = filmStorage.getMostPopularFilms();
-            int numberToRemove = allFilmsList.size() - count;
-            for (int i = 0; i < numberToRemove; i++) {
-                allFilmsList.removeLast();
-            }
-            List<FilmDTO> dtoList = allFilmsList
-                    .stream()
-                    .map(film -> FilmMapper.toDto(film))
-                    .collect(Collectors.toList());
-            return dtoList;
-        } else {
+        if (filmStorage.findAll().isEmpty()) {
             log.error("Ошибка при получении списка самых популярных фильмов.");
             throw new NotFoundException("Список фильмов пуст.");
+
         }
+        List<Film> allFilmsList = filmStorage.getMostPopularFilms();
+        int numberToRemove = allFilmsList.size() - count;
+        for (int i = 0; i < numberToRemove; i++) {
+            allFilmsList.removeLast();
+        }
+
+        return allFilmsList
+                .stream()
+                .map(FilmMapper::toDto)
+                .toList();
     }
 
     public List<FilmDTO> getCommonFilms(Long userId, Long friendId) {
@@ -324,6 +351,19 @@ public class FilmService {
         return dtoList;
     }
 
+    public List<FilmDTO> getFilmsByDirector(final Long directorId, final String sort) {
+        return filmStorage.getFilmsByDirector(directorId, sort.equals("likes") ? "likes" : "year")
+                          .stream()
+                          .map(film -> {
+                              this.assignGenres(film);
+                              this.assignDirectors(film);
+                              this.assignMpa(film);
+
+                              return FilmMapper.toDto(film);
+                          })
+                          .toList();
+    }
+
     private Film assignGenres(Film film) {
         List<Genre> filmGenresList = new ArrayList<>();
         List<Integer> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.getId());
@@ -372,5 +412,9 @@ public class FilmService {
                 break;
         }
         return film;
+    }
+
+    private void assignDirectors(Film film) {
+        film.setDirectors(databaseFilmDirectorsStorage.getDirectorIdsOfFilm(film.getId()));
     }
 }
