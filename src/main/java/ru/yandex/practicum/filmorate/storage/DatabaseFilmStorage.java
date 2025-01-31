@@ -99,7 +99,9 @@ public class DatabaseFilmStorage implements FilmStorage {
 
         params.add(limit);
 
-        sqlQuery += "WHERE " + String.join(" AND ", whereClause) + " ";
+        if (!whereClause.isEmpty()) {
+            sqlQuery += "WHERE " + String.join(" AND ", whereClause) + " ";
+        }
 
         sqlQuery += "GROUP BY f.film_id " +
                 "ORDER BY like_cnt DESC " +
