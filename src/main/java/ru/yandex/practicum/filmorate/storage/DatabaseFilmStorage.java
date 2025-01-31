@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
 
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,31 +78,34 @@ public class DatabaseFilmStorage implements FilmStorage {
         return film;
     }
 
-    public List<Film> getMostPopularFilms() {
-        String sqlQuery = "SELECT FILM_ID,\n" +
-                "       NAME,\n" +
-                "       DESCRIPTION,\n" +
-                "       RELEASEDATE,\n" +
-                "       DURATION,\n" +
-                "       MPARATING_ID\n" +
-                "FROM (\n" +
-                "\n" +
-                "select f.FILM_ID,\n" +
-                "       f.NAME,\n" +
-                "       f.DESCRIPTION,\n" +
-                "       f.RELEASEDATE,\n" +
-                "       f.DURATION,\n" +
-                "       f.MPARATING_ID,\n" +
-                "       \n" +
-                "       COUNT (f.FILM_ID) as count_value\n" +
-                "       \n" +
-                "from likes as l\n" +
-                "INNER JOIN films as f ON f.film_id = l.film_id\n" +
-                "\n" +
-                "GROUP BY f.FILM_ID\n" +
-                "ORDER BY count_value desc )";
-        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
-        return result;
+    public List<Film> getMostPopularFilms(Integer limit, Integer genreId, Integer year) {
+        String sqlQuery = "SELECT f.*, COUNT(l.film_id) like_cnt " +
+                "FROM films AS f " +
+                "LEFT JOIN likes as l ON (l.film_id = f.film_id) ";
+
+        List<String> whereClause =  new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+
+        if (genreId != null && genreId > 0) {
+            sqlQuery += "INNER JOIN film_genres fg ON fg.film_id = f.film_id ";
+            whereClause.add("fg.genres_id = ? ");
+            params.add(genreId);
+        }
+
+        if (year != null && year > 0) {
+            whereClause.add("YEAR(f.releasedate) = ? ");
+            params.add(year);
+        }
+
+        params.add(limit);
+
+        sqlQuery += "WHERE " + String.join(" AND ", whereClause) + " ";
+
+        sqlQuery += "GROUP BY f.film_id " +
+                "ORDER BY like_cnt DESC " +
+                "LIMIT ?";
+
+        return jdbcTemplate.query(sqlQuery, filmRowMapper, params.toArray());
     }
 
     @Override

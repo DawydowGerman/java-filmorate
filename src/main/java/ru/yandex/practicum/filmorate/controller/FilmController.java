@@ -50,11 +50,12 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<FilmDTO> getMostPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
-        if (count.isPresent()) {
-            return filmService.getMostPopularFilms(count.get());
-        }
-        return filmService.getMostPopularFilms(Integer.valueOf(10));
+    public List<FilmDTO> getMostPopularFilms(
+            @RequestParam(required = false, defaultValue = "10") Integer count,
+            @RequestParam(required = false) Integer genreId,
+            @RequestParam(required = false) Integer year
+    ) {
+        return filmService.getMostPopularFilms(count, genreId, year);
     }
 
     @GetMapping("/common")

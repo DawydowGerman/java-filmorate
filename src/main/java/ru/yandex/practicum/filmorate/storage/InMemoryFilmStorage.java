@@ -78,7 +78,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getMostPopularFilms() {
+    public List<Film> getMostPopularFilms(Integer limit, Integer genreId, Integer year) {
         List<Film> allFilmsList = this.findAll().get();
         Collections.sort(allFilmsList);
         return allFilmsList;

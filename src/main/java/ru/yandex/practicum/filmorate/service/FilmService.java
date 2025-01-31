@@ -201,22 +201,20 @@ public class FilmService {
         }
     }
 
-    public List<FilmDTO> getMostPopularFilms(Integer count) {
-        if (filmStorage.findAll().isPresent()) {
-            List<Film> allFilmsList = filmStorage.getMostPopularFilms();
-            int numberToRemove = allFilmsList.size() - count;
-            for (int i = 0; i < numberToRemove; i++) {
-                allFilmsList.removeLast();
-            }
-            List<FilmDTO> dtoList = allFilmsList
-                    .stream()
-                    .map(film -> FilmMapper.toDto(film))
-                    .collect(Collectors.toList());
-            return dtoList;
-        } else {
+    public List<FilmDTO> getMostPopularFilms(
+            Integer count,
+            Integer genderId,
+            Integer year
+    ) {
+        if (filmStorage.findAll().isEmpty()) {
             log.error("Ошибка при получении списка самых популярных фильмов.");
             throw new NotFoundException("Список фильмов пуст.");
         }
+
+        return filmStorage.getMostPopularFilms(count, genderId, year)
+                .stream()
+                .map(FilmMapper::toDto)
+                .toList();
     }
 
     public List<FilmDTO> getCommonFilms(Long userId, Long friendId) {
