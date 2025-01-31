@@ -146,6 +146,10 @@ public class FilmService {
             this.assignGenres(film.get());
         }
 
+        if (databaseFilmDirectorsStorage.isFilmHasDirector(film.get().getId())) {
+            this.assignDirectors(film.get());
+        }
+
         this.assignMpa(film.get());
         return FilmMapper.toDto(film.get());
     }
@@ -194,9 +198,15 @@ public class FilmService {
             }
             Film film = FilmMapper.toModel(filmDTO);
             film = filmStorage.update(film);
-            if (film.getGenres() != null && film.getGenres().size() > 0) {
+
+            if (film.getGenres() != null && !film.getGenres().isEmpty()) {
                 databaseFilmGenresStorage.saveFilmGenres(film);
             }
+
+            if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+                databaseFilmDirectorsStorage.saveFilmDirectors(film);
+            }
+
             return FilmMapper.toDto(film);
         } else {
             log.error("Ошибка при обновлении фильма");
@@ -415,6 +425,6 @@ public class FilmService {
     }
 
     private void assignDirectors(Film film) {
-        film.setDirectors(databaseFilmDirectorsStorage.getDirectorIdsOfFilm(film.getId()));
+        film.setDirectors(databaseFilmDirectorsStorage.getDirectorOfFilm(film.getId()));
     }
 }

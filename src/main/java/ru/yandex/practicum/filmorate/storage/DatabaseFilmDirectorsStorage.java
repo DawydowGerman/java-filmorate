@@ -18,6 +18,8 @@ public class DatabaseFilmDirectorsStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public void saveFilmDirectors(Film film) {
+        jdbcTemplate.update("DELETE FROM film_directors WHERE film_id = ?", film.getId());
+
         String sqlQuery = "INSERT INTO film_directors (film_id, director_id) VALUES (?, ?)";
 
         jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
@@ -29,23 +31,26 @@ public class DatabaseFilmDirectorsStorage {
 
                     @Override
                     public int getBatchSize() {
-                        return film.getGenres().size();
+                        return film.getDirectors().size();
                     }
                 }
         );
     }
 
     public boolean isFilmHasDirector(final Long filmId) {
-        return jdbcTemplate.queryForObject(
-                "SELECT director_id FROM film_directors WHERE film_id = ?",
-                Long.class,
+        return !jdbcTemplate.query(
+                "SELECT director_id as id FROM film_directors WHERE film_id = ?",
+                new DirectorRowMapper(),
                 filmId
-        ) > 0;
+        ).isEmpty();
     }
 
-    public List<Director> getDirectorIdsOfFilm(Long filmId) {
+    public List<Director> getDirectorOfFilm(Long filmId) {
         return jdbcTemplate.query(
-                "SELECT director_id FROM film_directors WHERE film_id = ?",
+                "SELECT d.* "
+                        + "FROM directors d "
+                        + "INNER JOIN film_directors fd ON fd.director_id = d.id "
+                        + "WHERE fd.film_id = ?",
                 new DirectorRowMapper(),
                 filmId
         );
