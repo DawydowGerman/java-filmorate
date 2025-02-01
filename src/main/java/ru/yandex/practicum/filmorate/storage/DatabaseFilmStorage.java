@@ -129,4 +129,24 @@ public class DatabaseFilmStorage implements FilmStorage {
         int count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
         return count > 0;
     }
+
+    public List<Film> getFilmsByDirector(final Long directorId, final String sort) {
+        String sqlSortOrder = "ASC";
+        String subQuery = "YEAR(f.RELEASEDATE)";
+
+        if (sort.equals("likes")) {
+            sqlSortOrder = "DESC";
+            subQuery = "(SELECT COUNT(fl.*) FROM likes fl WHERE fl.film_id = f.film_id)";
+        }
+
+        return jdbcTemplate.query(
+                "SELECT res.* FROM (SELECT f.*, " + subQuery + " _rate "
+                        + "FROM films f "
+                        + "INNER JOIN film_directors fd ON f.film_id = fd.film_id "
+                        + "WHERE fd.director_id = ? ) as res "
+                        + "ORDER BY res._rate " + sqlSortOrder,
+                new FilmRowMapper(),
+                directorId
+        );
+    }
 }
