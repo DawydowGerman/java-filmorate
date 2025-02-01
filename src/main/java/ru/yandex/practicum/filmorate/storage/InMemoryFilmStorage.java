@@ -143,6 +143,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.containsKey(id);
     }
 
+    @Override
+    public List<Film> getFilmsByDirector(final Long directorId, final String sort) {
+        return this.findAll().orElse(new ArrayList<>());
+    }
+
     private long getNextId() {
         long currentMaxId = films.keySet()
                 .stream()

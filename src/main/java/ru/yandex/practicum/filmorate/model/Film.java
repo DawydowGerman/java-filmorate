@@ -31,6 +31,8 @@ public class Film implements Comparable<Film> {
     @Builder.Default
     private List<Genre> genres = new ArrayList<>();
     @Builder.Default
+    private List<Director> directors = new ArrayList<>();
+    @Builder.Default
     private Set<Long> likes = new HashSet<>();
 
     public void addLike(Long userId) {

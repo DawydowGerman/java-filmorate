@@ -34,11 +34,11 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    private static class ErrorResponse {
-        public String message;
+	private static class ErrorResponse {
+		public String error;
 
-        public ErrorResponse(String message) {
-            this.message = message;
-        }
-    }
+		public ErrorResponse(String message) {
+			this.error = message;
+		}
+	}
 }
