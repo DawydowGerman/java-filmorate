@@ -78,6 +78,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void remove(Long id) {
+        films.remove(id);
+        log.debug("Фильм с id = {} удален", id);
+    }
+
+    @Override
     public List<Film> getMostPopularFilms(Integer limit, Integer genreId, Integer year) {
         List<Film> allFilmsList = this.findAll().get();
         Collections.sort(allFilmsList);

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -44,9 +45,13 @@ public class DatabaseFilmStorage implements FilmStorage {
     public Optional<Film> getFilmById(Long filmId) {
         String sqlQuery = "select film_id, name, description, releasedate, duration, mparating_id " +
                 "from films where film_id = ?";
-        Film film = jdbcTemplate.queryForObject(sqlQuery, filmRowMapper, filmId);
-        if (film != null) {
-            return Optional.of(film);
+        try {
+            Film film = jdbcTemplate.queryForObject(sqlQuery, filmRowMapper, filmId);
+            if (film != null) {
+                return Optional.of(film);
+            }
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
         }
         return Optional.empty();
     }
@@ -78,12 +83,18 @@ public class DatabaseFilmStorage implements FilmStorage {
         return film;
     }
 
+    @Override
+    public void remove(Long id) {
+        String sqlQuery = "delete from films where film_id = ?";
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
     public List<Film> getMostPopularFilms(Integer limit, Integer genreId, Integer year) {
         String sqlQuery = "SELECT f.*, COUNT(l.film_id) like_cnt " +
                 "FROM films AS f " +
                 "LEFT JOIN likes as l ON (l.film_id = f.film_id) ";
 
-        List<String> whereClause =  new ArrayList<>();
+        List<String> whereClause = new ArrayList<>();
         List<Object> params = new ArrayList<>();
 
         if (genreId != null && genreId > 0) {

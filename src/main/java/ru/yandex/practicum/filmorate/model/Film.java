@@ -10,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static java.lang.Long.valueOf;
-
 @Data
 @Builder
 public class Film implements Comparable<Film> {
@@ -27,7 +25,7 @@ public class Film implements Comparable<Film> {
     @Builder.Default
     private Long duration = Long.valueOf(110);
     @Builder.Default
-    private Mpa mpa = new Mpa(valueOf(0));
+    private Mpa mpa = new Mpa(1L);
     @Builder.Default
     private List<Genre> genres = new ArrayList<>();
     @Builder.Default

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -41,11 +42,15 @@ public class DatabaseUserStorage implements UserStorage {
     public Optional<User> getUserById(Long userId) {
         String sqlQuery = "select user_id, email, login, name, birthday " +
                 "from users where user_id = ?";
-        User user = jdbcTemplate.queryForObject(sqlQuery, userRowMapper, userId);
-        if (user != null) {
-            return Optional.of(user);
+        try {
+            User user = jdbcTemplate.queryForObject(sqlQuery, userRowMapper, userId);
+            if (user != null) {
+                return Optional.of(user);
+            }
+            return Optional.empty();
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override
@@ -74,9 +79,9 @@ public class DatabaseUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean remove(Long id) {
+    public void remove(Long id) {
         String sqlQuery = "DELETE FROM users WHERE user_id = ?";
-        return jdbcTemplate.update(sqlQuery, id) > 0;
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     public boolean isUserIdExists(Long id) {

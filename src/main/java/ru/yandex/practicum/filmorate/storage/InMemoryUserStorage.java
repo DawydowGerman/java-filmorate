@@ -82,8 +82,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean remove(Long id) {
-        return users.get(id).equals(users.remove(id));
+    public void remove(Long id) {
+        users.remove(id);
+        log.debug("Пользователь с id = {} удален", id);
     }
 
     @Override
