@@ -15,14 +15,9 @@ import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,8 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static java.lang.Long.valueOf;
 
 @Service
 @Data
@@ -41,7 +34,6 @@ public class UserService {
     private DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private MpaStorage mpaStorage;
     private GenreStorage genreStorage;
-    private DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private FriendshipStorage friendshipStorage;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
@@ -51,16 +43,12 @@ public class UserService {
                        @Qualifier("DatabaseMpaStorage") MpaStorage mpaStorage,
                        @Qualifier("DatabaseGenreStorage") GenreStorage genreStorage,
                        DatabaseFilmGenresStorage databaseFilmGenresStorage,
-    public UserService(@Qualifier("DatabaseFilmStorage") FilmStorage filmStorage,
-                       @Qualifier("DatabaseUserStorage") UserStorage userStorage,
-                       DatabaseFilmGenresStorage databaseFilmGenresStorage,
                        @Qualifier("DatabaseFriendshipStorage") FriendshipStorage friendshipStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.databaseFilmGenresStorage = databaseFilmGenresStorage;
         this.mpaStorage = mpaStorage;
         this.genreStorage = genreStorage;
-        this.databaseFilmGenresStorage = databaseFilmGenresStorage;
-        this.databaseFilmGenresStorage = databaseFilmGenresStorage;
         this.friendshipStorage = friendshipStorage;
     }
 
@@ -216,7 +204,6 @@ public class UserService {
         }
     }
 
-
     public List<FilmDTO> getRecommendations(Long userId) {
         Optional<List<Film>> filmList = filmStorage.getRecommendations(userId);
         if (filmList.isPresent()) {
@@ -263,5 +250,4 @@ public class UserService {
 
         return film;
     }
-
 }
