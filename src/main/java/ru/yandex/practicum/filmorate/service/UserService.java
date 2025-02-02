@@ -235,7 +235,7 @@ public class UserService {
 
     private Film assignGenres(Film film) {
         List<Genre> filmGenresList = new ArrayList<>();
-        List<Integer> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.getId());
+        List<Long> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.getId());
         for (int i = 0; i < genresList.size(); i++) {
             switch (genresList.get(i)) {
                 case 1:
