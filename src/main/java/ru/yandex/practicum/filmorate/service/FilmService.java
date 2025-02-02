@@ -18,40 +18,37 @@ import ru.yandex.practicum.filmorate.mapper.MpaMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
-import ru.yandex.practicum.filmorate.storage.DatabaseFilmDirectorsStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.LikesStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static java.lang.Long.valueOf;
 
 @Service
 @Data
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private MpaStorage mpaStorage;
+    private GenreStorage genreStorage;
     private final DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private final DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage;
     private final LikesStorage likesStorage;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Autowired
-    public FilmService(
-            @Qualifier("DatabaseFilmStorage") FilmStorage filmStorage,
-            @Qualifier("DatabaseUserStorage") UserStorage userStorage,
-            DatabaseFilmGenresStorage databaseFilmGenresStorage,
-            DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage,
-            @Qualifier("DatabaseLikesStorage") LikesStorage likesStorage
-    ) {
+    public FilmService(@Qualifier("DatabaseFilmStorage") FilmStorage filmStorage,
+                       @Qualifier("DatabaseUserStorage") UserStorage userStorage,
+                       @Qualifier("DatabaseMpaStorage") MpaStorage mpaStorage,
+                       @Qualifier("DatabaseGenreStorage") GenreStorage genreStorage,
+                       DatabaseFilmGenresStorage databaseFilmGenresStorage,
+                       DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage,
+                       @Qualifier("DatabaseLikesStorage") LikesStorage likesStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.mpaStorage = mpaStorage;
+        this.genreStorage = genreStorage;
         this.databaseFilmGenresStorage = databaseFilmGenresStorage;
         this.databaseFilmDirectorsStorage = databaseFilmDirectorsStorage;
         this.likesStorage = likesStorage;
@@ -83,14 +80,14 @@ public class FilmService {
             log.error("Ошибка при добавлении фильма");
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
         }
-        if (filmDTO.getMpa().getId() > 5) {
+        if (!mpaStorage.exists(filmDTO.getMpa().getId())) {
             log.error("Ошибка при добавлении фильма");
-            throw new NotFoundException("MPA рэйтинг не может быть больше 5");
+            throw new NotFoundException("MPA рэйтинг не найден с id = " + filmDTO.getMpa().getId());
         }
         for (Genre genre : filmDTO.getGenres()) {
-            if (genre.getId() > 6) {
+            if (!genreStorage.exists(genre.getId())) {
                 log.error("Ошибка при добавлении фильма");
-                throw new NotFoundException("Жанр не может иметь ID больше 6");
+                throw new NotFoundException("Жанр не найден с id = " + genre.getId());
             }
         }
         filmDTO.setGenres(filmDTO.getGenres().stream().distinct().toList());
@@ -131,9 +128,9 @@ public class FilmService {
                 });
 
         return filmList.get()
-                       .stream()
-                       .map(FilmMapper::toDto)
-                       .toList();
+                .stream()
+                .map(FilmMapper::toDto)
+                .toList();
     }
 
     public FilmDTO getFilmById(Long filmId) {
@@ -186,14 +183,14 @@ public class FilmService {
                 log.error("Ошибка при добавлении фильма");
                 throw new ValidationException("Продолжительность фильма должна быть положительным числом");
             }
-            if (filmDTO.getMpa().getId() > 5) {
+            if (!mpaStorage.exists(filmDTO.getMpa().getId())) {
                 log.error("Ошибка при добавлении фильма");
-                throw new ValidationException("MPA рэйтинг не может быть больше 5");
+                throw new ValidationException("MPA рэйтинг не найден с id = " + filmDTO.getMpa().getId());
             }
             for (Genre genre : filmDTO.getGenres()) {
-                if (genre.getId() > 6) {
+                if (!genreStorage.exists(genre.getId())) {
                     log.error("Ошибка при добавлении фильма");
-                    throw new NotFoundException("Жанр не может иметь ID больше 6");
+                    throw new NotFoundException("Жанр не найден с id = " + genre.getId());
                 }
             }
             Film film = FilmMapper.toModel(filmDTO);
@@ -212,6 +209,14 @@ public class FilmService {
             log.error("Ошибка при обновлении фильма");
             throw new NotFoundException("Фильм с id = " + filmDTO.getId() + " не найден");
         }
+    }
+
+    public void remove(Long id) {
+        if (!filmStorage.isFilmIdExists(id)) {
+            log.error("Ошибка при удалении фильма с id = {}", id);
+            throw new NotFoundException("Фильм не найден с id = " + id);
+        }
+        filmStorage.remove(id);
     }
 
     public void giveLike(Long userId, Long filmId) {
@@ -277,148 +282,59 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public MpaDTO getMpaById(Integer mpaId) {
-        if (mpaId > 5 || mpaId < 1) {
-            throw new NotFoundException("MPA с " + mpaId + " отсутствует.");
-        }
-        Mpa mpa = new Mpa();
-        switch (mpaId) {
-            case 1:
-                mpa = new Mpa(valueOf(1), "G");
-                break;
-            case 2:
-                mpa = new Mpa(valueOf(2), "PG");
-                break;
-            case 3:
-                mpa = new Mpa(valueOf(3), "PG-13");
-                break;
-            case 4:
-                mpa = new Mpa(valueOf(4), "R");
-                break;
-            case 5:
-                mpa = new Mpa(valueOf(5), "NC-17");
-                break;
-        }
-        return MpaMapper.toDTO(mpa);
+    public MpaDTO getMpaById(Long mpaId) {
+        return MpaMapper.toDTO(mpaStorage.getById(mpaId)
+                .orElseThrow(() -> new NotFoundException("Mpa не найден с id = " + mpaId)));
     }
 
     public List<MpaDTO> getAllMpa() {
-        List<Mpa> mpaList = new ArrayList<>();
-        mpaList.add(new Mpa(valueOf(1), "G"));
-        mpaList.add(new Mpa(valueOf(2), "PG"));
-        mpaList.add(new Mpa(valueOf(3), "PG-13"));
-        mpaList.add(new Mpa(valueOf(4), "R"));
-        mpaList.add(new Mpa(valueOf(5), "NC-17"));
-        List<MpaDTO> dtoList = mpaList
+        List<Mpa> mpaList = mpaStorage.findAll();
+        return mpaList
                 .stream()
-                .map(mpa -> MpaMapper.toDTO(mpa))
+                .map(MpaMapper::toDTO)
                 .collect(Collectors.toList());
-        return dtoList;
     }
 
-    public GenreDTO getGenreById(Integer genreId) {
-        if (genreId > 6 || genreId < 1) {
-            throw new NotFoundException("Жанр с " + genreId + " отсутствует.");
-        }
-        Genre genre = new Genre();
-        switch (genreId) {
-            case 1:
-                genre = new Genre(valueOf(1), "Комедия");
-                break;
-            case 2:
-                genre = new Genre(valueOf(2), "Драма");
-                break;
-            case 3:
-                genre = new Genre(valueOf(3), "Мультфильм");
-                break;
-            case 4:
-                genre = new Genre(valueOf(4), "Триллер");
-                break;
-            case 5:
-                genre = new Genre(valueOf(5), "Документальный");
-                break;
-            case 6:
-                genre = new Genre(valueOf(6), "Боевик");
-                break;
-        }
-        return GenreMapper.toDto(genre);
+    public GenreDTO getGenreById(Long genreId) {
+        return GenreMapper.toDto(genreStorage.getById(genreId)
+                .orElseThrow(() -> new NotFoundException("Жанр с " + genreId + " отсутствует.")));
     }
 
     public List<GenreDTO> getAllGenres() {
-        List<Genre> genreList = new ArrayList<>();
-        genreList.add(new Genre(valueOf(1), "Комедия"));
-        genreList.add(new Genre(valueOf(2), "Драма"));
-        genreList.add(new Genre(valueOf(3), "Мультфильм"));
-        genreList.add(new Genre(valueOf(4), "Триллер"));
-        genreList.add(new Genre(valueOf(5), "Документальный"));
-        genreList.add(new Genre(valueOf(6), "Боевик"));
-        List<GenreDTO> dtoList = genreList
+        List<Genre> genreList = genreStorage.findAll();
+        return genreList
                 .stream()
-                .map(genre -> GenreMapper.toDto(genre))
+                .map(GenreMapper::toDto)
                 .collect(Collectors.toList());
-        return dtoList;
     }
 
     public List<FilmDTO> getFilmsByDirector(final Long directorId, final String sort) {
         return filmStorage.getFilmsByDirector(directorId, sort.equals("likes") ? "likes" : "year")
-                          .stream()
-                          .map(film -> {
-                              this.assignGenres(film);
-                              this.assignDirectors(film);
-                              this.assignMpa(film);
+                .stream()
+                .map(film -> {
+                    this.assignGenres(film);
+                    this.assignDirectors(film);
+                    this.assignMpa(film);
 
-                              return FilmMapper.toDto(film);
-                          })
-                          .toList();
+                    return FilmMapper.toDto(film);
+                })
+                .toList();
     }
 
     private Film assignGenres(Film film) {
-        List<Genre> filmGenresList = new ArrayList<>();
-        List<Integer> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.getId());
-        for (int i = 0; i < genresList.size(); i++) {
-            switch (genresList.get(i)) {
-                case 1:
-                    filmGenresList.add(new Genre(valueOf(1), "Комедия"));
-                    break;
-                case 2:
-                    filmGenresList.add(new Genre(valueOf(2), "Драма"));
-                    break;
-                case 3:
-                    filmGenresList.add(new Genre(valueOf(3), "Мультфильм"));
-                    break;
-                case 4:
-                    filmGenresList.add(new Genre(valueOf(4), "Триллер"));
-                    break;
-                case 5:
-                    filmGenresList.add(new Genre(valueOf(5), "Документальный"));
-                    break;
-                case 6:
-                    filmGenresList.add(new Genre(valueOf(6), "Боевик"));
-                    break;
-            }
-        }
+        List<Long> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.getId());
+        List<Genre> filmGenresList = genreStorage.findAll()
+                .stream()
+                .filter(genre -> genresList.contains(genre.getId()))
+                .toList();
         film.setGenres(filmGenresList);
         return film;
     }
 
     private Film assignMpa(Film film) {
-        switch ((int) film.getMpa().getId()) {
-            case 1:
-                film.getMpa().setName("G");
-                break;
-            case 2:
-                film.getMpa().setName("PG");
-                break;
-            case 3:
-                film.getMpa().setName("PG-13");
-                break;
-            case 4:
-                film.getMpa().setName("R");
-                break;
-            case 5:
-                film.getMpa().setName("NC-17");
-                break;
-        }
+        Optional<Mpa> optionalMpa = mpaStorage.getById(film.getMpa().getId());
+        optionalMpa.ifPresent(mpa -> film.getMpa().setName(mpa.getName()));
+
         return film;
     }
 

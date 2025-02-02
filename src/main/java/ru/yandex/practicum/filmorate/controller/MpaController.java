@@ -21,7 +21,7 @@ public class MpaController {
     }
 
     @GetMapping("/{mpaId}")
-    public MpaDTO getMpaById(@PathVariable Integer mpaId) {
+    public MpaDTO getMpaById(@PathVariable Long mpaId) {
         return filmService.getMpaById(mpaId);
     }
 
