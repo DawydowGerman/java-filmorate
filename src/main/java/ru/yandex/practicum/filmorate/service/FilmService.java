@@ -238,19 +238,17 @@ public class FilmService {
         throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
     }
 
-    public List<FilmDTO> getMostPopularFilms(Integer count) {
+    public List<FilmDTO> getMostPopularFilms(
+            Integer count,
+            Integer genderId,
+            Integer year
+    ) {
         if (filmStorage.findAll().isEmpty()) {
             log.error("Ошибка при получении списка самых популярных фильмов.");
             throw new NotFoundException("Список фильмов пуст.");
-
-        }
-        List<Film> allFilmsList = filmStorage.getMostPopularFilms();
-        int numberToRemove = allFilmsList.size() - count;
-        for (int i = 0; i < numberToRemove; i++) {
-            allFilmsList.removeLast();
         }
 
-        return allFilmsList
+        return filmStorage.getMostPopularFilms(count, genderId, year)
                 .stream()
                 .map(FilmMapper::toDto)
                 .toList();

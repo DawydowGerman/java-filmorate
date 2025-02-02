@@ -176,9 +176,9 @@ class FilmoRateApplicationTests {
         databaseLikesStorage.giveLike(user0.getId(), film1.getId());
         databaseLikesStorage.giveLike(user0.getId(), film2.getId());
         databaseLikesStorage.giveLike(user1.getId(), film2.getId());
-        List<Film> mostPopularFilmsList = filmStorage.getMostPopularFilms();
-        assertEquals(mostPopularFilmsList.get(0).getName(), "film2");
-        assertEquals(mostPopularFilmsList.get(1).getName(), "film1");
+        List<Film> mostPopularFilmsList = filmStorage.getMostPopularFilms(2, null, null);
+        assertEquals("film2", mostPopularFilmsList.get(0).getName());
+        assertEquals("film1", mostPopularFilmsList.get(1).getName());
     }
 
     @Test
@@ -220,8 +220,8 @@ class FilmoRateApplicationTests {
         databaseLikesStorage.giveLike(user0.getId(), film2.getId());
         databaseLikesStorage.giveLike(user1.getId(), film2.getId());
         databaseLikesStorage.removeLike(user0.getId(), film1.getId());
-        List<Film> mostPopularFilmsList = filmStorage.getMostPopularFilms();
-        assertEquals(mostPopularFilmsList.size(), 1);
+        List<Film> mostPopularFilmsList = filmStorage.getMostPopularFilms(1, null, null);
+        assertEquals(1, mostPopularFilmsList.size());
     }
 
     @Test
