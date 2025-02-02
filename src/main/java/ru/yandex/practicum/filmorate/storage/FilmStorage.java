@@ -12,15 +12,17 @@ public interface FilmStorage {
 
     Film update(Film newFilm);
 
+    void remove(Long id);
+
     Optional<Film> getFilmById(Long id);
 
-    public boolean isFilmIdExists(Long id);
+    boolean isFilmIdExists(Long id);
 
-    public List<Film> getMostPopularFilms();
+    List<Film> getMostPopularFilms(Integer limit, Integer genreId, Integer year);
 
     List<Film> getCommonFilms(Long userId, Long friendId);
 
-    public Optional<List<Film>> getRecommendations(Long id);
+    Optional<List<Film>> getRecommendations(Long id);
 
-    public List<Film> getFilmsByDirector(final Long directorId, final String sort);
+    List<Film> getFilmsByDirector(final Long directorId, final String sort);
 }

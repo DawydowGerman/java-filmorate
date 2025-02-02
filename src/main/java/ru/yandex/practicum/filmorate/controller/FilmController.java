@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.dto.FilmDTO;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/films")
@@ -39,6 +38,11 @@ public class FilmController {
         return filmService.update(filmDTO);
     }
 
+    @DeleteMapping("/{userId}")
+    public void remove(@PathVariable(name = "userId") Long id) {
+        filmService.remove(id);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void giveLike(@PathVariable Long userId, @PathVariable Long id) {
         filmService.giveLike(userId, id);
@@ -50,11 +54,12 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<FilmDTO> getMostPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
-        if (count.isPresent()) {
-            return filmService.getMostPopularFilms(count.get());
-        }
-        return filmService.getMostPopularFilms(Integer.valueOf(10));
+    public List<FilmDTO> getMostPopularFilms(
+            @RequestParam(required = false, defaultValue = "10") Integer count,
+            @RequestParam(required = false) Integer genreId,
+            @RequestParam(required = false) Integer year
+    ) {
+        return filmService.getMostPopularFilms(count, genreId, year);
     }
 
     @GetMapping("/common")

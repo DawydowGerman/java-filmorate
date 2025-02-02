@@ -43,11 +43,11 @@ public class DatabaseFilmGenresStorage {
         return count > 0;
     }
 
-    public List<Integer> getGenresIdsOfFilm(Long filmId) {
+    public List<Long> getGenresIdsOfFilm(Long filmId) {
         String sqlQuery = "SELECT GENRES_ID \n" +
                 "FROM FILM_GENRES\n" +
                 "where FILM_ID = ?";
-        List<Integer> resultList = jdbcTemplate.queryForList(sqlQuery, Integer.class, filmId);
+        List<Long> resultList = jdbcTemplate.queryForList(sqlQuery, Long.class, filmId);
         return resultList;
     }
 }

@@ -202,6 +202,7 @@ public class UserService {
         }
     }
 
+
     public List<FilmDTO> getRecommendations(Long userId) {
         Optional<List<Film>> filmList = filmStorage.getRecommendations(userId);
         if (filmList.isPresent()) {
@@ -223,13 +224,13 @@ public class UserService {
         } else throw new NotFoundException("Список фильмов пуст.");
     }
 
-    public boolean remove(Long id) {
-        if (userStorage.isUserIdExists(id)) {
-            return userStorage.remove(id);
-        } else {
-            log.error("Ошибка при удалении юзера");
-            throw new NotFoundException("Юзер отсутствует");
+    public void remove(Long id) {
+        if (!userStorage.isUserIdExists(id)) {
+            log.error("Ошибка при удалении юзера с id = {}", id);
+            throw new NotFoundException("Юзер не найден с id = " + id);
+
         }
+        userStorage.remove(id);
     }
 
     private Film assignGenres(Film film) {
