@@ -15,11 +15,9 @@ import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,6 +33,8 @@ import static java.lang.Long.valueOf;
 public class UserService {
     private FilmStorage filmStorage;
     private UserStorage userStorage;
+    private MpaStorage mpaStorage;
+    private GenreStorage genreStorage;
     private DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private FriendshipStorage friendshipStorage;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
@@ -42,10 +42,14 @@ public class UserService {
     @Autowired
     public UserService(@Qualifier("DatabaseFilmStorage") FilmStorage filmStorage,
                        @Qualifier("DatabaseUserStorage") UserStorage userStorage,
+                       @Qualifier("DatabaseMpaStorage") MpaStorage mpaStorage,
+                       @Qualifier("DatabaseGenreStorage") GenreStorage genreStorage,
                        DatabaseFilmGenresStorage databaseFilmGenresStorage,
                        @Qualifier("DatabaseFriendshipStorage") FriendshipStorage friendshipStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.mpaStorage = mpaStorage;
+        this.genreStorage = genreStorage;
         this.databaseFilmGenresStorage = databaseFilmGenresStorage;
         this.friendshipStorage = friendshipStorage;
     }
@@ -223,12 +227,6 @@ public class UserService {
         } else throw new NotFoundException("Список фильмов пуст.");
     }
 
-    public boolean remove(Long id) {
-        if (userStorage.isUserIdExists(id)) {
-            return userStorage.remove(id);
-        } else {
-            log.error("Ошибка при удалении юзера");
-            throw new NotFoundException("Юзер отсутствует");
     public void remove(Long id) {
         if (!userStorage.isUserIdExists(id)) {
             log.error("Ошибка при удалении юзера с id = {}", id);
@@ -236,4 +234,22 @@ public class UserService {
         }
         userStorage.remove(id);
     }
+
+    private Film assignGenres(Film film) {
+        List<Long> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.getId());
+        List<Genre> filmGenresList = genreStorage.findAll()
+                .stream()
+                .filter(genre -> genresList.contains(genre.getId()))
+                .toList();
+        film.setGenres(filmGenresList);
+        return film;
+    }
+
+    private Film assignMpa(Film film) {
+        Optional<Mpa> optionalMpa = mpaStorage.getById(film.getMpa().getId());
+        optionalMpa.ifPresent(mpa -> film.getMpa().setName(mpa.getName()));
+
+        return film;
+    }
+
 }
