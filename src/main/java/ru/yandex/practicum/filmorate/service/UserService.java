@@ -15,9 +15,14 @@ import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.*;
+import ru.yandex.practicum.filmorate.storage.DatabaseFilmGenresStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -33,6 +38,7 @@ import static java.lang.Long.valueOf;
 public class UserService {
     private FilmStorage filmStorage;
     private UserStorage userStorage;
+    private DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private MpaStorage mpaStorage;
     private GenreStorage genreStorage;
     private DatabaseFilmGenresStorage databaseFilmGenresStorage;
@@ -45,11 +51,15 @@ public class UserService {
                        @Qualifier("DatabaseMpaStorage") MpaStorage mpaStorage,
                        @Qualifier("DatabaseGenreStorage") GenreStorage genreStorage,
                        DatabaseFilmGenresStorage databaseFilmGenresStorage,
+    public UserService(@Qualifier("DatabaseFilmStorage") FilmStorage filmStorage,
+                       @Qualifier("DatabaseUserStorage") UserStorage userStorage,
+                       DatabaseFilmGenresStorage databaseFilmGenresStorage,
                        @Qualifier("DatabaseFriendshipStorage") FriendshipStorage friendshipStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.mpaStorage = mpaStorage;
         this.genreStorage = genreStorage;
+        this.databaseFilmGenresStorage = databaseFilmGenresStorage;
         this.databaseFilmGenresStorage = databaseFilmGenresStorage;
         this.friendshipStorage = friendshipStorage;
     }
@@ -206,6 +216,7 @@ public class UserService {
         }
     }
 
+
     public List<FilmDTO> getRecommendations(Long userId) {
         Optional<List<Film>> filmList = filmStorage.getRecommendations(userId);
         if (filmList.isPresent()) {
@@ -231,6 +242,7 @@ public class UserService {
         if (!userStorage.isUserIdExists(id)) {
             log.error("Ошибка при удалении юзера с id = {}", id);
             throw new NotFoundException("Юзер не найден с id = " + id);
+
         }
         userStorage.remove(id);
     }
