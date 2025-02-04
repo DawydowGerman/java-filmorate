@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import ru.yandex.practicum.filmorate.model.LikeType;
+import ru.yandex.practicum.filmorate.model.enums.LikeType;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
