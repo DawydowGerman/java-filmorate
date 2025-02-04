@@ -10,6 +10,11 @@ import java.util.*;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
+    @Override
+    public Optional<List<Film>> findByFilmTitle(String query) {
+        return Optional.empty();
+    }
+
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Long, Film> films = new HashMap<>();
 
@@ -116,6 +121,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getFilmsByDirector(final Long directorId, final String sort) {
         return this.findAll().orElse(new ArrayList<>());
+    }
+
+    @Override
+    public Optional<List<Film>> findByDirectorName(String query) {
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean isFilmTitleExists(String name) {
+        return false;
     }
 
     private long getNextId() {

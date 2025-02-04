@@ -68,6 +68,37 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Optional<List<Film>> findByDirectorName(String query) {
+        String sqlQuery = "SELECT *\n" +
+                "FROM FILMS\n" +
+                "WHERE FILM_ID IN\n" +
+                "\n" +
+                "(SELECT FILM_ID\n" +
+                "FROM FILM_DIRECTORS\n" +
+                "WHERE DIRECTOR_ID IN (\n" +
+                "                      SELECT ID\n" +
+                "                      from DIRECTORS\n" +
+                "                      WHERE UPPER(NAME) LIKE UPPER('%" + query + "%')))";
+        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
+        if (result.size() != 0 || result != null) {
+            return Optional.of(result);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<List<Film>> findByFilmTitle(String query) {
+        String sqlQuery = "SELECT *\n" +
+                "FROM FILMS\n" +
+                "WHERE UPPER(NAME) LIKE UPPER('%" + query + "%')";
+        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
+        if (result.size() != 0 || result != null) {
+            return Optional.of(result);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Film update(Film film) {
         String sqlQuery = "update films set " +
                 "name = ?, description = ?, releasedate = ?, duration = ?, mparating_id = ? " +
@@ -142,8 +173,16 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     public boolean isFilmIdExists(Long id) {
-        String sql = "SELECT count(*) FROM films WHERE film_id = ?";
+        String sql = "SELECT film_id FROM films WHERE film_id = ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
+        return count > 0;
+    }
+
+    public boolean isFilmTitleExists(String name) {
+        String sql = "SELECT name " +
+                     "FROM films " +
+                     "WHERE UPPER(NAME) LIKE UPPER('%" + name + "%')";
+        int count = jdbcTemplate.queryForObject(sql, new Object[]{name}, Integer.class);
         return count > 0;
     }
 

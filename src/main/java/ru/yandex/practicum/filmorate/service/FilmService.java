@@ -21,6 +21,8 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +37,7 @@ public class FilmService {
     private final DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private final DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage;
     private final LikesStorage likesStorage;
+    private final DirectorStorage directorStorage;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Autowired
@@ -44,7 +47,8 @@ public class FilmService {
                        @Qualifier("DatabaseGenreStorage") GenreStorage genreStorage,
                        DatabaseFilmGenresStorage databaseFilmGenresStorage,
                        DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage,
-                       @Qualifier("DatabaseLikesStorage") LikesStorage likesStorage) {
+                       @Qualifier("DatabaseLikesStorage") LikesStorage likesStorage,
+                       DirectorStorage directorStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.mpaStorage = mpaStorage;
@@ -52,6 +56,7 @@ public class FilmService {
         this.databaseFilmGenresStorage = databaseFilmGenresStorage;
         this.databaseFilmDirectorsStorage = databaseFilmDirectorsStorage;
         this.likesStorage = likesStorage;
+        this.directorStorage = directorStorage;
     }
 
     public FilmDTO create(FilmDTO filmDTO) {
@@ -113,24 +118,7 @@ public class FilmService {
         if (filmList.isEmpty()) {
             throw new NotFoundException("Список фильмов пуст.");
         }
-
-        filmList.get()
-                .stream()
-                .forEach(film -> {
-                    if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
-                        this.assignGenres(film);
-                    }
-                    if (databaseFilmDirectorsStorage.isFilmHasDirector(film.getId())) {
-                        this.assignDirectors(film);
-                    }
-                    this.assignMpa(film);
-                    FilmMapper.toDto(film);
-                });
-
-        return filmList.get()
-                .stream()
-                .map(FilmMapper::toDto)
-                .toList();
+        return this.assignGenreDirectorMpaConvertToDto(filmList);
     }
 
     public FilmDTO getFilmById(Long filmId) {
@@ -340,5 +328,83 @@ public class FilmService {
 
     private void assignDirectors(Film film) {
         film.setDirectors(databaseFilmDirectorsStorage.getDirectorOfFilm(film.getId()));
+    }
+
+    public List<FilmDTO> searchByTitleAndDirector(String query, List<String> by) {
+        Optional<List<Film>> result = Optional.empty();
+        if (by.size() < 1 || by.size() > 2) {
+            log.error("Ошибка при посике фильма");
+            throw new ValidationException("Строка запроса by должна содержать один либо два параметра");
+        }
+        if (by.size() == 1 && by.get(0).equals("director")) {
+            if (directorStorage.isDirectorExists(query)) {
+                result = filmStorage.findByDirectorName(query);
+                if (result.isEmpty()) {
+                    System.out.println("IS EMPTY?");
+                    log.error("Ошибка при получении фильмов");
+                    throw new NotFoundException("Фильма с таким режиссером нет.");
+                }
+                Collections.sort(result.get());
+                return this.assignGenreDirectorMpaConvertToDto(result);
+            } else {
+                log.error("Ошибка при получении фильмов");
+                throw new NotFoundException("Директор с именем " + query + " не найден.");
+            }
+        }
+        if (by.size() == 1 && by.get(0).equals("title")) {
+            if (filmStorage.isFilmTitleExists(query)) {
+                result = filmStorage.findByFilmTitle(query);
+                if (result.isEmpty()) {
+                    log.error("Ошибка при получении фильмов");
+                    throw new NotFoundException("Фильма с таким названием нет.");
+                }
+                Collections.sort(result.get());
+                return this.assignGenreDirectorMpaConvertToDto(result);
+            } else {
+                log.error("Ошибка при получении фильмов");
+                throw new NotFoundException("Фильм с названием " + query + " не найден.");
+            }
+        }
+        if (by.size() == 2) {
+            if ((by.get(0).equals("title") || by.get(0).equals("director")) &&
+                    (by.get(1).equals("title") || by.get(1).equals("director"))) {
+                Optional<List<Film>> filmList0 = filmStorage.findByDirectorName(query);
+                Optional<List<Film>> filmList1 = filmStorage.findByFilmTitle(query);
+                if (filmList0.isPresent() && filmList1.isEmpty()) {
+                    Collections.sort(filmList0.get());
+                    return this.assignGenreDirectorMpaConvertToDto(filmList0);
+                }
+                if (filmList1.isPresent() && filmList0.isEmpty()) {
+                    Collections.sort(filmList1.get());
+                    return this.assignGenreDirectorMpaConvertToDto(filmList1);
+                }
+                if (filmList1.isPresent() && filmList0.isPresent()) {
+                    filmList0.get().addAll(filmList1.get());
+                    Collections.sort(filmList0.get());
+                    return this.assignGenreDirectorMpaConvertToDto(filmList0);
+                }
+            }
+        }
+        return this.assignGenreDirectorMpaConvertToDto(result);
+    }
+
+    private List<FilmDTO> assignGenreDirectorMpaConvertToDto(Optional<List<Film>> filmList) {
+        filmList.get()
+                .stream()
+                .forEach(film -> {
+                    if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
+                        this.assignGenres(film);
+                    }
+                    if (databaseFilmDirectorsStorage.isFilmHasDirector(film.getId())) {
+                        this.assignDirectors(film);
+                    }
+                    this.assignMpa(film);
+                    FilmMapper.toDto(film);
+                });
+
+        return filmList.get()
+                .stream()
+                .map(FilmMapper::toDto)
+                .toList();
     }
 }

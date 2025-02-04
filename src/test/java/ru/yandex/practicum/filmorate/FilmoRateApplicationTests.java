@@ -308,4 +308,10 @@ class FilmoRateApplicationTests {
         Optional<List<User>> mutualFriendList = databaseFriendshipStorage.getMutualFriends(user0.getId(), user2.getId());
         assertEquals(mutualFriendList.get().get(0).getId(), user1.getId());
     }
+
+
+
+
+
+
 }
