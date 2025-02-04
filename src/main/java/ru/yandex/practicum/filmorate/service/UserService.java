@@ -7,13 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.dto.FilmDTO;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,14 +29,26 @@ import java.util.stream.Collectors;
 @Service
 @Data
 public class UserService {
+    private FilmStorage filmStorage;
     private UserStorage userStorage;
+    private DatabaseFilmGenresStorage databaseFilmGenresStorage;
+    private MpaStorage mpaStorage;
+    private GenreStorage genreStorage;
     private FriendshipStorage friendshipStorage;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    public UserService(@Qualifier("DatabaseUserStorage") UserStorage userStorage,
+    public UserService(@Qualifier("DatabaseFilmStorage") FilmStorage filmStorage,
+                       @Qualifier("DatabaseUserStorage") UserStorage userStorage,
+                       @Qualifier("DatabaseMpaStorage") MpaStorage mpaStorage,
+                       @Qualifier("DatabaseGenreStorage") GenreStorage genreStorage,
+                       DatabaseFilmGenresStorage databaseFilmGenresStorage,
                        @Qualifier("DatabaseFriendshipStorage") FriendshipStorage friendshipStorage) {
+        this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.databaseFilmGenresStorage = databaseFilmGenresStorage;
+        this.mpaStorage = mpaStorage;
+        this.genreStorage = genreStorage;
         this.friendshipStorage = friendshipStorage;
     }
 
@@ -188,11 +204,50 @@ public class UserService {
         }
     }
 
+    public List<FilmDTO> getRecommendations(Long userId) {
+        Optional<List<Film>> filmList = filmStorage.getRecommendations(userId);
+        if (filmList.isPresent()) {
+            filmList.get()
+                    .stream()
+                    .forEach(film -> {
+                        if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
+                            this.assignGenres(film);
+                        }
+                        this.assignMpa(film);
+                        FilmMapper.toDto(film);
+                    });
+
+            List<FilmDTO> dtoList = filmList.get()
+                    .stream()
+                    .map(film -> FilmMapper.toDto(film))
+                    .collect(Collectors.toList());
+            return dtoList;
+        } else throw new NotFoundException("Список фильмов пуст.");
+    }
+
     public void remove(Long id) {
         if (!userStorage.isUserIdExists(id)) {
             log.error("Ошибка при удалении юзера с id = {}", id);
             throw new NotFoundException("Юзер не найден с id = " + id);
+
         }
         userStorage.remove(id);
+    }
+
+    private Film assignGenres(Film film) {
+        List<Long> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.getId());
+        List<Genre> filmGenresList = genreStorage.findAll()
+                .stream()
+                .filter(genre -> genresList.contains(genre.getId()))
+                .toList();
+        film.setGenres(filmGenresList);
+        return film;
+    }
+
+    private Film assignMpa(Film film) {
+        Optional<Mpa> optionalMpa = mpaStorage.getById(film.getMpa().getId());
+        optionalMpa.ifPresent(mpa -> film.getMpa().setName(mpa.getName()));
+
+        return film;
     }
 }

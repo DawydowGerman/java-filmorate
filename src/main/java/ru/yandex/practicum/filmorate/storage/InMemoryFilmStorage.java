@@ -114,6 +114,42 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Optional<List<Film>> getRecommendations(Long id) {
+        List<Film> listFromMap = new ArrayList<>(films.values());
+        List<Film> filmsLikedByUser = new ArrayList<>();
+        List<Long> listUsers = new ArrayList<>();
+        List<Film> listOfFilmsLikedByOtherUsers = new ArrayList<>();
+        for (int i = 0; i < listFromMap.size(); i++) {
+            for (Long long0 : listFromMap.get(i).getLikes()) {
+                if (long0.equals(id)) {
+                    filmsLikedByUser.add(listFromMap.get(i));
+                }
+            }
+        }
+        for (Film film0 : filmsLikedByUser) {
+            for (Long long1 : film0.getLikes()) {
+                if (!long1.equals(id)) {
+                    listUsers.add(long1);
+                }
+            }
+        }
+        for (Film film1 : listFromMap) {
+            for (Long long2 : film1.getLikes()) {
+                for (Long long3 : listUsers) {
+                    if (long3.equals(long2)) {
+                        listOfFilmsLikedByOtherUsers.add(film1);
+                    }
+                }
+            }
+        }
+        listOfFilmsLikedByOtherUsers.removeAll(filmsLikedByUser);
+        if (listOfFilmsLikedByOtherUsers.size() != 0 || listOfFilmsLikedByOtherUsers != null) {
+            return Optional.of(listOfFilmsLikedByOtherUsers);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public boolean isFilmIdExists(Long id) {
         return films.containsKey(id);
     }

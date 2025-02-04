@@ -92,6 +92,14 @@ class FilmoRateApplicationTests {
             .duration(Long.valueOf(120))
             .build();
 
+    Film film3 = Film.builder()
+            .id(Long.valueOf(92))
+            .name("film3")
+            .description("some desc0")
+            .releaseDate(LocalDate.of(2022, 12, 28))
+            .duration(Long.valueOf(120))
+            .build();
+
     @Test
     public void testCreateUserStorage() {
         User testUser = userStorage.create(user0);
@@ -309,9 +317,28 @@ class FilmoRateApplicationTests {
         assertEquals(mutualFriendList.get().get(0).getId(), user1.getId());
     }
 
+    @Test
+    public void testGetRecommendations() {
+        userStorage.create(user0);
+        userStorage.create(user1);
+        userStorage.create(user2);
 
+        filmStorage.create(film0);
+        filmStorage.create(film1);
+        filmStorage.create(film2);
+        filmStorage.create(film3);
 
+        databaseLikesStorage.giveLike(user0.getId(), film0.getId());
+        databaseLikesStorage.giveLike(user0.getId(), film1.getId());
 
+        databaseLikesStorage.giveLike(user1.getId(), film0.getId());
+        databaseLikesStorage.giveLike(user1.getId(), film2.getId());
 
+        databaseLikesStorage.giveLike(user2.getId(), film0.getId());
+        databaseLikesStorage.giveLike(user2.getId(), film3.getId());
 
+        Optional<List<Film>> filmList = filmStorage.getRecommendations(user2.getId());
+        assertEquals(filmList.get().get(0), (film1));
+        assertEquals(filmList.get().get(1), (film2));
+    }
 }
