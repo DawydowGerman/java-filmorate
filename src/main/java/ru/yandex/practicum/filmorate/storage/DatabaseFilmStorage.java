@@ -209,13 +209,13 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     public boolean isFilmIdExists(Long id) {
-        String sql = "SELECT film_id FROM films WHERE film_id = ?";
+        String sql = "SELECT count(*) FROM films WHERE film_id = ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
         return count > 0;
     }
 
     public boolean isFilmTitleExists(String name) {
-        String sql = "SELECT name " +
+        String sql = "SELECT count(*) " +
                      "FROM films " +
                      "WHERE UPPER(NAME) LIKE UPPER('%" + name + "%')";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{name}, Integer.class);
