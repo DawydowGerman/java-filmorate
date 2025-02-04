@@ -37,8 +37,8 @@ public class FilmService {
     private final DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private final DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage;
     private final LikesStorage likesStorage;
-    private final DirectorStorage directorStorage;
     private EventService eventService;
+    private final DirectorStorage directorStorage;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Autowired
@@ -49,7 +49,7 @@ public class FilmService {
                        DatabaseFilmGenresStorage databaseFilmGenresStorage,
                        DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage,
                        @Qualifier("DatabaseLikesStorage") LikesStorage likesStorage,
-                       DirectorStorage directorStorage) {
+                       DirectorStorage directorStorage,
                        EventService eventService) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
@@ -213,7 +213,6 @@ public class FilmService {
     public void giveLike(Long userId, Long filmId) {
         if (userStorage.isUserIdExists(userId) && filmStorage.isFilmIdExists(filmId)) {
             likesStorage.giveLike(userId, filmId);
-            eventService.add(filmId, userId, EventType.LIKE);
             log.trace("Фильму с Id {} поставлен лайк", filmId);
 
             return;
