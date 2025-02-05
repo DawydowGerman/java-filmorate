@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.CreateReviewRequest;
 import ru.yandex.practicum.filmorate.dto.ReviewDTO;
 import ru.yandex.practicum.filmorate.dto.UpdateReviewRequest;
-import ru.yandex.practicum.filmorate.model.LikeType;
+import ru.yandex.practicum.filmorate.model.enums.LikeType;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import java.util.List;

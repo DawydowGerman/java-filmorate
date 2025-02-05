@@ -18,6 +18,7 @@ import ru.yandex.practicum.filmorate.mapper.MpaMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
@@ -37,6 +38,7 @@ public class FilmService {
     private final DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage;
     private final LikesStorage likesStorage;
     private final DirectorStorage directorStorage;
+    private EventService eventService;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Autowired
@@ -48,6 +50,7 @@ public class FilmService {
                        DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage,
                        @Qualifier("DatabaseLikesStorage") LikesStorage likesStorage,
                        DirectorStorage directorStorage) {
+                       EventService eventService) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.mpaStorage = mpaStorage;
@@ -56,6 +59,7 @@ public class FilmService {
         this.databaseFilmDirectorsStorage = databaseFilmDirectorsStorage;
         this.likesStorage = likesStorage;
         this.directorStorage = directorStorage;
+        this.eventService = eventService;
     }
 
     public FilmDTO create(FilmDTO filmDTO) {
@@ -209,6 +213,7 @@ public class FilmService {
     public void giveLike(Long userId, Long filmId) {
         if (userStorage.isUserIdExists(userId) && filmStorage.isFilmIdExists(filmId)) {
             likesStorage.giveLike(userId, filmId);
+            eventService.add(filmId, userId, EventType.LIKE);
             log.trace("Фильму с Id {} поставлен лайк", filmId);
 
             return;
@@ -221,6 +226,7 @@ public class FilmService {
     public void removeLike(Long userId, Long filmId) {
         if (userStorage.isUserIdExists(userId) && filmStorage.isFilmIdExists(filmId)) {
             likesStorage.removeLike(userId, filmId);
+            eventService.remove(filmId, userId, EventType.LIKE);
             log.trace("Для фильма с Id {} удален лайк", filmId);
 
             return;

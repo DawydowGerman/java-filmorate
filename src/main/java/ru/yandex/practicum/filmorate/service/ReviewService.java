@@ -8,7 +8,8 @@ import ru.yandex.practicum.filmorate.dto.CreateReviewRequest;
 import ru.yandex.practicum.filmorate.dto.ReviewDTO;
 import ru.yandex.practicum.filmorate.dto.UpdateReviewRequest;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
-import ru.yandex.practicum.filmorate.model.LikeType;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.LikeType;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
@@ -22,12 +23,14 @@ public class ReviewService {
     private FilmService filmService;
     private UserService userService;
     private ReviewStorage reviewStorage;
+    private EventService eventService;
 
     public ReviewDTO create(CreateReviewRequest review) {
         filmService.getFilmById(review.getFilmId());
         userService.getUserById(review.getUserId());
 
         Review result = reviewStorage.create(ReviewMapper.mapToReview(review));
+        eventService.add(result.getId(), result.getUserId(), EventType.REVIEW);
         return ReviewMapper.mapToReviewResponse(result);
     }
 
@@ -51,6 +54,7 @@ public class ReviewService {
         Review updatedReview = ReviewMapper.updateReviewFields(oldReview, request);
 
         reviewStorage.update(updatedReview);
+        eventService.update(updatedReview.getId(), updatedReview.getUserId(), EventType.REVIEW);
         return ReviewMapper.mapToReviewResponse(updatedReview);
     }
 
@@ -58,6 +62,7 @@ public class ReviewService {
         Optional<Review> review = reviewStorage.getById(reviewId);
         if (review.isPresent()) {
             reviewStorage.deleteReview(reviewId);
+            eventService.remove(reviewId, review.get().getUserId(), EventType.REVIEW);
         }
     }
 
