@@ -186,10 +186,8 @@ public class FilmService {
             }
             Film film = FilmMapper.toModel(filmDTO);
             film = filmStorage.update(film);
-
-            if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-                databaseFilmGenresStorage.saveFilmGenres(film);
-            }
+            databaseFilmGenresStorage.updateFilmGenres(film);
+            assignGenres(film);
 
             if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
                 databaseFilmDirectorsStorage.saveFilmDirectors(film);
@@ -247,6 +245,8 @@ public class FilmService {
 
         return filmStorage.getMostPopularFilms(count, genderId, year)
                 .stream()
+                .map(this::assignGenres)
+                .map(this::assignMpa)
                 .map(FilmMapper::toDto)
                 .toList();
     }

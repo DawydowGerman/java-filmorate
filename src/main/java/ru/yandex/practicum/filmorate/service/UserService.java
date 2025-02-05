@@ -195,19 +195,17 @@ public class UserService {
     }
 
     public List<UserDTO> getMutualFriends(Long idUser0, Long idUser1) {
-        if (userStorage.isUserIdExists(idUser0) && userStorage.isUserIdExists(idUser1)) {
-            if (friendshipStorage.getMutualFriends(idUser0, idUser1).isPresent()) {
-                List<UserDTO> dtoList = friendshipStorage.getMutualFriends(idUser0, idUser1).get()
-                        .stream()
-                        .map(user -> UserMapper.toDto(user))
-                        .collect(Collectors.toList());
-                return dtoList;
-            } else throw new NotFoundException("У юзера с " + idUser0 + " "
-                    + idUser1 + " отсутствует общие друзья.");
-        } else {
+        if (!userStorage.isUserIdExists(idUser0) || !userStorage.isUserIdExists(idUser1)) {
             log.error("Ошибка при удалении из друзей");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");
         }
+
+        Optional<List<User>> optionalUserList = friendshipStorage.getMutualFriends(idUser0, idUser1);
+        return optionalUserList.map(users -> users
+                .stream()
+                .map(UserMapper::toDto)
+                .collect(Collectors.toList())).orElseGet(ArrayList::new);
+
     }
 
     public List<FilmDTO> getRecommendations(Long userId) {

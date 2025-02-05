@@ -37,6 +37,14 @@ public class DatabaseFilmGenresStorage {
         } else jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(0).getId());
     }
 
+    public void updateFilmGenres(Film film) {
+        String sqlQuery = "delete from film_genres where film_id = ?";
+        jdbcTemplate.update(sqlQuery, film.getId());
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            saveFilmGenres(film);
+        }
+    }
+
     public boolean isFilmHasGenre(Long filmId) {
         String sql = "SELECT count(*) FROM film_genres WHERE film_id = ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{filmId}, Integer.class);
