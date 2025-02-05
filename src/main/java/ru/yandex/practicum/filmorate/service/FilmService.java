@@ -329,6 +329,7 @@ public class FilmService {
         film.setDirectors(databaseFilmDirectorsStorage.getDirectorOfFilm(film.getId()));
     }
 
+
     public List<FilmDTO> searchByTitleAndDirector(String query, List<String> by) {
         Optional<List<Film>> result = Optional.empty();
         if (by.size() < 1 || by.size() > 2) {
