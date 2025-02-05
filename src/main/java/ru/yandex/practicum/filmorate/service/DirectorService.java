@@ -67,7 +67,7 @@ public class DirectorService {
     }
 
     private void validate(final DirectorDTO directorDto) {
-        if (directorDto.getName() == null || directorDto.getName().isEmpty()) {
+        if (directorDto.getName() == null || directorDto.getName().isBlank()) {
             throw new ValidationException("Director name is empty");
         }
     }
