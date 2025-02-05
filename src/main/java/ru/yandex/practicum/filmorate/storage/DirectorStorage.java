@@ -16,4 +16,6 @@ public interface DirectorStorage {
     public void deleteById(Long id);
 
     public boolean existsById(Long id);
+
+    public boolean isDirectorExists(String name);
 }

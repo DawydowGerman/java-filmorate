@@ -341,4 +341,10 @@ class FilmoRateApplicationTests {
         assertEquals(filmList.get().get(0), (film1));
         assertEquals(filmList.get().get(1), (film2));
     }
+
+
+
+
+
+
 }

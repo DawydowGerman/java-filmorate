@@ -25,4 +25,10 @@ public interface FilmStorage {
     Optional<List<Film>> getRecommendations(Long id);
 
     List<Film> getFilmsByDirector(final Long directorId, final String sort);
+
+    Optional<List<Film>> findByDirectorName(String query);
+
+    Optional<List<Film>> findByFilmTitle(String query);
+
+    boolean isFilmTitleExists(String name);
 }

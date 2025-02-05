@@ -19,6 +19,7 @@ import java.util.List;
 public class DatabaseDirectorStorage implements DirectorStorage {
 
     private final JdbcTemplate jdbc;
+    private final JdbcTemplate jdbcTemplate;
     private final DirectorRowMapper mapper = new DirectorRowMapper();
 
     @Override
@@ -99,4 +100,11 @@ public class DatabaseDirectorStorage implements DirectorStorage {
         }
     }
 
+    @Override
+    public boolean isDirectorExists(String name) {
+        name = "%" + name + "%";
+        String sql = "SELECT count(*) FROM DIRECTORS WHERE NAME LIKE ?";
+        int count = jdbcTemplate.queryForObject(sql, new Object[]{name}, Integer.class);
+        return count > 0;
+    }
 }

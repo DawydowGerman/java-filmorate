@@ -38,11 +38,9 @@ public class DatabaseFilmDirectorsStorage {
     }
 
     public boolean isFilmHasDirector(final Long filmId) {
-        return !jdbcTemplate.query(
-                "SELECT director_id as id FROM film_directors WHERE film_id = ?",
-                new DirectorRowMapper(),
-                filmId
-        ).isEmpty();
+        String sql = "SELECT count(*) FROM film_directors WHERE film_id = ?";
+        int count = jdbcTemplate.queryForObject(sql, new Object[]{filmId}, Integer.class);
+        return count > 0;
     }
 
     public List<Director> getDirectorOfFilm(Long filmId) {
