@@ -215,9 +215,8 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     public boolean isFilmTitleExists(String name) {
-        String sql = "SELECT count(*) " +
-                     "FROM films " +
-                     "WHERE UPPER(NAME) LIKE UPPER('%" + name + "%')";
+        name = "%" + name + "%";
+        String sql = "SELECT count(*) FROM films WHERE NAME LIKE ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{name}, Integer.class);
         return count > 0;
     }

@@ -103,7 +103,7 @@ public class DatabaseDirectorStorage implements DirectorStorage {
     @Override
     public boolean isDirectorExists(String name) {
         name = "%" + name + "%";
-        String sql = "SELECT count(*) FROM DIRECTORS WHERE LOWER(NAME) LIKE ?";
+        String sql = "SELECT count(*) FROM DIRECTORS WHERE NAME LIKE ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{name}, Integer.class);
         return count > 0;
     }
