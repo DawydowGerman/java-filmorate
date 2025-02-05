@@ -368,26 +368,17 @@ public class FilmService {
         if (by.size() == 2) {
             if ((by.get(0).equals("title") || by.get(0).equals("director")) &&
                     (by.get(1).equals("title") || by.get(1).equals("director"))) {
-                if (filmStorage.isFilmTitleExists(query) ||
-                        directorStorage.isDirectorExists(query)) {
-                    Optional<List<Film>> filmList0 = filmStorage.findByDirectorName(query);
-                    Optional<List<Film>> filmList1 = filmStorage.findByFilmTitle(query);
-                    if (filmList0.isPresent() && filmList1.isEmpty()) {
-                        Collections.sort(filmList0.get());
-                        return this.assignGenreDirectorMpaConvertToDto(filmList0);
-                    }
-                    if (filmList1.isPresent() && filmList0.isEmpty()) {
-                        Collections.sort(filmList1.get());
-                        return this.assignGenreDirectorMpaConvertToDto(filmList1);
-                    }
-                    if (filmList1.isPresent() && filmList0.isPresent()) {
-                        filmList0.get().addAll(filmList1.get());
-                        Collections.sort(filmList0.get());
-                        return this.assignGenreDirectorMpaConvertToDto(filmList0);
-                    }
-                } else {
-                    log.error("Ошибка при получении фильмов");
-                    throw new NotFoundException("Фильм с названием и/или директор с именем " + query + " не найдены.");
+                Optional<List<Film>> filmList0 = filmStorage.findByDirectorName(query);
+                Optional<List<Film>> filmList1 = filmStorage.findByFilmTitle(query);
+                if (filmList0.isPresent() && filmList1.isEmpty()) {
+                    return this.assignGenreDirectorMpaConvertToDto(filmList0);
+                }
+                if (filmList1.isPresent() && filmList0.isEmpty()) {
+                    return this.assignGenreDirectorMpaConvertToDto(filmList1);
+                }
+                if (filmList1.isPresent() && filmList0.isPresent()) {
+                    filmList1.get().addAll(filmList0.get());
+                    return this.assignGenreDirectorMpaConvertToDto(filmList1);
                 }
             }
         }
