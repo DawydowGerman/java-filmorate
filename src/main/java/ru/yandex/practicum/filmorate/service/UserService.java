@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ public class UserService {
     private MpaStorage mpaStorage;
     private GenreStorage genreStorage;
     private FriendshipStorage friendshipStorage;
+    private EventService eventService;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
@@ -43,13 +45,15 @@ public class UserService {
                        @Qualifier("DatabaseMpaStorage") MpaStorage mpaStorage,
                        @Qualifier("DatabaseGenreStorage") GenreStorage genreStorage,
                        DatabaseFilmGenresStorage databaseFilmGenresStorage,
-                       @Qualifier("DatabaseFriendshipStorage") FriendshipStorage friendshipStorage) {
+                       @Qualifier("DatabaseFriendshipStorage") FriendshipStorage friendshipStorage,
+                       EventService eventService) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.databaseFilmGenresStorage = databaseFilmGenresStorage;
         this.mpaStorage = mpaStorage;
         this.genreStorage = genreStorage;
         this.friendshipStorage = friendshipStorage;
+        this.eventService = eventService;
     }
 
     public UserDTO create(UserDTO userDto) {
@@ -157,6 +161,7 @@ public class UserService {
     public void addFriend(Long id, Long friendId) {
         if (userStorage.isUserIdExists(id) && userStorage.isUserIdExists(friendId)) {
             friendshipStorage.addFriend(id, friendId);
+            eventService.add(friendId, id, EventType.FRIEND);
         } else {
             log.error("Ошибка при добавлении в друзья");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");
@@ -166,6 +171,7 @@ public class UserService {
     public void removeFriend(Long id, Long friendId) {
         if (userStorage.isUserIdExists(id) && userStorage.isUserIdExists(friendId)) {
             friendshipStorage.removeFriend(id, friendId);
+            eventService.remove(friendId, id, EventType.FRIEND);
         } else {
             log.error("Ошибка при удалении из друзей");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");

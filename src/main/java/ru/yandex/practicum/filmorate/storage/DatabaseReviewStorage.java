@@ -4,7 +4,7 @@ import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.LikeType;
+import ru.yandex.practicum.filmorate.model.enums.LikeType;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
