@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.Data;
-import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
