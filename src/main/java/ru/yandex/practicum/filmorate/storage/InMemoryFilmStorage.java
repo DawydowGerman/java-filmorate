@@ -15,6 +15,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Optional.empty();
     }
 
+    @Override
+    public Optional<List<Film>> getMostPopularByDirectorOrTitle(String query) {
+        return Optional.empty();
+    }
+
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Long, Film> films = new HashMap<>();
 

@@ -334,7 +334,6 @@ public class FilmService {
         film.setDirectors(databaseFilmDirectorsStorage.getDirectorOfFilm(film.getId()));
     }
 
-
     public List<FilmDTO> searchByTitleAndDirector(String query, List<String> by) {
         Optional<List<Film>> result = Optional.empty();
         if (by.size() < 1 || by.size() > 2) {
@@ -342,33 +341,20 @@ public class FilmService {
             throw new ValidationException("Строка запроса by должна содержать один либо два параметра");
         }
         if (by.size() == 1 && by.get(0).equals("director")) {
-            if (directorStorage.isDirectorExists(query)) {
-                result = filmStorage.findByDirectorName(query);
-                if (result.isEmpty()) {
-                    System.out.println("IS EMPTY?");
-                    log.error("Ошибка при получении фильмов");
-                    throw new NotFoundException("Фильма с таким режиссером нет.");
-                }
-                Collections.sort(result.get());
-                return this.assignGenreDirectorMpaConvertToDto(result);
-            } else {
+            result = filmStorage.findByDirectorName(query);
+            if (result.isEmpty()) {
                 log.error("Ошибка при получении фильмов");
-                throw new NotFoundException("Директор с именем " + query + " не найден.");
+                throw new NotFoundException("Фильма с таким режиссером нет.");
             }
+            return this.assignGenreDirectorMpaConvertToDto(result);
         }
         if (by.size() == 1 && by.get(0).equals("title")) {
-            if (filmStorage.isFilmTitleExists(query)) {
-                result = filmStorage.findByFilmTitle(query);
-                if (result.isEmpty()) {
-                    log.error("Ошибка при получении фильмов");
-                    throw new NotFoundException("Фильма с таким названием нет.");
-                }
-                Collections.sort(result.get());
-                return this.assignGenreDirectorMpaConvertToDto(result);
-            } else {
+            result = filmStorage.findByFilmTitle(query);
+            if (result.isEmpty()) {
                 log.error("Ошибка при получении фильмов");
-                throw new NotFoundException("Фильм с названием " + query + " не найден.");
+                throw new NotFoundException("Фильма с таким названием нет.");
             }
+            return this.assignGenreDirectorMpaConvertToDto(result);
         }
         if (by.size() == 2) {
             if ((by.get(0).equals("title") || by.get(0).equals("director")) &&
@@ -382,8 +368,7 @@ public class FilmService {
                     return this.assignGenreDirectorMpaConvertToDto(filmList1);
                 }
                 if (filmList1.isPresent() && filmList0.isPresent()) {
-                    filmList1.get().addAll(filmList0.get());
-                    return this.assignGenreDirectorMpaConvertToDto(filmList1);
+                    return this.assignGenreDirectorMpaConvertToDto(filmStorage.getMostPopularByDirectorOrTitle(query));
                 }
             }
         }
