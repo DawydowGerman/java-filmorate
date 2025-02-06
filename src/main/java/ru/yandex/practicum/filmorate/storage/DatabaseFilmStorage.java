@@ -68,11 +68,49 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<List<Film>> findByDirectorName(String query) {
-        String sqlQuery = "SELECT *\n" +
-                "FROM FILMS\n" +
+    public Optional<List<Film>> getMostPopularByDirectorOrTitle(String query) {
+        String sqlQuery = "SELECT FILM_ID,\n" +
+                "       NAME,\n" +
+                "       DESCRIPTION,\n" +
+                "       RELEASEDATE,\n" +
+                "       DURATION,\n" +
+                "       MPARATING_ID\n" +
+                "FROM (\n" +
+                "SELECT f.*, COUNT(l.film_id) like_cnt\n" +
+                "FROM films AS f\n" +
+                "LEFT JOIN likes as l ON (l.film_id = f.film_id) \n" +
+                "GROUP BY f.film_id\n" +
+                "ORDER BY like_cnt DESC )\n" +
                 "WHERE FILM_ID IN\n" +
-                "\n" +
+                "(SELECT FILM_ID\n" +
+                "FROM FILM_DIRECTORS\n" +
+                "WHERE DIRECTOR_ID IN (\n" +
+                "                      SELECT ID\n" +
+                "                      from DIRECTORS\n" +
+                "                      WHERE UPPER(NAME) LIKE UPPER('%" + query + "%')))" +
+                "OR UPPER(NAME) LIKE UPPER('%" + query + "%')";
+        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
+        if (result.size() != 0 || result != null) {
+            return Optional.of(result);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<List<Film>> findByDirectorName(String query) {
+        String sqlQuery = "SELECT FILM_ID,\n" +
+                "       NAME,\n" +
+                "       DESCRIPTION,\n" +
+                "       RELEASEDATE,\n" +
+                "       DURATION,\n" +
+                "       MPARATING_ID\n" +
+                "FROM (\n" +
+                "SELECT f.*, COUNT(l.film_id) like_cnt\n" +
+                "FROM films AS f\n" +
+                "LEFT JOIN likes as l ON (l.film_id = f.film_id) \n" +
+                "GROUP BY f.film_id\n" +
+                "ORDER BY like_cnt DESC )\n" +
+                "WHERE FILM_ID IN\n" +
                 "(SELECT FILM_ID\n" +
                 "FROM FILM_DIRECTORS\n" +
                 "WHERE DIRECTOR_ID IN (\n" +
@@ -88,8 +126,18 @@ public class DatabaseFilmStorage implements FilmStorage {
 
     @Override
     public Optional<List<Film>> findByFilmTitle(String query) {
-        String sqlQuery = "SELECT *\n" +
-                "FROM FILMS\n" +
+        String sqlQuery = "SELECT FILM_ID,\n" +
+                "       NAME,\n" +
+                "       DESCRIPTION,\n" +
+                "       RELEASEDATE,\n" +
+                "       DURATION,\n" +
+                "       MPARATING_ID\n" +
+                "FROM (\n" +
+                "SELECT f.*, COUNT(l.film_id) like_cnt\n" +
+                "FROM films AS f\n" +
+                "LEFT JOIN likes as l ON (l.film_id = f.film_id) \n" +
+                "GROUP BY f.film_id\n" +
+                "ORDER BY like_cnt DESC )\n" +
                 "WHERE UPPER(NAME) LIKE UPPER('%" + query + "%')";
         List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
         if (result.size() != 0 || result != null) {
