@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.Data;
+import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,6 +191,8 @@ public class FilmService {
 
             if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
                 databaseFilmDirectorsStorage.saveFilmDirectors(film);
+            } else {
+                databaseFilmDirectorsStorage.removeFilmDirectors(film.getId());
             }
 
             return FilmMapper.toDto(film);
@@ -300,8 +303,12 @@ public class FilmService {
     }
 
     public List<FilmDTO> getFilmsByDirector(final Long directorId, final String sort) {
-        return filmStorage.getFilmsByDirector(directorId, sort.equals("likes") ? "likes" : "year")
-                .stream()
+        Optional<List<Film>> filmList = filmStorage.getFilmsByDirector(directorId, sort.equals("likes") ? "likes" : "year");
+        if (filmList.isEmpty()) {
+            throw new NotFoundException("Список фильмов пуст.");
+        }
+
+        return filmList.get().stream()
                 .map(film -> {
                     this.assignGenres(film);
                     this.assignDirectors(film);

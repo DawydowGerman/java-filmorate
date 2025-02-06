@@ -160,8 +160,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilmsByDirector(final Long directorId, final String sort) {
-        return this.findAll().orElse(new ArrayList<>());
+    public Optional<List<Film>> getFilmsByDirector(final Long directorId, final String sort) {
+        return Optional.empty();
     }
 
     @Override

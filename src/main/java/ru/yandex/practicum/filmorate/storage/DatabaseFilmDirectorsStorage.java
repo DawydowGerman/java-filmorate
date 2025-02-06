@@ -37,6 +37,11 @@ public class DatabaseFilmDirectorsStorage {
         );
     }
 
+    public void removeFilmDirectors(final Long filmId) {
+        String sqlQuery = "DELETE FROM film_directors WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
+    }
+
     public boolean isFilmHasDirector(final Long filmId) {
         String sql = "SELECT count(*) FROM film_directors WHERE film_id = ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{filmId}, Integer.class);
