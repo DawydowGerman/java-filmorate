@@ -269,7 +269,7 @@ public class DatabaseFilmStorage implements FilmStorage {
         return count > 0;
     }
 
-    public List<Film> getFilmsByDirector(final Long directorId, final String sort) {
+    public Optional<List<Film>> getFilmsByDirector(final Long directorId, final String sort) {
         String sqlSortOrder = "ASC";
         String subQuery = "YEAR(f.RELEASEDATE)";
 
@@ -278,7 +278,7 @@ public class DatabaseFilmStorage implements FilmStorage {
             subQuery = "(SELECT COUNT(fl.*) FROM likes fl WHERE fl.film_id = f.film_id)";
         }
 
-        return jdbcTemplate.query(
+        List<Film> result =  jdbcTemplate.query(
                 "SELECT res.* FROM (SELECT f.*, " + subQuery + " _rate "
                         + "FROM films f "
                         + "INNER JOIN film_directors fd ON f.film_id = fd.film_id "
@@ -287,5 +287,9 @@ public class DatabaseFilmStorage implements FilmStorage {
                 new FilmRowMapper(),
                 directorId
         );
+        if (result.size() != 0) {
+            return Optional.of(result);
+        }
+        return Optional.empty();
     }
 }
