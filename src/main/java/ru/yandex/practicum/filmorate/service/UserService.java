@@ -92,10 +92,9 @@ public class UserService {
     }
 
     public UserDTO getUserById(Long userId) {
-        Optional<User> user = userStorage.getUserById(userId);
-        if (user.isPresent()) {
-            return UserMapper.toDto(user.get());
-        } else throw new NotFoundException("Юзер с " + userId + " отсутствует.");
+        return userStorage.getUserById(userId)
+                .map(UserMapper::toDto)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
     }
 
     public List<UserDTO> findAll() {
