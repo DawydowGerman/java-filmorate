@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public class DatabaseFeedStorage extends DatabaseStorage<Event> implements FeedStorage {
     private static final String INSERT_QUERY =
-            "INSERT INTO events(event_type, operation, user_id, entity_id, created_at)" +
+            "INSERT INTO events(entity_id, event_type, operation, user_id,  created_at)" +
                     "VALUES (?, ?, ?, ?, ?)";
 
     private static final String READ_EVENT_FEED_FOR_USER_QUERY = "SELECT * FROM EVENTS WHERE USER_ID = ?;";
@@ -24,10 +24,10 @@ public class DatabaseFeedStorage extends DatabaseStorage<Event> implements FeedS
     public Event create(Event event) {
         long id = insert(
                 INSERT_QUERY,
+                event.getEntityId(),
                 event.getEventType().toString(),
                 event.getOperation().toString(),
                 event.getUserId(),
-                event.getEntityId(),
                 event.getCreatedAt());
         event.setId(id);
         return event;

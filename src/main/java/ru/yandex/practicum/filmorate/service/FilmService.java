@@ -189,11 +189,13 @@ public class FilmService {
             databaseFilmGenresStorage.updateFilmGenres(film);
             assignGenres(film);
 
+
             if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
                 databaseFilmDirectorsStorage.saveFilmDirectors(film);
+
             } else {
                 databaseFilmDirectorsStorage.removeFilmDirectors(film.getId());
-            }
+        }
 
             return FilmMapper.toDto(film);
         } else {
@@ -213,6 +215,7 @@ public class FilmService {
     public void giveLike(Long userId, Long filmId) {
         if (userStorage.isUserIdExists(userId) && filmStorage.isFilmIdExists(filmId)) {
             likesStorage.giveLike(userId, filmId);
+            eventService.add(filmId, userId, EventType.LIKE);
             log.trace("Фильму с Id {} поставлен лайк", filmId);
 
             return;
@@ -249,6 +252,7 @@ public class FilmService {
                 .stream()
                 .map(this::assignGenres)
                 .map(this::assignMpa)
+                .map(this::assignDirectors)
                 .map(FilmMapper::toDto)
                 .toList();
     }
@@ -336,8 +340,10 @@ public class FilmService {
         return film;
     }
 
-    private void assignDirectors(Film film) {
+    private Film assignDirectors(Film film) {
         film.setDirectors(databaseFilmDirectorsStorage.getDirectorOfFilm(film.getId()));
+
+        return film;
     }
 
     public List<FilmDTO> searchByTitleAndDirector(String query, List<String> by) {

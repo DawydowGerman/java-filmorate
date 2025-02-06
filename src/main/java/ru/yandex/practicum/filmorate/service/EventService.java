@@ -18,18 +18,18 @@ public class EventService {
     FeedStorage feedStorage;
 
     public void add(Long entityId, Long userId, EventType eventType) {
-        feedStorage.create(createEvent(entityId, userId, eventType, Operation.ADD));
+        feedStorage.create(createEvent(entityId, eventType, Operation.ADD, userId));
     }
 
     public void remove(Long entityId, Long userId, EventType eventType) {
-        feedStorage.create(createEvent(entityId, userId, eventType, Operation.REMOVE));
+        feedStorage.create(createEvent(entityId, eventType, Operation.REMOVE, userId));
     }
 
     public void update(Long entityId, Long userId, EventType eventType) {
-        feedStorage.create(createEvent(entityId, userId, eventType, Operation.UPDATE));
+        feedStorage.create(createEvent(entityId, eventType, Operation.UPDATE, userId));
     }
 
-    private Event createEvent(Long entityId, Long userId, EventType eventType, Operation operationType) {
+    private Event createEvent(Long entityId, EventType eventType, Operation operationType, Long userId) {
         return Event.builder()
                 .entityId(entityId)
                 .eventType(eventType)
