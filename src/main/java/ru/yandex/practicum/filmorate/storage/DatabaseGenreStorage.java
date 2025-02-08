@@ -19,19 +19,19 @@ public class DatabaseGenreStorage implements GenreStorage {
     private final GenreRowMapper genreRowMapper;
 
     @Override
-    public boolean exists(Long id) {
+    public Boolean exists(Long id) {
         return getById(id).isPresent();
     }
 
     @Override
     public List<Genre> findAll() {
-        String query = "select * from genres";
+        String query = "SELECT * FROM genres";
         return jdbc.query(query, genreRowMapper);
     }
 
     @Override
     public Optional<Genre> getById(Long id) {
-        String query = "select * from genres where genres_id = :id";
+        String query = "SELECT * FROM genres WHERE genres_id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
 

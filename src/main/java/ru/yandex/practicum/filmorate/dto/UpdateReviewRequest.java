@@ -8,7 +8,7 @@ import lombok.Data;
 @Builder
 public class UpdateReviewRequest {
     @JsonProperty("reviewId")
-    private long id;
+    private Long id;
     private String content;
-    private boolean isPositive;
+    private Boolean isPositive;
 }

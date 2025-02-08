@@ -92,7 +92,7 @@ public class DatabaseDirectorStorage implements DirectorStorage {
     }
 
     @Override
-    public boolean existsById(final Long id) {
+    public Boolean existsById(final Long id) {
         try {
             return jdbc.query("SELECT id FROM directors WHERE id = ?", mapper, id).getFirst() != null;
         } catch (DataAccessException e) {
@@ -101,7 +101,7 @@ public class DatabaseDirectorStorage implements DirectorStorage {
     }
 
     @Override
-    public boolean isDirectorExists(String name) {
+    public Boolean isDirectorExists(String name) {
         name = "%" + name + "%";
         String sql = "SELECT count(*) FROM DIRECTORS WHERE NAME LIKE ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{name}, Integer.class);

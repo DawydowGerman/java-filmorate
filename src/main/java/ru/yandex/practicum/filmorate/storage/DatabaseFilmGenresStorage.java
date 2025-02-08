@@ -18,8 +18,8 @@ public class DatabaseFilmGenresStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public void saveFilmGenres(Film film) {
-        String sqlQuery = "insert into film_genres (film_id, genres_id) " +
-                "values (?, ?)";
+        String sqlQuery = "INSERT INTO film_genres (film_id, genres_id) " +
+                "VALUES (?, ?)";
         if (film.getGenres().size() > 1) {
             jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
                         @Override
@@ -38,7 +38,7 @@ public class DatabaseFilmGenresStorage {
     }
 
     public void updateFilmGenres(Film film) {
-        String sqlQuery = "delete from film_genres where film_id = ?";
+        String sqlQuery = "DELETE FROM film_genres WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, film.getId());
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             saveFilmGenres(film);
@@ -54,7 +54,7 @@ public class DatabaseFilmGenresStorage {
     public List<Long> getGenresIdsOfFilm(Long filmId) {
         String sqlQuery = "SELECT GENRES_ID \n" +
                 "FROM FILM_GENRES\n" +
-                "where FILM_ID = ?";
+                "WHERE FILM_ID = ?";
         List<Long> resultList = jdbcTemplate.queryForList(sqlQuery, Long.class, filmId);
         return resultList;
     }

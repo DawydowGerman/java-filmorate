@@ -30,13 +30,13 @@ import java.util.stream.Collectors;
 @Service
 @Data
 public class UserService {
-    private FilmStorage filmStorage;
-    private UserStorage userStorage;
-    private DatabaseFilmGenresStorage databaseFilmGenresStorage;
-    private MpaStorage mpaStorage;
-    private GenreStorage genreStorage;
-    private FriendshipStorage friendshipStorage;
-    private EventService eventService;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
+    private final DatabaseFilmGenresStorage databaseFilmGenresStorage;
+    private final MpaStorage mpaStorage;
+    private final GenreStorage genreStorage;
+    private final FriendshipStorage friendshipStorage;
+    private final EventService eventService;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired

@@ -18,7 +18,7 @@ public class InMemoryGenreStorage implements GenreStorage {
     );
 
     @Override
-    public boolean exists(Long id) {
+    public Boolean exists(Long id) {
         return GENRE_MAP.containsKey(id);
     }
 

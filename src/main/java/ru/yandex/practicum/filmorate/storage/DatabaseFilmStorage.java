@@ -43,8 +43,8 @@ public class DatabaseFilmStorage implements FilmStorage {
 
     @Override
     public Optional<Film> getFilmById(Long filmId) {
-        String sqlQuery = "select film_id, name, description, releasedate, duration, mparating_id " +
-                "from films where film_id = ?";
+        String sqlQuery = "SELECT film_id, name, description, releasedate, duration, mparating_id " +
+                "FROM films WHERE film_id = ?";
         try {
             Film film = jdbcTemplate.queryForObject(sqlQuery, filmRowMapper, filmId);
             if (film != null) {
@@ -58,8 +58,8 @@ public class DatabaseFilmStorage implements FilmStorage {
 
     @Override
     public Optional<List<Film>> findAll() {
-        String sqlQuery = "select film_id, name, description, releasedate, duration, mparating_id " +
-                "from films";
+        String sqlQuery = "SELECT film_id, name, description, releasedate, duration, mparating_id " +
+                "FROM films";
         List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
         if (result.size() != 0 || result != null) {
             return Optional.of(result);
@@ -148,9 +148,9 @@ public class DatabaseFilmStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        String sqlQuery = "update films set " +
+        String sqlQuery = "UPDATE films set " +
                 "name = ?, description = ?, releasedate = ?, duration = ?, mparating_id = ? " +
-                "where film_id = ?";
+                "WHERE film_id = ?";
 
         jdbcTemplate.update(sqlQuery,
                 film.getName(),
@@ -164,7 +164,7 @@ public class DatabaseFilmStorage implements FilmStorage {
 
     @Override
     public void remove(Long id) {
-        String sqlQuery = "delete from films where film_id = ?";
+        String sqlQuery = "DELETE FROM films WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }
 
@@ -202,20 +202,20 @@ public class DatabaseFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getCommonFilms(Long userId, Long friendId) {
-        String sqlQuery = "select сf.*\n" +
-                "from  (select f.*\n" +
-                "       from likes l1\n" +
-                "       inner join films f\n" +
-                "           on f.film_id = l1.film_id\n" +
-                "       inner join likes l2\n" +
-                "           on l2.film_id = l1.film_id\n" +
-                "           and l2.user_id = ?\n" +
-                "       where l1.user_id = ?) сf\n" +
-                "inner join (select l.film_id, count(l.user_id) as cnt\n" +
-                "           from likes l\n" +
-                "           group by l.film_id) сl\n" +
-                "   on сl.film_id = сf.film_id\n" +
-                "order by сl.cnt desc";
+        String sqlQuery = "SELECT сf.*\n" +
+                "FROM  (SELECT f.*\n" +
+                "       FROM likes l1\n" +
+                "       INNER JOIN films f\n" +
+                "           ON f.film_id = l1.film_id\n" +
+                "       INNER JOIN likes l2\n" +
+                "           ON l2.film_id = l1.film_id\n" +
+                "           AND l2.user_id = ?\n" +
+                "       WHERE l1.user_id = ?) сf\n" +
+                "INNER JOIN (SELECT l.film_id, count(l.user_id) AS cnt\n" +
+                "           FROM likes l\n" +
+                "           GROUP BY l.film_id) сl\n" +
+                "   ON сl.film_id = сf.film_id\n" +
+                "ORDER BY сl.cnt desc";
 
         return jdbcTemplate.query(sqlQuery, filmRowMapper, userId, friendId);
     }
@@ -256,13 +256,13 @@ public class DatabaseFilmStorage implements FilmStorage {
         return Optional.empty();
     }
 
-    public boolean isFilmIdExists(Long id) {
+    public Boolean isFilmIdExists(Long id) {
         String sql = "SELECT count(*) FROM films WHERE film_id = ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
         return count > 0;
     }
 
-    public boolean isFilmTitleExists(String name) {
+    public Boolean isFilmTitleExists(String name) {
         name = "%" + name + "%";
         String sql = "SELECT count(*) FROM films WHERE NAME LIKE ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{name}, Integer.class);

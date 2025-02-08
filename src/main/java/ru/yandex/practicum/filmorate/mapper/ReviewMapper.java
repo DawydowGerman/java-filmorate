@@ -30,7 +30,7 @@ public class ReviewMapper {
     }
 
     public static Review updateReviewFields(Review review, UpdateReviewRequest request) {
-        review.setIsPositive(request.isPositive());
+        review.setIsPositive(request.getIsPositive());
 
         if (request.getContent() != null) {
             review.setContent(request.getContent());

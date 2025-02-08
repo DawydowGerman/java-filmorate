@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface GenreStorage {
 
-    boolean exists(Long id);
+    Boolean exists(Long id);
 
     List<Genre> findAll();
 

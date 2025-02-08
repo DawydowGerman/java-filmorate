@@ -7,13 +7,13 @@ import lombok.Data;
 @Builder
 @Data
 public class Review {
-    Long id;
-    String content;
+    private Long id;
+    private String content;
     @NotNull
-    Boolean isPositive;
+    private Boolean isPositive;
     @NotNull
-    Long userId;
+    private Long userId;
     @NotNull
-    Long filmId;
-    Integer useful;
+    private Long filmId;
+    private Integer useful;
 }

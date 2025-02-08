@@ -14,7 +14,7 @@ import java.util.Optional;
 @Component("InMemoryFriendshipStorage")
 public class InMemoryFriendshipStorage implements FriendshipStorage {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private InMemoryUserStorage inMemoryUserStorage;
+    private final InMemoryUserStorage inMemoryUserStorage;
 
     @Autowired
     public InMemoryFriendshipStorage(InMemoryUserStorage inMemoryUserStorage) {

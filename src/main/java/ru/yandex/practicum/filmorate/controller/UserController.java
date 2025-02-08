@@ -15,8 +15,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private UserService userService;
-    private FeedService feedService;
+    private final UserService userService;
+    private final FeedService feedService;
 
     @Autowired
     public UserController(UserService userService, FeedService feedService) {

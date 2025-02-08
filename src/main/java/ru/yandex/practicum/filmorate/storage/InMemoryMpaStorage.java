@@ -17,7 +17,7 @@ public class InMemoryMpaStorage implements MpaStorage {
     );
 
     @Override
-    public boolean exists(Long id) {
+    public Boolean exists(Long id) {
         return MPA_MAP.containsKey(id);
     }
 
