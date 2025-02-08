@@ -20,10 +20,10 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class ReviewService {
-    private FilmService filmService;
-    private UserService userService;
-    private ReviewStorage reviewStorage;
-    private EventService eventService;
+    private final FilmService filmService;
+    private final UserService userService;
+    private final ReviewStorage reviewStorage;
+    private final EventService eventService;
 
     public ReviewDTO create(CreateReviewRequest review) {
         filmService.getFilmById(review.getFilmId());

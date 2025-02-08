@@ -12,13 +12,13 @@ public class DatabaseLikesStorage implements LikesStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public void giveLike(Long userId, Long filmId) {
-        String sqlQuery = "insert into likes (user_id, film_id) " +
-                "values (?, ?)";
+        String sqlQuery = "INSERT INTO likes (user_id, film_id) " +
+                "VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }
 
     public void removeLike(Long userId, Long filmId) {
-        String sqlQuery = "delete from likes where user_id = ? and film_id = ?";
+        String sqlQuery = "DELETE FROM likes WHERE user_id = ? AND film_id = ?";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }
 }

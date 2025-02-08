@@ -31,12 +31,12 @@ import java.util.stream.Collectors;
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-    private MpaStorage mpaStorage;
-    private GenreStorage genreStorage;
+    private final MpaStorage mpaStorage;
+    private final GenreStorage genreStorage;
     private final DatabaseFilmGenresStorage databaseFilmGenresStorage;
     private final DatabaseFilmDirectorsStorage databaseFilmDirectorsStorage;
     private final LikesStorage likesStorage;
-    private EventService eventService;
+    private final EventService eventService;
     private final DirectorStorage directorStorage;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 

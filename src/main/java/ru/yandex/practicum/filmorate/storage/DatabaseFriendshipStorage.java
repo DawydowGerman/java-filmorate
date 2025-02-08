@@ -45,9 +45,9 @@ public class DatabaseFriendshipStorage implements FriendshipStorage {
 
     @Override
     public Optional<List<User>> getMutualFriends(Long idUser0, Long idUser1) {
-        String sqlQuery = "select * " +
-                "from users " +
-                "where user_id IN (SELECT friend_id " +
+        String sqlQuery = "SELECT * " +
+                "FROM users " +
+                "WHERE user_id IN (SELECT friend_id " +
                 "FROM (SELECT friend_id " +
                 "FROM friendship " +
                 "WHERE user_id = " + idUser0 + " OR user_id = " + idUser1 + ")" +

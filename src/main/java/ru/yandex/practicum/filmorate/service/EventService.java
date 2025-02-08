@@ -15,7 +15,7 @@ import java.time.Instant;
 @Service
 @AllArgsConstructor
 public class EventService {
-    FeedStorage feedStorage;
+    private final FeedStorage feedStorage;
 
     public void add(Long entityId, Long userId, EventType eventType) {
         feedStorage.create(createEvent(entityId, eventType, Operation.ADD, userId));

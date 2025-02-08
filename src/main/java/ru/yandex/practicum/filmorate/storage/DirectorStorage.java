@@ -5,17 +5,17 @@ import ru.yandex.practicum.filmorate.model.Director;
 import java.util.List;
 
 public interface DirectorStorage {
-    public List<Director> getAll();
+    List<Director> getAll();
 
-    public Director findById(Long id);
+    Director findById(Long id);
 
-    public Director create(Director director);
+    Director create(Director director);
 
-    public Director update(Director director);
+    Director update(Director director);
 
-    public void deleteById(Long id);
+    void deleteById(Long id);
 
-    public boolean existsById(Long id);
+    Boolean existsById(Long id);
 
-    public boolean isDirectorExists(String name);
+    Boolean isDirectorExists(String name);
 }

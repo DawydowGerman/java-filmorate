@@ -10,15 +10,15 @@ import java.sql.Timestamp;
 @Data
 @Builder
 public class Event {
-    Long id;
+    private Long id;
 
-    EventType eventType;
+    private EventType eventType;
 
-    Operation operation;
+    private Operation operation;
 
-    Long userId;
+    private Long userId;
 
-    Long entityId;
+    private Long entityId;
 
-    Timestamp createdAt;
+    private Timestamp createdAt;
 }

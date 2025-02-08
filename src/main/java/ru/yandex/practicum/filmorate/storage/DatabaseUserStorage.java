@@ -40,8 +40,8 @@ public class DatabaseUserStorage implements UserStorage {
 
     @Override
     public Optional<User> getUserById(Long userId) {
-        String sqlQuery = "select user_id, email, login, name, birthday " +
-                "from users where user_id = ?";
+        String sqlQuery = "SELECT user_id, email, login, name, birthday " +
+                "FROM users WHERE user_id = ?";
         try {
             User user = jdbcTemplate.queryForObject(sqlQuery, userRowMapper, userId);
             if (user != null) {
@@ -55,7 +55,7 @@ public class DatabaseUserStorage implements UserStorage {
 
     @Override
     public Optional<List<User>> findAll() {
-        String sqlQuery = "select user_id, email, login, name, birthday from users";
+        String sqlQuery = "SELECT user_id, email, login, name, birthday FROM users";
         List<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
         if (result.size() != 0 || result != null) {
             return Optional.of(result);
@@ -65,9 +65,9 @@ public class DatabaseUserStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        String sqlQuery = "update users set " +
+        String sqlQuery = "UPDATE users SET " +
                 "email = ?, login = ?, name = ?, birthday = ? " +
-                "where user_id = ?";
+                "WHERE user_id = ?";
 
         jdbcTemplate.update(sqlQuery,
                 user.getEmail(),
@@ -84,7 +84,7 @@ public class DatabaseUserStorage implements UserStorage {
         jdbcTemplate.update(sqlQuery, id);
     }
 
-    public boolean isUserIdExists(Long id) {
+    public Boolean isUserIdExists(Long id) {
         String sql = "SELECT count(*) FROM users WHERE user_id = ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
         return count > 0;

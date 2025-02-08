@@ -155,7 +155,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean isFilmIdExists(Long id) {
+    public Boolean isFilmIdExists(Long id) {
         return films.containsKey(id);
     }
 
@@ -170,7 +170,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean isFilmTitleExists(String name) {
+    public Boolean isFilmTitleExists(String name) {
         return false;
     }
 

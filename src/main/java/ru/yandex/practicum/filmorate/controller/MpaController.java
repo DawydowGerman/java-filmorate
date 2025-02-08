@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/mpa")
 public class MpaController {
-    private FilmService filmService;
+    private final FilmService filmService;
 
     @Autowired
     public MpaController(FilmService filmService) {

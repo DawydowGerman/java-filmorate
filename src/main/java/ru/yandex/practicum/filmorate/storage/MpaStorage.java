@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface MpaStorage {
 
-    boolean exists(Long id);
+    Boolean exists(Long id);
 
     List<Mpa> findAll();
 

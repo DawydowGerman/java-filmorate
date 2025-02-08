@@ -16,7 +16,7 @@ public interface FilmStorage {
 
     Optional<Film> getFilmById(Long id);
 
-    boolean isFilmIdExists(Long id);
+    Boolean isFilmIdExists(Long id);
 
     List<Film> getMostPopularFilms(Integer limit, Integer genreId, Integer year);
 
@@ -32,5 +32,5 @@ public interface FilmStorage {
 
     Optional<List<Film>> getMostPopularByDirectorOrTitle(String query);
 
-    boolean isFilmTitleExists(String name);
+    Boolean isFilmTitleExists(String name);
 }

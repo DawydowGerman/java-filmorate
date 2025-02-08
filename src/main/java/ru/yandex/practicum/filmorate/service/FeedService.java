@@ -14,8 +14,8 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class FeedService {
-    FeedStorage feedStorage;
-    UserService userService;
+    private final FeedStorage feedStorage;
+    private final UserService userService;
 
     public List<EventDTO> readEventFeedForUser(Long userId) {
         userService.getUserById(userId);

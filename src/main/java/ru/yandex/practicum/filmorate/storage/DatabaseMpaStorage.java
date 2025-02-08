@@ -19,19 +19,19 @@ public class DatabaseMpaStorage implements MpaStorage {
     private final MpaRowMapper mpaRowMapper;
 
     @Override
-    public boolean exists(Long id) {
+    public Boolean exists(Long id) {
         return getById(id).isPresent();
     }
 
     @Override
     public List<Mpa> findAll() {
-        String query = "select * from mparating";
+        String query = "SELECT * FROM mparating";
         return jdbc.query(query, mpaRowMapper);
     }
 
     @Override
     public Optional<Mpa> getById(Long id) {
-        String query = "select * from mparating where mparating_id = :id";
+        String query = "SELECT * FROM mparating WHERE mparating_id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
 

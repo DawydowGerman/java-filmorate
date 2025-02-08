@@ -8,11 +8,11 @@ import lombok.Data;
 @Data
 public class EventDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private long eventId;
-    private long entityId;
+    private Long eventId;
+    private Long entityId;
     private String eventType;
     private String operation;
-    private long userId;
-    private long timestamp;
+    private Long userId;
+    private Long timestamp;
 }
 
