@@ -7,29 +7,53 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.dto.FilmDTO;
+import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FriendshipStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.dto.UserDTO;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.storage.*;
+
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Data
 public class UserService {
-    private UserStorage userStorage;
-    private FriendshipStorage friendshipStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
+    private final DatabaseFilmGenresStorage databaseFilmGenresStorage;
+    private final MpaStorage mpaStorage;
+    private final GenreStorage genreStorage;
+    private final FriendshipStorage friendshipStorage;
+    private final EventService eventService;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    public UserService(@Qualifier("DatabaseUserStorage") UserStorage userStorage,
-                       @Qualifier("DatabaseFriendshipStorage")FriendshipStorage friendshipStorage) {
+    public UserService(@Qualifier("DatabaseFilmStorage") FilmStorage filmStorage,
+                       @Qualifier("DatabaseUserStorage") UserStorage userStorage,
+                       @Qualifier("DatabaseMpaStorage") MpaStorage mpaStorage,
+                       @Qualifier("DatabaseGenreStorage") GenreStorage genreStorage,
+                       DatabaseFilmGenresStorage databaseFilmGenresStorage,
+                       @Qualifier("DatabaseFriendshipStorage") FriendshipStorage friendshipStorage,
+                       EventService eventService) {
+        this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.databaseFilmGenresStorage = databaseFilmGenresStorage;
+        this.mpaStorage = mpaStorage;
+        this.genreStorage = genreStorage;
         this.friendshipStorage = friendshipStorage;
+        this.eventService = eventService;
     }
 
     public UserDTO create(UserDTO userDto) {
@@ -68,10 +92,9 @@ public class UserService {
     }
 
     public UserDTO getUserById(Long userId) {
-        Optional<User> user = userStorage.getUserById(userId);
-        if (user.isPresent()) {
-            return UserMapper.toDto(user.get());
-        } else throw new NotFoundException("Юзер с " + userId + " отсутствует.");
+        return userStorage.getUserById(userId)
+                .map(UserMapper::toDto)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
     }
 
     public List<UserDTO> findAll() {
@@ -137,6 +160,7 @@ public class UserService {
     public void addFriend(Long id, Long friendId) {
         if (userStorage.isUserIdExists(id) && userStorage.isUserIdExists(friendId)) {
             friendshipStorage.addFriend(id, friendId);
+            eventService.add(friendId, id, EventType.FRIEND);
         } else {
             log.error("Ошибка при добавлении в друзья");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");
@@ -146,6 +170,7 @@ public class UserService {
     public void removeFriend(Long id, Long friendId) {
         if (userStorage.isUserIdExists(id) && userStorage.isUserIdExists(friendId)) {
             friendshipStorage.removeFriend(id, friendId);
+            eventService.remove(friendId, id, EventType.FRIEND);
         } else {
             log.error("Ошибка при удалении из друзей");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");
@@ -169,27 +194,63 @@ public class UserService {
     }
 
     public List<UserDTO> getMutualFriends(Long idUser0, Long idUser1) {
-        if (userStorage.isUserIdExists(idUser0) && userStorage.isUserIdExists(idUser1)) {
-            if (friendshipStorage.getMutualFriends(idUser0, idUser1).isPresent()) {
-                List<UserDTO> dtoList = friendshipStorage.getMutualFriends(idUser0, idUser1).get()
-                        .stream()
-                        .map(user -> UserMapper.toDto(user))
-                        .collect(Collectors.toList());
-                return dtoList;
-            } else throw new NotFoundException("У юзера с " + idUser0 + " "
-                    + idUser1 + " отсутствует общие друзья.");
-        } else {
+        if (!userStorage.isUserIdExists(idUser0) || !userStorage.isUserIdExists(idUser1)) {
             log.error("Ошибка при удалении из друзей");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");
         }
+
+        Optional<List<User>> optionalUserList = friendshipStorage.getMutualFriends(idUser0, idUser1);
+        return optionalUserList.map(users -> users
+                .stream()
+                .map(UserMapper::toDto)
+                .collect(Collectors.toList())).orElseGet(ArrayList::new);
+
     }
 
-    public boolean remove(Long id) {
-        if (userStorage.isUserIdExists(id)) {
-            return userStorage.remove(id);
-        } else {
-            log.error("Ошибка при удалении юзера");
-            throw new NotFoundException("Юзер отсутствует");
+    public List<FilmDTO> getRecommendations(Long userId) {
+        Optional<List<Film>> filmList = filmStorage.getRecommendations(userId);
+        if (filmList.isPresent()) {
+            filmList.get()
+                    .stream()
+                    .forEach(film -> {
+                        if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
+                            this.assignGenres(film);
+                        }
+                        this.assignMpa(film);
+                        FilmMapper.toDto(film);
+                    });
+
+            List<FilmDTO> dtoList = filmList.get()
+                    .stream()
+                    .map(film -> FilmMapper.toDto(film))
+                    .collect(Collectors.toList());
+            return dtoList;
+        } else throw new NotFoundException("Список фильмов пуст.");
+    }
+
+    public void remove(Long id) {
+        if (!userStorage.isUserIdExists(id)) {
+            log.error("Ошибка при удалении юзера с id = {}", id);
+            throw new NotFoundException("Юзер не найден с id = " + id);
+
         }
+        userStorage.remove(id);
+    }
+
+    private Film assignGenres(Film film) {
+        List<Long> genresList = databaseFilmGenresStorage.getGenresIdsOfFilm(film.getId());
+        List<Genre> filmGenresList = genreStorage.findAll()
+                .stream()
+                .filter(genre -> genresList.contains(genre.getId()))
+                .toList();
+        film.setGenres(filmGenresList);
+        return film;
+    }
+
+    private Film assignMpa(Film film) {
+        Optional<Mpa> optionalMpa = mpaStorage.getById(film.getMpa().getId());
+        optionalMpa.ifPresent(mpa -> film.getMpa().setName(mpa.getName()));
+
+        return film;
     }
 }

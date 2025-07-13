@@ -7,12 +7,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.MpaDTO;
 import ru.yandex.practicum.filmorate.service.FilmService;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/mpa")
 public class MpaController {
-    private FilmService filmService;
+    private final FilmService filmService;
 
     @Autowired
     public MpaController(FilmService filmService) {
@@ -20,7 +21,7 @@ public class MpaController {
     }
 
     @GetMapping("/{mpaId}")
-    public MpaDTO getMpaById(@PathVariable Integer mpaId) {
+    public MpaDTO getMpaById(@PathVariable Long mpaId) {
         return filmService.getMpaById(mpaId);
     }
 

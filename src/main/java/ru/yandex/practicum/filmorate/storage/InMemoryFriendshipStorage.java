@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,7 @@ import java.util.Optional;
 @Component("InMemoryFriendshipStorage")
 public class InMemoryFriendshipStorage implements FriendshipStorage {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private InMemoryUserStorage inMemoryUserStorage;
+    private final InMemoryUserStorage inMemoryUserStorage;
 
     @Autowired
     public InMemoryFriendshipStorage(InMemoryUserStorage inMemoryUserStorage) {

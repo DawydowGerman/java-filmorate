@@ -11,34 +11,34 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 @RestControllerAdvice
 public class ErrorHandler {
-	private static final Logger log = LoggerFactory.getLogger(ErrorHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ErrorHandler.class);
 
-	@ExceptionHandler
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public ErrorResponse handleThrowable(final Throwable e) {
-		log.info("500 {}", e.getMessage());
-		return new ErrorResponse(e.getMessage());
-	}
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleThrowable(final Throwable e) {
+        log.info("500 {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
 
-	@ExceptionHandler
-	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
-	public ErrorResponse handleValidationException(final ValidationException e) {
-		log.info("400 {}", e.getMessage());
-		return new ErrorResponse(e.getMessage());
-	}
+    @ExceptionHandler
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationException(final ValidationException e) {
+        log.info("400 {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
 
-	@ExceptionHandler
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public ErrorResponse handleNotFoundException(final NotFoundException e) {
-		log.info("404 {}", e.getMessage());
-		return new ErrorResponse(e.getMessage());
-	}
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNotFoundException(final NotFoundException e) {
+        log.info("404 {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
 
-	private static class ErrorResponse {
-		public String message;
+    private static class ErrorResponse {
+        public String error;
 
-		public ErrorResponse(String message) {
-			this.message = message;
-		}
-	}
+        public ErrorResponse(String message) {
+            this.error = message;
+        }
+    }
 }

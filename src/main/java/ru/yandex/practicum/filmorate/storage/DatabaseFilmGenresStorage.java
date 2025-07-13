@@ -18,8 +18,8 @@ public class DatabaseFilmGenresStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public void saveFilmGenres(Film film) {
-        String sqlQuery = "insert into film_genres (film_id, genres_id) " +
-                "values (?, ?)";
+        String sqlQuery = "INSERT INTO film_genres (film_id, genres_id) " +
+                "VALUES (?, ?)";
         if (film.getGenres().size() > 1) {
             jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
                         @Override
@@ -37,17 +37,25 @@ public class DatabaseFilmGenresStorage {
         } else jdbcTemplate.update(sqlQuery, film.getId(), film.getGenres().get(0).getId());
     }
 
+    public void updateFilmGenres(Film film) {
+        String sqlQuery = "DELETE FROM film_genres WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, film.getId());
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            saveFilmGenres(film);
+        }
+    }
+
     public boolean isFilmHasGenre(Long filmId) {
         String sql = "SELECT count(*) FROM film_genres WHERE film_id = ?";
-        int count = jdbcTemplate.queryForObject(sql, new Object[] { filmId }, Integer.class);
+        int count = jdbcTemplate.queryForObject(sql, new Object[]{filmId}, Integer.class);
         return count > 0;
     }
 
-    public List<Integer> getGenresIdsOfFilm(Long filmId) {
+    public List<Long> getGenresIdsOfFilm(Long filmId) {
         String sqlQuery = "SELECT GENRES_ID \n" +
                 "FROM FILM_GENRES\n" +
-                "where FILM_ID = ?";
-        List<Integer> resultList = jdbcTemplate.queryForList(sqlQuery, Integer.class, filmId);
+                "WHERE FILM_ID = ?";
+        List<Long> resultList = jdbcTemplate.queryForList(sqlQuery, Long.class, filmId);
         return resultList;
     }
 }

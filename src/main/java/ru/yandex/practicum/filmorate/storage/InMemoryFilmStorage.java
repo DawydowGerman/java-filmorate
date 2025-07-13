@@ -5,10 +5,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
+
 import java.util.*;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
+    @Override
+    public Optional<List<Film>> findByFilmTitle(String query) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<List<Film>> getMostPopularByDirectorOrTitle(String query) {
+        return Optional.empty();
+    }
+
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Long, Film> films = new HashMap<>();
 
@@ -30,7 +41,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (films.size() == 0) {
             log.error("Ошибка при получении списка фильмов");
             return Optional.empty();
-        } else return Optional.of((List<Film>)films.values());
+        } else return Optional.of((List<Film>) films.values());
     }
 
     public Optional<Film> getFilmById(Long filmId) {
@@ -77,15 +88,90 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getMostPopularFilms() {
+    public void remove(Long id) {
+        films.remove(id);
+        log.debug("Фильм с id = {} удален", id);
+    }
+
+    @Override
+    public List<Film> getMostPopularFilms(Integer limit, Integer genreId, Integer year) {
         List<Film> allFilmsList = this.findAll().get();
         Collections.sort(allFilmsList);
         return allFilmsList;
     }
 
     @Override
-    public boolean isFilmIdExists(Long id) {
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        List<Film> userFilms = films.values()
+                .stream()
+                .filter(film -> film.getLikes().contains(userId))
+                .toList();
+        List<Film> friendFilms = films.values()
+                .stream()
+                .filter(film -> film.getLikes().contains(friendId))
+                .toList();
+
+        List<Film> commonFilms = new ArrayList<>(userFilms);
+        commonFilms.retainAll(friendFilms);
+        Collections.sort(commonFilms);
+
+        return commonFilms;
+    }
+
+    @Override
+    public Optional<List<Film>> getRecommendations(Long id) {
+        List<Film> listFromMap = new ArrayList<>(films.values());
+        List<Film> filmsLikedByUser = new ArrayList<>();
+        List<Long> listUsers = new ArrayList<>();
+        List<Film> listOfFilmsLikedByOtherUsers = new ArrayList<>();
+        for (int i = 0; i < listFromMap.size(); i++) {
+            for (Long long0 : listFromMap.get(i).getLikes()) {
+                if (long0.equals(id)) {
+                    filmsLikedByUser.add(listFromMap.get(i));
+                }
+            }
+        }
+        for (Film film0 : filmsLikedByUser) {
+            for (Long long1 : film0.getLikes()) {
+                if (!long1.equals(id)) {
+                    listUsers.add(long1);
+                }
+            }
+        }
+        for (Film film1 : listFromMap) {
+            for (Long long2 : film1.getLikes()) {
+                for (Long long3 : listUsers) {
+                    if (long3.equals(long2)) {
+                        listOfFilmsLikedByOtherUsers.add(film1);
+                    }
+                }
+            }
+        }
+        listOfFilmsLikedByOtherUsers.removeAll(filmsLikedByUser);
+        if (listOfFilmsLikedByOtherUsers.size() != 0 || listOfFilmsLikedByOtherUsers != null) {
+            return Optional.of(listOfFilmsLikedByOtherUsers);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Boolean isFilmIdExists(Long id) {
         return films.containsKey(id);
+    }
+
+    @Override
+    public Optional<List<Film>> getFilmsByDirector(final Long directorId, final String sort) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<List<Film>> findByDirectorName(String query) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Boolean isFilmTitleExists(String name) {
+        return false;
     }
 
     private long getNextId() {
