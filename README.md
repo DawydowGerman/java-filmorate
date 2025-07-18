@@ -1,57 +1,85 @@
 # java-filmorate
-The repository for the Filmorate project.
 
-The data base scheme:
+A Spring Boot service for managing films rates, user reviews, and recommendations.
 
-![The link to the data base scheme file](https://github.com/DawydowGerman/java-filmorate/blob/main/dbdiagram.svg)
+[![Java](https://img.shields.io/badge/Java-21-blue.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2.4-green.svg)](https://spring.io/projects/spring-boot)
+[![Maven](https://img.shields.io/badge/Maven-3.6-red.svg)](https://maven.apache.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.4-blue.svg)](https://www.postgresql.org)
+[![H2](https://img.shields.io/badge/H2_Database-2.2.224-lightgrey.svg)](https://www.h2database.com)
 
-The database scheme describes the two main models as well as the logic of the application.
+## Features
 
-The following SQL queries can be applied:
+### Core Functionality
+- **Film Management**
+    - CRUD operations, and validation
+    - Metadata handling (MPA ratings, genres, directors), and cross-validation
+    - Multi-criteria search
+    - Filtering based on popularity and common interests
+- **User Interactions**
+    - User registration and profile management
+    - Friendship system (add/remove friends, view mutual friends)
+    - Like/dislike films and reviews
+    - Personalized film recommendations
+- **Review System**
+    - Post and manage film reviews
+    - Like/dislike reviews to affect usefulness score
+    - View reviews for specific films and all reviews
 
-Getting all the films:
-SELECT * 
-FROM Film;
+### Storage Options
+- **Database Support**
+    - PostgreSQL for production
+    - H2 in-memory database for testing
+- **Flexible Data Access**
+    - JdbcTemplate for database operations
+    - In-memory storage classes for testing
 
-Getting all the users:
-SELECT * 
-FROM User;
+### REST API
+    - Comprehensive endpoints for all entities
+    - JSON request/response format
+    - Proper HTTP status codes, error handling, and validation
 
-Getting all the friends of the user with id 1:
-SELECT user_id
-FROM Friendship
-WHERE user_id IN (SELECT friend_id 
-      FROM Friendship
-      WHERE user_id = 1) AND
-      friend_id = 1;
+### Additional Features
+    - Event feed tracking user activities
+    - Director management system, and common films between friends
+    - Film recommendations based on user preferences
 
-Getting the mutual friends of the users with ids 1 and 3:
-SELECT tf1.user_id
-FROM 
-(SELECT *
-FROM Friendship
-WHERE user_id IN (SELECT friend_id 
-      FROM Friendship
-      WHERE user_id = 1) AND
-      friend_id = 1) AS tf1
-INNER JOIN 
-(SELECT *
-FROM Friendship
-WHERE user_id IN (SELECT friend_id 
-      FROM Friendship
-      WHERE user_id = 3) AND
-      friend_id = 3) AS tf3 ON tf1.user_id = tf3.user_id;
 
-Getting the three most popular films:
-SELECT name
-FROM Film
-WHERE film_id IN (SELECT film_id
-                  FROM Likes
-                  GROUP BY film_id
-                  ORDER BY COUNT(user_id) DESC
-                  LIMIT 3);
+## Getting Started
 
-Getting all the films of genre with id 1:
-SELECT * 
-FROM Film_genres
-WHERE genres_id = 1;
+### Prerequisites
+- Java 21 or later
+- Maven 3.6 or later
+- PostgreSQL 17.4 or later (optional, for production)
+- Docker 27.4.0 or later (optional, for containerized deployment)
+
+### Clone the Repository
+  ```sh
+git clone git@github.com:DawydowGerman/java-filmorate.git
+  ```
+  ```sh
+  cd java-filmorate
+  ```
+
+### Build with Maven
+  ```sh
+  mvn clean package
+  ```
+
+### Run the Application
+
+- Option 1: With H2 (default)
+  ```sh
+  mvn spring-boot:run
+  ```
+
+- Option 2: With PostgreSQL
+  Update application-prod.properties with your PostgreSQL credentials
+  ```sh
+  mvn spring-boot:run -Dspring.profiles.active=prod
+  ```
+
+- Option 3: With Docker
+  ```sh
+  docker-compose up --build
+  ```
