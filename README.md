@@ -35,14 +35,14 @@ A Spring Boot service for managing films rates, user reviews, and recommendation
     - In-memory storage classes for testing
 
 ### REST API
-    - Comprehensive endpoints for all entities
-    - JSON request/response format
-    - Proper HTTP status codes, error handling, and validation
+- Comprehensive endpoints for all entities
+- JSON request/response format
+- Proper HTTP status codes, error handling, and validation
 
 ### Additional Features
-    - Event feed tracking user activities
-    - Director management system, and common films between friends
-    - Film recommendations based on user preferences
+- Event feed tracking user activities
+- Director management system, and common films between friends
+- Film recommendations based on user preferences
 
 
 ## Getting Started
