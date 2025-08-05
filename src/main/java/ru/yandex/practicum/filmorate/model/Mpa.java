@@ -22,8 +22,8 @@ public class Mpa {
         this.id = Long.parseLong(id);
     }
 
-    public Mpa(Long id, String mpaRating) {
+    public Mpa(Long id, String name) {
         this.id = id;
-        this.name = mpaRating;
+        this.name = name;
     }
 }

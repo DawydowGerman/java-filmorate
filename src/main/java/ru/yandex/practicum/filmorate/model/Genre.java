@@ -1,10 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.NonNull;
 import lombok.Data;
 
 @Data
 public class Genre {
+    @NonNull
     private Long id;
+
+    @NonNull
     private String name;
 
     public Genre() {
