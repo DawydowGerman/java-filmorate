@@ -15,21 +15,32 @@ import java.util.Set;
 public class Film implements Comparable<Film> {
     @Builder.Default
     private Long id = Long.valueOf(0);
+
+    @NotNull
     @Builder.Default
-    private String name = "Default name";
+    private String name = "";
+
     @Builder.Default
-    private String description = "Default description";
+    private String description = "";
+
     @NotNull
     @Builder.Default
     private LocalDate releaseDate = LocalDate.of(2000, 12, 28);
+
+    @NotNull
     @Builder.Default
     private Long duration = Long.valueOf(110);
+
+    @NotNull
     @Builder.Default
     private Mpa mpa = new Mpa(1L);
+
     @Builder.Default
     private List<Genre> genres = new ArrayList<>();
+
     @Builder.Default
     private List<Director> directors = new ArrayList<>();
+
     @Builder.Default
     private Set<Long> likes = new HashSet<>();
 
@@ -39,14 +50,6 @@ public class Film implements Comparable<Film> {
 
     public void removeLike(Long userId) {
         likes.remove(userId);
-    }
-
-    public List<Genre> getGenres() {
-        return genres;
-    }
-
-    public void setGenres(List<Genre> genres) {
-        this.genres = genres;
     }
 
     @Override
@@ -61,6 +64,6 @@ public class Film implements Comparable<Film> {
     }
 
     public int compareTo(Film obj) {
-        return obj.getLikes().size() - this.getLikes().size();
+        return Integer.compare(obj.getLikes().size(), this.getLikes().size());
     }
 }
