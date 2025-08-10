@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.EventDTO;
 import ru.yandex.practicum.filmorate.dto.FilmDTO;
-import ru.yandex.practicum.filmorate.dto.UserDTO;
+import ru.yandex.practicum.filmorate.dto.user.UserDTO;
+import ru.yandex.practicum.filmorate.dto.user.UserRequestDTO;
 import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDTO create(@Valid @RequestBody UserDTO userDto) {
+    public UserDTO create(@Valid @RequestBody UserRequestDTO userDto) {
         return userService.create(userDto);
     }
 

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dto;
+package ru.yandex.practicum.filmorate.dto.user;
 
 import lombok.Data;
 
@@ -7,8 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-public class UserDTO {
-    private Long id;
+public class UserRequestDTO {
     private String email;
     private String login;
     private String name;

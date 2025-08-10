@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.dto.FilmDTO;
-import ru.yandex.practicum.filmorate.dto.UserDTO;
+import ru.yandex.practicum.filmorate.dto.user.UserDTO;
+import ru.yandex.practicum.filmorate.dto.user.UserRequestDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
@@ -56,14 +57,14 @@ public class UserService {
         this.eventService = eventService;
     }
 
-    public UserDTO create(UserDTO userDto) {
+    public UserDTO create(UserRequestDTO userDto) {
         if (userDto.getEmail() == null || userDto.getEmail().isBlank() || !userDto.getEmail().contains("@")) {
             log.error("Ошибка при добавлении юзера");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
         }
         if (this.findAll() != null && this.findAll().size() > 0) {
             for (User user0 : this.findAllUtil()) {
-                if (!user0.getId().equals(userDto.getId()) && user0.getEmail().equals(userDto.getEmail())) {
+                if (user0.getEmail().equals(userDto.getEmail())) {
                     log.error("Ошибка при добавлении юзера");
                     throw new ValidationException("Этот имейл уже используется");
                 }
@@ -86,7 +87,7 @@ public class UserService {
         if (userDto.getFriends() == null) {
             userDto.setFriends(new HashSet<>());
         }
-        User user = UserMapper.toModel(userDto);
+        User user = UserMapper.toModelCreate(userDto);
         user = userStorage.create(user);
         return UserMapper.toDto(user);
     }
@@ -148,7 +149,7 @@ public class UserService {
                     throw new ValidationException("Этот имейл уже используется");
                 }
             }
-            User user0 = UserMapper.toModel(userDto);
+            User user0 = UserMapper.toModelUpdate(userDto);
             user0 = userStorage.update(user0);
             return UserMapper.toDto(user0);
         } else {
