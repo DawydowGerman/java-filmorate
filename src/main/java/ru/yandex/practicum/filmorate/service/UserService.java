@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.dto.FilmDTO;
+import ru.yandex.practicum.filmorate.dto.user.UserBaseDTO;
 import ru.yandex.practicum.filmorate.dto.user.UserDTO;
 import ru.yandex.practicum.filmorate.dto.user.UserRequestDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -58,10 +59,6 @@ public class UserService {
     }
 
     public UserDTO create(UserRequestDTO userDto) {
-        if (userDto.getEmail() == null || userDto.getEmail().isBlank() || !userDto.getEmail().contains("@")) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
         if (this.findAll() != null && this.findAll().size() > 0) {
             for (User user0 : this.findAllUtil()) {
                 if (user0.getEmail().equals(userDto.getEmail())) {
@@ -70,24 +67,8 @@ public class UserService {
                 }
             }
         }
-        if (userDto.getLogin() == null || userDto.getLogin().isBlank() || userDto.getLogin().contains(" ")) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-        }
-        if (userDto.getBirthday() == null) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Дата рождения должна быть указана");
-        } else if (userDto.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Ошибка при добавлении юзера");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
-        if (userDto.getName() == null || userDto.getName().isBlank()) {
-            userDto.setName(userDto.getLogin());
-        }
-        if (userDto.getFriends() == null) {
-            userDto.setFriends(new HashSet<>());
-        }
-        User user = UserMapper.toModelCreate(userDto);
+        UserRequestDTO userDTO = (UserRequestDTO) this.validateUserDTO(userDto);
+        User user = UserMapper.toModelCreate(userDTO);
         user = userStorage.create(user);
         return UserMapper.toDto(user);
     }
@@ -122,40 +103,19 @@ public class UserService {
             throw new ValidationException("Id должен быть указан");
         }
         if (userStorage.isUserIdExists(userDto.getId())) {
-            if (userDto.getEmail() == null || userDto.getEmail().isBlank() || !userDto.getEmail().contains("@")) {
-                log.error("Ошибка при обновлении данных юзера");
-                throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-            }
-            if (userDto.getLogin() == null || userDto.getLogin().isBlank() || userDto.getLogin().contains(" ")) {
-                log.error("Ошибка при обновлении данных юзера");
-                throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-            }
-            if (userDto.getBirthday() == null) {
-                log.error("Ошибка при обновлении данных юзера");
-                throw new ValidationException("Дата рождения должна быть указана");
-            } else if (userDto.getBirthday().isAfter(LocalDate.now())) {
-                log.error("Ошибка при обновлении данных юзера");
-                throw new ValidationException("Дата рождения не может быть в будущем");
-            }
-            if (userDto.getName() == null || userDto.getName().isBlank()) {
-                userDto.setName(userDto.getLogin());
-            }
-            if (userDto.getFriends() == null) {
-                userDto.setFriends(new HashSet<>());
-            }
-            for (User user0 : this.findAllUtil()) {
-                if (!user0.getId().equals(userDto.getId()) && user0.getEmail().equals(userDto.getEmail())) {
-                    log.error("Ошибка при обновлении данных юзера");
-                    throw new ValidationException("Этот имейл уже используется");
-                }
-            }
-            User user0 = UserMapper.toModelUpdate(userDto);
-            user0 = userStorage.update(user0);
-            return UserMapper.toDto(user0);
-        } else {
             log.error("Ошибка при обновлении данных юзера");
             throw new NotFoundException("Юзер отсутствуют");
         }
+        for (User user0 : this.findAllUtil()) {
+            if (!user0.getId().equals(userDto.getId()) && user0.getEmail().equals(userDto.getEmail())) {
+                log.error("Ошибка при обновлении данных юзера");
+                throw new ValidationException("Этот имейл уже используется");
+            }
+        }
+        UserDTO userDTO = (UserDTO) this.validateUserDTO(userDto);
+        User user0 = UserMapper.toModelUpdate(userDTO);
+        user0 = userStorage.update(user0);
+        return UserMapper.toDto(user0);
     }
 
     public void addFriend(Long id, Long friendId) {
@@ -253,5 +213,30 @@ public class UserService {
         optionalMpa.ifPresent(mpa -> film.getMpa().setName(mpa.getName()));
 
         return film;
+    }
+
+    private UserBaseDTO validateUserDTO (UserBaseDTO userDTO) {
+        if (userDTO.getEmail() == null || userDTO.getEmail().isBlank() || !userDTO.getEmail().contains("@")) {
+            log.error("Ошибка при добавлении юзера");
+            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
+        }
+        if (userDTO.getLogin() == null || userDTO.getLogin().isBlank() || userDTO.getLogin().contains(" ")) {
+            log.error("Ошибка при добавлении юзера");
+            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
+        }
+        if (userDTO.getBirthday() == null) {
+            log.error("Ошибка при добавлении юзера");
+            throw new ValidationException("Дата рождения должна быть указана");
+        } else if (userDTO.getBirthday().isAfter(LocalDate.now())) {
+            log.error("Ошибка при добавлении юзера");
+            throw new ValidationException("Дата рождения не может быть в будущем");
+        }
+        if (userDTO.getName() == null || userDTO.getName().isBlank()) {
+            userDTO.setName(userDTO.getLogin());
+        }
+        if (userDTO.getFriends() == null) {
+            userDTO.setFriends(new HashSet<>());
+        }
+       return userDTO;
     }
 }
