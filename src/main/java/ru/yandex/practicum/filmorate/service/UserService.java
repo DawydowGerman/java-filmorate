@@ -59,14 +59,15 @@ public class UserService {
     }
 
     public UserDTO create(UserRequestDTO userDto) {
-        if (this.findAll() != null && this.findAll().size() > 0) {
-            for (User user0 : this.findAllUtil()) {
-                if (user0.getEmail().equals(userDto.getEmail())) {
-                    log.error("Ошибка при добавлении юзера");
-                    throw new ValidationException("Этот имейл уже используется");
-                }
-            }
-        }
+        Optional.ofNullable(this.findAllUtil())
+                .filter(list -> !list.isEmpty())
+                .ifPresent(users -> users.stream()
+                        .filter(user -> user.getEmail().equals(userDto.getEmail()))
+                        .findFirst()
+                        .ifPresent(user -> {
+                            log.error("Ошибка при добавлении юзера");
+                            throw new ValidationException("Этот имейл уже используется");
+                        }));
         UserRequestDTO userDTO = (UserRequestDTO) this.validateUserDTO(userDto);
         User user = UserMapper.toModelCreate(userDTO);
         user = userStorage.create(user);
@@ -106,12 +107,15 @@ public class UserService {
             log.error("Ошибка при обновлении данных юзера");
             throw new NotFoundException("Юзер отсутствуют");
         }
-        for (User user0 : this.findAllUtil()) {
-            if (!user0.getId().equals(userDto.getId()) && user0.getEmail().equals(userDto.getEmail())) {
-                log.error("Ошибка при обновлении данных юзера");
-                throw new ValidationException("Этот имейл уже используется");
-            }
-        }
+        this.findAllUtil().stream()
+                .filter(user0 ->
+                        !user0.getId().equals(userDto.getId()) &&
+                                user0.getEmail().equals(userDto.getEmail()))
+                .findFirst()
+                .ifPresent(user0 -> {
+                    log.error("Ошибка при обновлении данных юзера");
+                    throw new ValidationException("Этот имейл уже используется");
+                });
         UserDTO userDTO = (UserDTO) this.validateUserDTO(userDto);
         User user0 = UserMapper.toModelUpdate(userDTO);
         user0 = userStorage.update(user0);
