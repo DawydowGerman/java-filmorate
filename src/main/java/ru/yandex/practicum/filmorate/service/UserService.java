@@ -81,21 +81,16 @@ public class UserService {
     }
 
     public List<UserDTO> findAll() {
-        Optional<List<User>> userList = userStorage.findAll();
-        if (userList.isPresent()) {
-            List<UserDTO> dtoList = userList.get()
-                    .stream()
-                    .map(user -> UserMapper.toDto(user))
-                    .collect(Collectors.toList());
-            return dtoList;
-        } else throw new NotFoundException("Список юзеров пуст.");
+        return userStorage.findAll()
+                .orElseThrow(() -> new NotFoundException("Список юзеров пуст."))
+                .stream()
+                .map(user -> UserMapper.toDto(user))
+                .collect(Collectors.toList());
     }
 
     public List<User> findAllUtil() {
-        Optional<List<User>> userList = userStorage.findAll();
-        if (userList.isPresent()) {
-            return userList.get();
-        } else throw new NotFoundException("Список юзеров пуст.");
+        return userStorage.findAll()
+                .orElseThrow(() -> new NotFoundException("Список юзеров пуст."));
     }
 
     public UserDTO update(UserDTO userDto) {
@@ -169,7 +164,6 @@ public class UserService {
                 .stream()
                 .map(UserMapper::toDto)
                 .collect(Collectors.toList())).orElseGet(ArrayList::new);
-
     }
 
     public List<FilmDTO> getRecommendations(Long userId) {
@@ -197,7 +191,6 @@ public class UserService {
         if (!userStorage.isUserIdExists(id)) {
             log.error("Ошибка при удалении юзера с id = {}", id);
             throw new NotFoundException("Юзер не найден с id = " + id);
-
         }
         userStorage.remove(id);
     }
@@ -215,7 +208,6 @@ public class UserService {
     private Film assignMpa(Film film) {
         Optional<Mpa> optionalMpa = mpaStorage.getById(film.getMpa().getId());
         optionalMpa.ifPresent(mpa -> film.getMpa().setName(mpa.getName()));
-
         return film;
     }
 
