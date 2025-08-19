@@ -59,7 +59,7 @@ public class UserService {
     }
 
     public UserDTO create(UserRequestDTO userDto) {
-        Optional.ofNullable(this.findAllUtil())
+        userStorage.findAll()
                 .filter(list -> !list.isEmpty())
                 .ifPresent(users -> users.stream()
                         .filter(user -> user.getEmail().equals(userDto.getEmail()))
@@ -88,21 +88,18 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public List<User> findAllUtil() {
-        return userStorage.findAll()
-                .orElseThrow(() -> new NotFoundException("Список юзеров пуст."));
-    }
-
     public UserDTO update(UserDTO userDto) {
         if (userDto.getId() == null) {
             log.error("Ошибка при обновлении данных юзера");
             throw new ValidationException("Id должен быть указан");
         }
-        if (userStorage.isUserIdExists(userDto.getId())) {
+        if (!userStorage.isUserIdExists(userDto.getId())) {
             log.error("Ошибка при обновлении данных юзера");
             throw new NotFoundException("Юзер отсутствуют");
         }
-        this.findAllUtil().stream()
+        userStorage.findAll()
+                .orElseThrow(() -> new NotFoundException("Список юзеров пуст."))
+                .stream()
                 .filter(user0 ->
                         !user0.getId().equals(userDto.getId()) &&
                                 user0.getEmail().equals(userDto.getEmail()))
