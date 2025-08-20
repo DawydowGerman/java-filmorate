@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Service
 @Data
@@ -135,19 +136,15 @@ public class UserService {
     }
 
     public List<UserDTO> getFriends(Long id) {
-        List<UserDTO> result = new ArrayList<>();
-        if (userStorage.isUserIdExists(id)) {
-            if (friendshipStorage.getFriends(id).isPresent()) {
-                List<UserDTO> dtoList = friendshipStorage.getFriends(id).get()
-                        .stream()
-                        .map(user -> UserMapper.toDto(user))
-                        .collect(Collectors.toList());
-                return dtoList;
-            } else return result;
-        } else {
+        if (!userStorage.isUserIdExists(id)) {
             log.error("Ошибка при добавлении в друзья");
             throw new NotFoundException("Юзер с " + id + " отсутствует.");
         }
+        return friendshipStorage.getFriends(id)
+                .map(friends -> friends.stream()
+                        .map(UserMapper::toDto)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
     public List<UserDTO> getMutualFriends(Long idUser0, Long idUser1) {
