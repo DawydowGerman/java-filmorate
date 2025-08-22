@@ -161,24 +161,17 @@ public class UserService {
     }
 
     public List<FilmDTO> getRecommendations(Long userId) {
-        Optional<List<Film>> filmList = filmStorage.getRecommendations(userId);
-        if (filmList.isPresent()) {
-            filmList.get()
-                    .stream()
-                    .forEach(film -> {
-                        if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
-                            this.assignGenres(film);
-                        }
-                        this.assignMpa(film);
-                        FilmMapper.toDto(film);
-                    });
-
-            List<FilmDTO> dtoList = filmList.get()
-                    .stream()
-                    .map(film -> FilmMapper.toDto(film))
-                    .collect(Collectors.toList());
-            return dtoList;
-        } else throw new NotFoundException("Список фильмов пуст.");
+        return filmStorage.getRecommendations(userId)
+                .orElseThrow(() -> new NotFoundException("Список фильмов пуст."))
+                .stream()
+                .map(film -> {
+                    if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
+                        this.assignGenres(film);
+                    }
+                    this.assignMpa(film);
+                    return FilmMapper.toDto(film);
+                 })
+                .collect(Collectors.toList());
     }
 
     public void remove(Long id) {
