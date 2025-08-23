@@ -69,7 +69,7 @@ public class UserService {
                             log.error("Ошибка при добавлении юзера");
                             throw new ValidationException("Этот имейл уже используется");
                         }));
-        UserRequestDTO userDTO = (UserRequestDTO) this.validateUserDTO(userDto);
+        UserRequestDTO userDTO = this.validateUserDTO(userDto);
         User user = UserMapper.toModelCreate(userDTO);
         user = userStorage.create(user);
         return UserMapper.toDto(user);
@@ -109,7 +109,7 @@ public class UserService {
                     log.error("Ошибка при обновлении данных юзера");
                     throw new ValidationException("Этот имейл уже используется");
                 });
-        UserDTO userDTO = (UserDTO) this.validateUserDTO(userDto);
+        UserDTO userDTO = this.validateUserDTO(userDto);
         User user0 = UserMapper.toModelUpdate(userDTO);
         user0 = userStorage.update(user0);
         return UserMapper.toDto(user0);
@@ -198,7 +198,7 @@ public class UserService {
         return film;
     }
 
-    private UserBaseDTO validateUserDTO (UserBaseDTO userDTO) {
+    private <T extends UserBaseDTO> T validateUserDTO(T userDTO) {
         if (userDTO.getEmail() == null || userDTO.getEmail().isBlank() || !userDTO.getEmail().contains("@")) {
             log.error("Ошибка при добавлении юзера");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
