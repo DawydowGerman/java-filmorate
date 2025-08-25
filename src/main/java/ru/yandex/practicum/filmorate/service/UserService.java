@@ -116,23 +116,21 @@ public class UserService {
     }
 
     public void addFriend(Long id, Long friendId) {
-        if (userStorage.isUserIdExists(id) && userStorage.isUserIdExists(friendId)) {
-            friendshipStorage.addFriend(id, friendId);
-            eventService.add(friendId, id, EventType.FRIEND);
-        } else {
+        if (!userStorage.isUserIdExists(id) || !userStorage.isUserIdExists(friendId)) {
             log.error("Ошибка при добавлении в друзья");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");
         }
+        friendshipStorage.addFriend(id, friendId);
+        eventService.add(friendId, id, EventType.FRIEND);
     }
 
     public void removeFriend(Long id, Long friendId) {
-        if (userStorage.isUserIdExists(id) && userStorage.isUserIdExists(friendId)) {
-            friendshipStorage.removeFriend(id, friendId);
-            eventService.remove(friendId, id, EventType.FRIEND);
-        } else {
+        if (!userStorage.isUserIdExists(id) || !userStorage.isUserIdExists(friendId)) {
             log.error("Ошибка при удалении из друзей");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");
         }
+        friendshipStorage.removeFriend(id, friendId);
+        eventService.remove(friendId, id, EventType.FRIEND);
     }
 
     public List<UserDTO> getFriends(Long id) {
