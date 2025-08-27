@@ -59,11 +59,10 @@ public class ReviewService {
     }
 
     public void deleteReview(Long reviewId) {
-        Optional<Review> review = reviewStorage.getById(reviewId);
-        if (review.isPresent()) {
-            reviewStorage.deleteReview(reviewId);
-            eventService.remove(reviewId, review.get().getUserId(), EventType.REVIEW);
-        }
+        Review review = reviewStorage.getById(reviewId)
+                .orElseThrow(() -> new NotFoundException("не найден отзыв c id = " + reviewId));
+        reviewStorage.deleteReview(reviewId);
+        eventService.remove(reviewId, review.getUserId(), EventType.REVIEW);
     }
 
     public void insertLikeDislikeToReview(Long reviewId, Long userId, LikeType likeType) {
