@@ -212,29 +212,23 @@ public class FilmService {
     }
 
     public void giveLike(Long userId, Long filmId) {
-        if (userStorage.isUserIdExists(userId) && filmStorage.isFilmIdExists(filmId)) {
-            likesStorage.giveLike(userId, filmId);
-            eventService.add(filmId, userId, EventType.LIKE);
-            log.trace("Фильму с Id {} поставлен лайк", filmId);
-
-            return;
+        if (!userStorage.isUserIdExists(userId) || !filmStorage.isFilmIdExists(filmId)) {
+            log.error("Ошибка при добавлении лайка");
+            throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
         }
-
-        log.error("Ошибка при добавлении лайка");
-        throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
+        likesStorage.giveLike(userId, filmId);
+        eventService.add(filmId, userId, EventType.LIKE);
+        log.trace("Фильму с Id {} поставлен лайк", filmId);
     }
 
     public void removeLike(Long userId, Long filmId) {
-        if (userStorage.isUserIdExists(userId) && filmStorage.isFilmIdExists(filmId)) {
-            likesStorage.removeLike(userId, filmId);
-            eventService.remove(filmId, userId, EventType.LIKE);
-            log.trace("Для фильма с Id {} удален лайк", filmId);
-
-            return;
+        if (!userStorage.isUserIdExists(userId) || !filmStorage.isFilmIdExists(filmId)) {
+            log.error("Ошибка при удаленнии лайка");
+            throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
         }
-
-        log.error("Ошибка при удаленнии лайка");
-        throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
+        likesStorage.removeLike(userId, filmId);
+        eventService.remove(filmId, userId, EventType.LIKE);
+        log.trace("Для фильма с Id {} удален лайк", filmId);
     }
 
     public List<FilmDTO> getMostPopularFilms(
