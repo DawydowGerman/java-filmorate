@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dto;
+package ru.yandex.practicum.filmorate.dto.film;
 
 import lombok.Data;
 import ru.yandex.practicum.filmorate.model.Director;
