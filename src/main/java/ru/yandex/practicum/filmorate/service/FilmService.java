@@ -87,6 +87,15 @@ public class FilmService {
             log.error("Ошибка при добавлении фильма");
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
         }
+        if (filmDTO.getMpa() == null) {
+            throw new ValidationException("Фильм должен содержать MPA рэйтинг");
+        }
+        if (filmDTO.getGenres() == null || filmDTO.getGenres().size() == 0) {
+            throw new ValidationException("Фильм должен содержать жанры");
+        }
+        if (filmDTO.getDirectors() == null || filmDTO.getDirectors().size() == 0) {
+            throw new ValidationException("Фильм должен содержать директоров");
+        }
         if (!mpaStorage.exists(filmDTO.getMpa().getId())) {
             log.error("Ошибка при добавлении фильма");
             throw new NotFoundException("MPA рэйтинг не найден с id = " + filmDTO.getMpa().getId());
