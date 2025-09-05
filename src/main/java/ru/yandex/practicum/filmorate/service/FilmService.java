@@ -90,10 +90,10 @@ public class FilmService {
         if (filmDTO.getMpa() == null) {
             throw new ValidationException("Фильм должен содержать MPA рэйтинг");
         }
-        if (filmDTO.getGenres() == null || filmDTO.getGenres().size() == 0) {
+        if (filmDTO.getGenres() == null || filmDTO.getGenres().isEmpty()) {
             throw new ValidationException("Фильм должен содержать жанры");
         }
-        if (filmDTO.getDirectors() == null || filmDTO.getDirectors().size() == 0) {
+        if (filmDTO.getDirectors() == null || filmDTO.getDirectors().isEmpty()) {
             throw new ValidationException("Фильм должен содержать директоров");
         }
         if (!mpaStorage.exists(filmDTO.getMpa().getId())) {
@@ -112,13 +112,8 @@ public class FilmService {
         Film film = FilmMapper.toModel(filmDTO);
         film = filmStorage.create(film);
 
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            databaseFilmGenresStorage.saveFilmGenres(film);
-        }
-
-        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            databaseFilmDirectorsStorage.saveFilmDirectors(film);
-        }
+        databaseFilmGenresStorage.saveFilmGenres(film);
+        databaseFilmDirectorsStorage.saveFilmDirectors(film);
 
         return FilmMapper.toDto(film);
     }
