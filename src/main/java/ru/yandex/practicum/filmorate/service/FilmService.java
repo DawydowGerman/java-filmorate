@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.dto.film.FilmBaseDTO;
 import ru.yandex.practicum.filmorate.dto.film.FilmDTO;
 import ru.yandex.practicum.filmorate.dto.GenreDTO;
 import ru.yandex.practicum.filmorate.dto.MpaDTO;
+import ru.yandex.practicum.filmorate.dto.film.FilmRequestDTO;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
@@ -61,60 +63,14 @@ public class FilmService {
         this.eventService = eventService;
     }
 
-    public FilmDTO create(FilmDTO filmDTO) {
-        if (filmDTO.getName() == null || filmDTO.getName().isBlank()) {
-            log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("Название не может быть пустым");
-        }
-        if (filmDTO.getDescription() == null || filmDTO.getDescription().isBlank()) {
-            log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("Описание не может быть пустым");
-        } else if (filmDTO.getDescription().length() > 200) {
-            log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("Максимальная длина описания — 200 символов");
-        }
-        if (filmDTO.getReleaseDate() == null) {
-            log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("Дата релиза должна быть указана");
-        } else if (filmDTO.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
-        }
-        if (filmDTO.getDuration() == null) {
-            log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("Продолжительность фильма должна быть указана");
-        } else if (filmDTO.getDuration() < 0) {
-            log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("Продолжительность фильма должна быть положительным числом");
-        }
-        if (filmDTO.getMpa() == null) {
-            throw new ValidationException("Фильм должен содержать MPA рэйтинг");
-        }
-        if (filmDTO.getGenres() == null || filmDTO.getGenres().isEmpty()) {
-            throw new ValidationException("Фильм должен содержать жанры");
-        }
-        if (filmDTO.getDirectors() == null || filmDTO.getDirectors().isEmpty()) {
-            throw new ValidationException("Фильм должен содержать директоров");
-        }
-        if (!mpaStorage.exists(filmDTO.getMpa().getId())) {
-            log.error("Ошибка при добавлении фильма");
-            throw new NotFoundException("MPA рэйтинг не найден с id = " + filmDTO.getMpa().getId());
-        }
-        for (Genre genre : filmDTO.getGenres()) {
-            if (!genreStorage.exists(genre.getId())) {
-                log.error("Ошибка при добавлении фильма");
-                throw new NotFoundException("Жанр не найден с id = " + genre.getId());
-            }
-        }
+    public FilmDTO create(FilmRequestDTO filmDto) {
+        FilmRequestDTO filmDTO = this.validateFilmDTO(filmDto);
         filmDTO.setGenres(filmDTO.getGenres().stream().distinct().toList());
         filmDTO.setDirectors(filmDTO.getDirectors().stream().distinct().toList());
-
-        Film film = FilmMapper.toModel(filmDTO);
+        Film film = FilmMapper.toModelCreate(filmDTO);
         film = filmStorage.create(film);
-
         databaseFilmGenresStorage.saveFilmGenres(film);
         databaseFilmDirectorsStorage.saveFilmDirectors(film);
-
         return FilmMapper.toDto(film);
     }
 
@@ -145,56 +101,12 @@ public class FilmService {
         return FilmMapper.toDto(film.get());
     }
 
-    public FilmDTO update(FilmDTO filmDTO) {
-        if (filmDTO.getId() == null) {
-            log.error("Ошибка при обновлении фильма");
-            throw new ValidationException("Id должен быть указан");
-        }
-        if (filmStorage.isFilmIdExists(filmDTO.getId())) {
-            log.error("Ошибка при обновлении фильма");
-            throw new NotFoundException("Фильм с id = " + filmDTO.getId() + " не найден");
-        }
-        if (filmDTO.getName() == null || filmDTO.getName().isBlank()) {
-            log.error("Ошибка при обновлении фильма");
-            throw new ValidationException("Название не может быть пустым");
-        }
-        if (filmDTO.getDescription() == null || filmDTO.getDescription().isBlank()) {
-            log.error("Ошибка при обновлении фильма");
-            throw new ValidationException("Описание не может быть пустым");
-        } else if (filmDTO.getDescription().length() > 200) {
-            log.error("Ошибка при обновлении фильма");
-            throw new ValidationException("Максимальная длина описания — 200 символов");
-        }
-        if (filmDTO.getReleaseDate() == null) {
-            log.error("Ошибка при обновлении фильма");
-            throw new ValidationException("Дата релиза должна быть указана");
-        } else if (filmDTO.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.error("Ошибка при обновлении фильма");
-            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
-        }
-        if (filmDTO.getDuration() == null) {
-            log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("Продолжительность фильма должна быть указана");
-        } else if (filmDTO.getDuration() < 0) {
-            log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("Продолжительность фильма должна быть положительным числом");
-        }
-        if (!mpaStorage.exists(filmDTO.getMpa().getId())) {
-            log.error("Ошибка при добавлении фильма");
-            throw new ValidationException("MPA рэйтинг не найден с id = " + filmDTO.getMpa().getId());
-        }
-        for (Genre genre : filmDTO.getGenres()) {
-            if (!genreStorage.exists(genre.getId())) {
-                log.error("Ошибка при добавлении фильма");
-                throw new NotFoundException("Жанр не найден с id = " + genre.getId());
-            }
-        }
-
-        Film film = FilmMapper.toModel(filmDTO);
+    public FilmDTO update(FilmDTO filmDto) {
+        FilmDTO filmDTO = this.validateFilmDTO(filmDto);
+        Film film = FilmMapper.toModelUpdate(filmDTO);
         film = filmStorage.update(film);
         databaseFilmGenresStorage.updateFilmGenres(film);
         assignGenres(film);
-
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
             databaseFilmDirectorsStorage.saveFilmDirectors(film);
         } else {
@@ -398,5 +310,53 @@ public class FilmService {
                 .stream()
                 .map(FilmMapper::toDto)
                 .toList();
+    }
+
+    private <T extends FilmBaseDTO> T validateFilmDTO(T filmDTO) {
+        if (filmDTO.getName() == null || filmDTO.getName().isBlank()) {
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Название не может быть пустым");
+        }
+        if (filmDTO.getDescription() == null || filmDTO.getDescription().isBlank()) {
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Описание не может быть пустым");
+        } else if (filmDTO.getDescription().length() > 200) {
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Максимальная длина описания — 200 символов");
+        }
+        if (filmDTO.getReleaseDate() == null) {
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Дата релиза должна быть указана");
+        } else if (filmDTO.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
+        }
+        if (filmDTO.getDuration() == null) {
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Продолжительность фильма должна быть указана");
+        } else if (filmDTO.getDuration() < 0) {
+            log.error("Ошибка при добавлении фильма");
+            throw new ValidationException("Продолжительность фильма должна быть положительным числом");
+        }
+        if (filmDTO.getMpa() == null) {
+            throw new ValidationException("Фильм должен содержать MPA рэйтинг");
+        }
+        if (filmDTO.getGenres() == null || filmDTO.getGenres().isEmpty()) {
+            throw new ValidationException("Фильм должен содержать жанры");
+        }
+        if (filmDTO.getDirectors() == null || filmDTO.getDirectors().isEmpty()) {
+            throw new ValidationException("Фильм должен содержать директоров");
+        }
+        if (!mpaStorage.exists(filmDTO.getMpa().getId())) {
+            log.error("Ошибка при добавлении фильма");
+            throw new NotFoundException("MPA рэйтинг не найден с id = " + filmDTO.getMpa().getId());
+        }
+        for (Genre genre : filmDTO.getGenres()) {
+            if (!genreStorage.exists(genre.getId())) {
+                log.error("Ошибка при добавлении фильма");
+                throw new NotFoundException("Жанр не найден с id = " + genre.getId());
+            }
+        }
+        return filmDTO;
     }
 }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class FilmRequestDTO {
+public class FilmRequestDTO implements FilmBaseDTO {
     private String name;
     private String description;
     private LocalDate releaseDate;
@@ -38,6 +38,16 @@ public class FilmRequestDTO {
         this.duration = duration;
         this.mpa = mpa;
         this.genres = genres;
+        this.directors = directors;
+    }
+
+    @Override
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
+    }
+
+    @Override
+    public void setDirectors(List<Director> directors) {
         this.directors = directors;
     }
 }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class FilmDTO {
+public class FilmDTO implements FilmBaseDTO {
     private Long id;
     private String name;
     private String description;
