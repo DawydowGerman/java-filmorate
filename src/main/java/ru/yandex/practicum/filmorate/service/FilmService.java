@@ -106,7 +106,6 @@ public class FilmService {
         Film film = FilmMapper.toModelUpdate(filmDTO);
         film = filmStorage.update(film);
         databaseFilmGenresStorage.updateFilmGenres(film);
-        assignGenres(film);
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
             databaseFilmDirectorsStorage.saveFilmDirectors(film);
         } else {
