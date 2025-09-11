@@ -37,6 +37,14 @@ public class DatabaseFilmDirectorsStorage {
         );
     }
 
+    public void updateFilmDirectors(Film film) {
+        String sqlQuery = "DELETE FROM film_directors WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, film.getId());
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            saveFilmDirectors(film);
+        }
+    }
+
     public void removeFilmDirectors(final Long filmId) {
         String sqlQuery = "DELETE FROM film_directors WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, filmId);
