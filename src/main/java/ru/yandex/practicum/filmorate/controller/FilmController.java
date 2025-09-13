@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.film.FilmDTO;
+import ru.yandex.practicum.filmorate.dto.film.FilmRequestDTO;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public FilmDTO create(@Valid @RequestBody FilmDTO filmDTO) {
+    public FilmDTO create(@Valid @RequestBody FilmRequestDTO filmDTO) {
         return filmService.create(filmDTO);
     }
 
