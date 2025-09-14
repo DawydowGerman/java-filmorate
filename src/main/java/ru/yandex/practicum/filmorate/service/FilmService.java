@@ -269,6 +269,11 @@ public class FilmService {
             return this.assignGenreDirectorMpaConvertToDto(result);
         }
         if (by.size() == 2) {
+            if ((by.get(0).equals("title") && by.get(1).equals("title")) ||
+                    (by.get(0).equals("director") || by.get(1).equals("director"))) {
+                log.error("Ошибка при посике фильма");
+                throw new ValidationException("Строка запроса by должна содержать разные параметры поиска");
+            }
             if ((by.get(0).equals("title") || by.get(0).equals("director")) &&
                     (by.get(1).equals("title") || by.get(1).equals("director"))) {
                 Optional<List<Film>> filmList0 = filmStorage.findByDirectorName(query);
