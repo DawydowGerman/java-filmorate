@@ -26,6 +26,7 @@ import ru.yandex.practicum.filmorate.storage.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -269,24 +270,27 @@ public class FilmService {
             return this.assignGenreDirectorMpaConvertToDto(result);
         }
         if (by.size() == 2) {
-            if ((by.get(0).equals("title") && by.get(1).equals("title")) ||
-                    (by.get(0).equals("director") || by.get(1).equals("director"))) {
+            String firstParam = by.get(0);
+            String secondParam = by.get(1);
+            if (firstParam.equals(secondParam)) {
                 log.error("Ошибка при посике фильма");
                 throw new ValidationException("Строка запроса by должна содержать разные параметры поиска");
             }
-            if ((by.get(0).equals("title") || by.get(0).equals("director")) &&
-                    (by.get(1).equals("title") || by.get(1).equals("director"))) {
-                Optional<List<Film>> filmList0 = filmStorage.findByDirectorName(query);
-                Optional<List<Film>> filmList1 = filmStorage.findByFilmTitle(query);
-                if (filmList0.isPresent() && filmList1.isEmpty()) {
-                    return this.assignGenreDirectorMpaConvertToDto(filmList0);
-                }
-                if (filmList1.isPresent() && filmList0.isEmpty()) {
-                    return this.assignGenreDirectorMpaConvertToDto(filmList1);
-                }
-                if (filmList1.isPresent() && filmList0.isPresent()) {
-                    return this.assignGenreDirectorMpaConvertToDto(filmStorage.getMostPopularByDirectorOrTitle(query));
-                }
+            Set<String> validParams = Set.of("title", "director");
+            if (!validParams.contains(firstParam) || !validParams.contains(secondParam)) {
+                log.error("Ошибка при поиске фильма: недопустимые параметры поиска");
+                throw new ValidationException("Допустимые параметры поиска: title, director");
+            }
+            Optional<List<Film>> filmList0 = filmStorage.findByDirectorName(query);
+            Optional<List<Film>> filmList1 = filmStorage.findByFilmTitle(query);
+            if (filmList0.isPresent() && filmList1.isEmpty()) {
+                return this.assignGenreDirectorMpaConvertToDto(filmList0);
+            }
+            if (filmList1.isPresent() && filmList0.isEmpty()) {
+                return this.assignGenreDirectorMpaConvertToDto(filmList1);
+            }
+            if (filmList1.isPresent() && filmList0.isPresent()) {
+                return this.assignGenreDirectorMpaConvertToDto(filmStorage.getMostPopularByDirectorOrTitle(query));
             }
         }
         return this.assignGenreDirectorMpaConvertToDto(result);
