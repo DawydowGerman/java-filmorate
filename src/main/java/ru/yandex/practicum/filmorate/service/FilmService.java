@@ -24,6 +24,7 @@ import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -297,9 +298,10 @@ public class FilmService {
     }
 
     private List<FilmDTO> assignGenreDirectorMpaConvertToDto(Optional<List<Film>> filmList) {
-        filmList.get()
+        return filmList
+                .orElse(Collections.emptyList())
                 .stream()
-                .forEach(film -> {
+                .map(film -> {
                     if (databaseFilmGenresStorage.isFilmHasGenre(film.getId())) {
                         this.assignGenres(film);
                     }
@@ -307,12 +309,8 @@ public class FilmService {
                         this.assignDirectors(film);
                     }
                     this.assignMpa(film);
-                    FilmMapper.toDto(film);
-                });
-
-        return filmList.get()
-                .stream()
-                .map(FilmMapper::toDto)
+                    return FilmMapper.toDto(film);
+                })
                 .toList();
     }
 
