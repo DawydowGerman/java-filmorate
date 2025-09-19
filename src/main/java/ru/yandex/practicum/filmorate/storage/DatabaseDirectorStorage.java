@@ -102,9 +102,10 @@ public class DatabaseDirectorStorage implements DirectorStorage {
 
     @Override
     public Boolean isDirectorExists(String name) {
-        name = "%" + name + "%";
+        if (name == null || name.trim().isEmpty()) return false;
+        String formattedName = "%" + name.trim() + "%";
         String sql = "SELECT count(*) FROM DIRECTORS WHERE NAME LIKE ?";
-        int count = jdbcTemplate.queryForObject(sql, new Object[]{name}, Integer.class);
+        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{formattedName}, Integer.class);
         return count > 0;
     }
 }
