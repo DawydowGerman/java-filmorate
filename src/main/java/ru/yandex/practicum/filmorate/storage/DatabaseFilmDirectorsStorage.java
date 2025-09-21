@@ -38,6 +38,7 @@ public class DatabaseFilmDirectorsStorage {
     }
 
     public void updateFilmDirectors(Film film) {
+        if (film == null || film.getId() == null) throw new IllegalArgumentException("Фильм или ID фильма не могут быть null");
         String sqlQuery = "DELETE FROM film_directors WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, film.getId());
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
