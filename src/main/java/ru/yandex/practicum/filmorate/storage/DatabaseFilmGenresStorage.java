@@ -20,7 +20,7 @@ public class DatabaseFilmGenresStorage {
     public void saveFilmGenres(Film film) {
         String sqlQuery = "INSERT INTO film_genres (film_id, genres_id) " +
                 "VALUES (?, ?)";
-        if (film.getGenres().size() > 1) {
+        if (film.getGenres() != null && film.getGenres().size() > 1) {
             jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
                         @Override
                         public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
