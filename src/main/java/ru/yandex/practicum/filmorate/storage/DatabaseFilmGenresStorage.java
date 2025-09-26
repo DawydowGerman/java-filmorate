@@ -18,9 +18,10 @@ public class DatabaseFilmGenresStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public void saveFilmGenres(Film film) {
+        if (film == null || film.getGenres() == null || film.getGenres().isEmpty()) throw new IllegalArgumentException("Фильм должен иметь жанры.");
         String sqlQuery = "INSERT INTO film_genres (film_id, genres_id) " +
                 "VALUES (?, ?)";
-        if (film.getGenres() != null && film.getGenres().size() > 1) {
+        if (film.getGenres().size() > 1) {
             jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
                         @Override
                         public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
