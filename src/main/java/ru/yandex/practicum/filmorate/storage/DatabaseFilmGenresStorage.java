@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -54,10 +55,11 @@ public class DatabaseFilmGenresStorage {
     }
 
     public List<Long> getGenresIdsOfFilm(Long filmId) {
+        if (filmId == null) return Collections.emptyList();
         String sqlQuery = "SELECT GENRES_ID \n" +
                 "FROM FILM_GENRES\n" +
                 "WHERE FILM_ID = ?";
-        List<Long> resultList = jdbcTemplate.queryForList(sqlQuery, Long.class, filmId);
-        return resultList;
+        List<Long> result = jdbcTemplate.queryForList(sqlQuery, Long.class, filmId);
+        return result != null ? result : Collections.emptyList();
     }
 }
