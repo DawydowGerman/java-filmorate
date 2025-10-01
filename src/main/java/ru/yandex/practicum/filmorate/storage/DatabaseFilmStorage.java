@@ -47,13 +47,10 @@ public class DatabaseFilmStorage implements FilmStorage {
                 "FROM films WHERE film_id = ?";
         try {
             Film film = jdbcTemplate.queryForObject(sqlQuery, filmRowMapper, filmId);
-            if (film != null) {
-                return Optional.of(film);
-            }
+            return Optional.of(film);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override
