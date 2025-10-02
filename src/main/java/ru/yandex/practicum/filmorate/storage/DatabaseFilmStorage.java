@@ -58,10 +58,7 @@ public class DatabaseFilmStorage implements FilmStorage {
         String sqlQuery = "SELECT film_id, name, description, releasedate, duration, mparating_id " +
                 "FROM films";
         List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
-        if (result.size() != 0 || result != null) {
-            return Optional.of(result);
-        }
-        return Optional.empty();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
     @Override
