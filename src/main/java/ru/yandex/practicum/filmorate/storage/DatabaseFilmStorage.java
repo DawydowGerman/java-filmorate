@@ -74,20 +74,17 @@ public class DatabaseFilmStorage implements FilmStorage {
                 "FROM films AS f\n" +
                 "LEFT JOIN likes as l ON (l.film_id = f.film_id) \n" +
                 "GROUP BY f.film_id\n" +
-                "ORDER BY like_cnt DESC )\n" +
+                "ORDER BY like_cnt DESC) AS popular_films\n" +
                 "WHERE FILM_ID IN\n" +
                 "(SELECT FILM_ID\n" +
                 "FROM FILM_DIRECTORS\n" +
                 "WHERE DIRECTOR_ID IN (\n" +
                 "                      SELECT ID\n" +
                 "                      from DIRECTORS\n" +
-                "                      WHERE UPPER(NAME) LIKE UPPER('%" + query + "%')))" +
-                "OR UPPER(NAME) LIKE UPPER('%" + query + "%')";
-        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
-        if (result.size() != 0 || result != null) {
-            return Optional.of(result);
-        }
-        return Optional.empty();
+                "                      WHERE UPPER(NAME) LIKE UPPER(CONCAT('%', ?, '%'))))" +
+                "OR UPPER(NAME) LIKE UPPER(CONCAT('%', ?, '%'))";
+        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper, query, query);
+        return result.isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
     @Override
