@@ -107,12 +107,9 @@ public class DatabaseFilmStorage implements FilmStorage {
                 "WHERE DIRECTOR_ID IN (\n" +
                 "                      SELECT ID\n" +
                 "                      from DIRECTORS\n" +
-                "                      WHERE UPPER(NAME) LIKE UPPER('%" + query + "%')))";
-        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
-        if (result.size() != 0 || result != null) {
-            return Optional.of(result);
-        }
-        return Optional.empty();
+                "                      WHERE UPPER(NAME) LIKE UPPER(CONCAT('%', ?, '%'))))";
+        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper, query);
+        return result.isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
     @Override
@@ -129,12 +126,9 @@ public class DatabaseFilmStorage implements FilmStorage {
                 "LEFT JOIN likes as l ON (l.film_id = f.film_id) \n" +
                 "GROUP BY f.film_id\n" +
                 "ORDER BY like_cnt DESC )\n" +
-                "WHERE UPPER(NAME) LIKE UPPER('%" + query + "%')";
-        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper);
-        if (result.size() != 0 || result != null) {
-            return Optional.of(result);
-        }
-        return Optional.empty();
+                "WHERE UPPER(NAME) LIKE UPPER(CONCAT('%', ?, '%'))";
+        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper, query);
+        return result.isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
     @Override
