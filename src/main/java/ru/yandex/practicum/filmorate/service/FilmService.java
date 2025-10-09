@@ -104,6 +104,10 @@ public class FilmService {
     }
 
     public FilmDTO update(FilmDTO filmDto) {
+        if (!filmStorage.isFilmIdExists(filmDto.getId())) {
+            log.error("Ошибка при обновлении фильма с id = {}", filmDto.getId());
+            throw new NotFoundException("Фильм не найден с id = " + filmDto.getId());
+        }
         FilmDTO filmDTO = this.validateFilmDTO(filmDto);
         Film film = FilmMapper.toModelUpdate(filmDTO);
         film = filmStorage.update(film);
