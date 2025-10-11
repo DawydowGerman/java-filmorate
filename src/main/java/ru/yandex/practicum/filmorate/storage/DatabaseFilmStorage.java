@@ -235,10 +235,7 @@ public class DatabaseFilmStorage implements FilmStorage {
                 ") ";
 
         List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper, userId, userId, userId);
-        if (result.size() != 0 || result != null) {
-            return Optional.of(result);
-        }
-        return Optional.empty();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
     public Boolean isFilmIdExists(Long id) {
