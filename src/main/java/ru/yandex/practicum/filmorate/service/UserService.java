@@ -116,6 +116,9 @@ public class UserService {
     }
 
     public void addFriend(Long id, Long friendId) {
+        if (id.equals(friendId)) {
+            throw new ValidationException("Юзер не может добавить в друзья самого себя");
+        }
         if (!userStorage.isUserIdExists(id) || !userStorage.isUserIdExists(friendId)) {
             log.error("Ошибка при добавлении в друзья");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");
