@@ -21,6 +21,10 @@ public class InMemoryFriendshipStorage implements FriendshipStorage {
         this.inMemoryUserStorage = inMemoryUserStorage;
     }
 
+    public Boolean isFriendshipExists(Long id, Long friendId) {
+        return true;
+    }
+
     @Override
     public void addFriend(Long id, Long friendId) {
         inMemoryUserStorage.getUserById(id).get()

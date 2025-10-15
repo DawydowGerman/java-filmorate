@@ -13,4 +13,6 @@ public interface FriendshipStorage {
     Optional<List<User>> getFriends(Long id);
 
     Optional<List<User>> getMutualFriends(Long idUser0, Long idUser1);
+
+    Boolean isFriendshipExists(Long id, Long friendId);
 }
