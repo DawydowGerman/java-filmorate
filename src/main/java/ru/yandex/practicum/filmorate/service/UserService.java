@@ -136,6 +136,13 @@ public class UserService {
             log.error("Ошибка при удалении из друзей");
             throw new NotFoundException("Один из юзеров либо оба отсутствуют");
         }
+        if (id.equals(friendId)) {
+            throw new ValidationException("Юзер не может удалить из друзей самого себя");
+        }
+        if (!friendshipStorage.isFriendshipExists(id, friendId)) {
+            log.error("Ошибка при добавлении в друзья");
+            throw new ValidationException("Юзеры не являются друзьями");
+        }
         friendshipStorage.removeFriend(id, friendId);
         eventService.remove(friendId, id, EventType.FRIEND);
     }
