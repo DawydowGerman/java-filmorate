@@ -19,7 +19,7 @@ public class DatabaseFriendshipStorage implements FriendshipStorage {
 
     @Override
     public void addFriend(Long id, Long friendId) {
-        String sqlQuery0 = "INSERT INTO friendship (user_id, friend_id)" + "VALUES (?, ?)";
+        String sqlQuery0 = "INSERT INTO friendship (user_id, friend_id) VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery0,
                 id,
                 friendId);
@@ -44,10 +44,7 @@ public class DatabaseFriendshipStorage implements FriendshipStorage {
         String sqlQuery = "SELECT * FROM users WHERE user_id IN " +
                 "(select friend_id from friendship where user_id = " + id + ")";
         List<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
-        if (result != null && result.size() > 0) {
-            return Optional.of(result);
-        }
-        return Optional.empty();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
     @Override
@@ -61,9 +58,6 @@ public class DatabaseFriendshipStorage implements FriendshipStorage {
                 "GROUP BY friend_id " +
                 "HAVING COUNT(friend_id) > 1)";
         List<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
-        if (result != null && result.size() > 0) {
-            return Optional.of(result);
-        }
-        return Optional.empty();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result);
     }
 }
