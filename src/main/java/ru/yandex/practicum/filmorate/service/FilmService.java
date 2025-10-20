@@ -129,6 +129,10 @@ public class FilmService {
             log.error("Ошибка при добавлении лайка");
             throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
         }
+        if (likesStorage.isFilmHasLike(userId, filmId)) {
+            log.error("Ошибка при добавлении лайка");
+            throw new ValidationException("Фильму с id" + filmId + " уже поставлен лайк юзером с id " + userId);
+        }
         likesStorage.giveLike(userId, filmId);
         eventService.add(filmId, userId, EventType.LIKE);
         log.trace("Фильму с Id {} поставлен лайк", filmId);

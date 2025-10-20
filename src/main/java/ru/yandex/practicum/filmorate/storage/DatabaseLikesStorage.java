@@ -21,4 +21,10 @@ public class DatabaseLikesStorage implements LikesStorage {
         String sqlQuery = "DELETE FROM likes WHERE user_id = ? AND film_id = ?";
         jdbcTemplate.update(sqlQuery, userId, filmId);
     }
+
+    public boolean isFilmHasLike(Long userId, Long filmId) {
+        String sql = "SELECT count(*) FROM likes WHERE user_id = ? AND film_id = ?";
+        int count = jdbcTemplate.queryForObject(sql, Integer.class, userId, filmId);
+        return count > 0;
+    }
 }
