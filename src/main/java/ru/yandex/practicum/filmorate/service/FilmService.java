@@ -143,6 +143,10 @@ public class FilmService {
             log.error("Ошибка при удаленнии лайка");
             throw new NotFoundException("Фильм с id" + filmId + " либо юзер с id " + userId + " отсутствует.");
         }
+        if (!likesStorage.isFilmHasLike(userId, filmId)) {
+            log.error("Ошибка при добавлении лайка");
+            throw new ValidationException("У фильма с id" + filmId + " отсутствует лайк от юзера с id " + userId);
+        }
         likesStorage.removeLike(userId, filmId);
         eventService.remove(filmId, userId, EventType.LIKE);
         log.trace("Для фильма с Id {} удален лайк", filmId);
