@@ -24,7 +24,7 @@ public class DatabaseUserStorage implements UserStorage {
     @Override
     public User create(User user) {
         String sqlQuery =
-                "INSERT INTO users (email, login, name, birthday)" + "VALUES (?, ?, ?, ?)";
+                "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"user_id"});
@@ -43,11 +43,7 @@ public class DatabaseUserStorage implements UserStorage {
         String sqlQuery = "SELECT user_id, email, login, name, birthday " +
                 "FROM users WHERE user_id = ?";
         try {
-            User user = jdbcTemplate.queryForObject(sqlQuery, userRowMapper, userId);
-            if (user != null) {
-                return Optional.of(user);
-            }
-            return Optional.empty();
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, userRowMapper, userId));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
