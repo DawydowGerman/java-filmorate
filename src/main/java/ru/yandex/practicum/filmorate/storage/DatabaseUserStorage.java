@@ -53,10 +53,7 @@ public class DatabaseUserStorage implements UserStorage {
     public Optional<List<User>> findAll() {
         String sqlQuery = "SELECT user_id, email, login, name, birthday FROM users";
         List<User> result = jdbcTemplate.query(sqlQuery, userRowMapper);
-        if (result.size() != 0 || result != null) {
-            return Optional.of(result);
-        }
-        return Optional.empty();
+        return (result == null || result.isEmpty()) ? Optional.empty() : Optional.of(result);
     }
 
     @Override
