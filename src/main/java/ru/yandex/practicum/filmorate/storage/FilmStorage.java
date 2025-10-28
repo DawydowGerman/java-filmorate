@@ -26,9 +26,9 @@ public interface FilmStorage {
 
     Optional<List<Film>> getFilmsByDirector(final Long directorId, final String sort);
 
-    Optional<List<Film>> findByDirectorName(String query);
+    List<Film> findByDirectorName(String query);
 
-    Optional<List<Film>> findByFilmTitle(String query);
+    List<Film> findByFilmTitle(String query);
 
     Optional<List<Film>> getMostPopularByDirectorOrTitle(String query);
 

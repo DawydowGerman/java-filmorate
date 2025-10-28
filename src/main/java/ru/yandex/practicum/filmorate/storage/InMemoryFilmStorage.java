@@ -11,7 +11,7 @@ import java.util.*;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     @Override
-    public Optional<List<Film>> findByFilmTitle(String query) {
+    public List<Film> findByFilmTitle(String query) {
         return Optional.empty();
     }
 
@@ -165,7 +165,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<List<Film>> findByDirectorName(String query) {
+    public List<Film> findByDirectorName(String query) {
         return Optional.empty();
     }
 

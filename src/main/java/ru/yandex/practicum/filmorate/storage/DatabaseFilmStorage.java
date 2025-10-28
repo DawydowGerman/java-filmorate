@@ -88,7 +88,7 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<List<Film>> findByDirectorName(String query) {
+    public List<Film> findByDirectorName(String query) {
         String sqlQuery = "SELECT FILM_ID,\n" +
                 "       NAME,\n" +
                 "       DESCRIPTION,\n" +
@@ -108,12 +108,11 @@ public class DatabaseFilmStorage implements FilmStorage {
                 "                      SELECT ID\n" +
                 "                      from DIRECTORS\n" +
                 "                      WHERE UPPER(NAME) LIKE UPPER(CONCAT('%', ?, '%'))))";
-        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper, query);
-        return result.isEmpty() ? Optional.empty() : Optional.of(result);
+        return jdbcTemplate.query(sqlQuery, filmRowMapper, query);
     }
 
     @Override
-    public Optional<List<Film>> findByFilmTitle(String query) {
+    public List<Film> findByFilmTitle(String query) {
         String sqlQuery = "SELECT FILM_ID,\n" +
                 "       NAME,\n" +
                 "       DESCRIPTION,\n" +
@@ -127,8 +126,7 @@ public class DatabaseFilmStorage implements FilmStorage {
                 "GROUP BY f.film_id\n" +
                 "ORDER BY like_cnt DESC )\n" +
                 "WHERE UPPER(NAME) LIKE UPPER(CONCAT('%', ?, '%'))";
-        List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper, query);
-        return result.isEmpty() ? Optional.empty() : Optional.of(result);
+        return jdbcTemplate.query(sqlQuery, filmRowMapper, query);
     }
 
     @Override

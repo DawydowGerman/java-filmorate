@@ -24,10 +24,7 @@ import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -261,7 +258,7 @@ public class FilmService {
     }
 
     public List<FilmDTO> searchByTitleAndDirector(String query, List<String> by) {
-        Optional<List<Film>> result = Optional.empty();
+        List<Film> result = new ArrayList<>();
         if (by.size() < 1 || by.size() > 2) {
             log.error("Ошибка при посике фильма");
             throw new ValidationException("Строка запроса by должна содержать один либо два параметра");
@@ -272,7 +269,7 @@ public class FilmService {
                 log.error("Ошибка при получении фильмов");
                 throw new NotFoundException("Фильма с таким режиссером нет.");
             }
-            return this.assignGenreDirectorMpaConvertToDto(result);
+            return this.assignGenreDirectorMpaConvertToDto(Optional.of(result));
         }
         if (by.size() == 1 && by.get(0).equals("title")) {
             result = filmStorage.findByFilmTitle(query);
@@ -280,7 +277,7 @@ public class FilmService {
                 log.error("Ошибка при получении фильмов");
                 throw new NotFoundException("Фильма с таким названием нет.");
             }
-            return this.assignGenreDirectorMpaConvertToDto(result);
+            return this.assignGenreDirectorMpaConvertToDto(Optional.of(result));
         }
         if (by.size() == 2) {
             String firstParam = by.get(0);
@@ -294,19 +291,19 @@ public class FilmService {
                 log.error("Ошибка при поиске фильма: недопустимые параметры поиска");
                 throw new ValidationException("Допустимые параметры поиска: title, director");
             }
-            Optional<List<Film>> filmList0 = filmStorage.findByDirectorName(query);
-            Optional<List<Film>> filmList1 = filmStorage.findByFilmTitle(query);
-            if (filmList0.isPresent() && filmList1.isEmpty()) {
-                return this.assignGenreDirectorMpaConvertToDto(filmList0);
+            List<Film> filmList0 = filmStorage.findByDirectorName(query);
+            List<Film> filmList1 = filmStorage.findByFilmTitle(query);
+            if (!filmList0.isEmpty() && filmList1.isEmpty()) {
+                return this.assignGenreDirectorMpaConvertToDto(Optional.of(filmList0));
             }
-            if (filmList1.isPresent() && filmList0.isEmpty()) {
-                return this.assignGenreDirectorMpaConvertToDto(filmList1);
+            if (!filmList1.isEmpty() && filmList0.isEmpty()) {
+                return this.assignGenreDirectorMpaConvertToDto(Optional.of(filmList1));
             }
-            if (filmList1.isPresent() && filmList0.isPresent()) {
+            if (!filmList1.isEmpty() && !filmList0.isEmpty()) {
                 return this.assignGenreDirectorMpaConvertToDto(filmStorage.getMostPopularByDirectorOrTitle(query));
             }
         }
-        return this.assignGenreDirectorMpaConvertToDto(result);
+        return this.assignGenreDirectorMpaConvertToDto(Optional.of(result));
     }
 
     private List<FilmDTO> assignGenreDirectorMpaConvertToDto(Optional<List<Film>> filmList) {
