@@ -300,7 +300,7 @@ public class FilmService {
                 return this.assignGenreDirectorMpaConvertToDto(Optional.of(filmList1));
             }
             if (!filmList1.isEmpty() && !filmList0.isEmpty()) {
-                return this.assignGenreDirectorMpaConvertToDto(filmStorage.getMostPopularByDirectorOrTitle(query));
+                return this.assignGenreDirectorMpaConvertToDto(Optional.of(filmStorage.getMostPopularByDirectorOrTitle(query)));
             }
         }
         return this.assignGenreDirectorMpaConvertToDto(Optional.of(result));

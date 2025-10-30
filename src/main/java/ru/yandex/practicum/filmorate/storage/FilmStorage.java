@@ -30,7 +30,7 @@ public interface FilmStorage {
 
     List<Film> findByFilmTitle(String query);
 
-    Optional<List<Film>> getMostPopularByDirectorOrTitle(String query);
+   List<Film> getMostPopularByDirectorOrTitle(String query);
 
     Boolean isFilmTitleExists(String name);
 }

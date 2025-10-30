@@ -12,12 +12,12 @@ import java.util.*;
 public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> findByFilmTitle(String query) {
-        return Optional.empty();
+        return new ArrayList<>();
     }
 
     @Override
-    public Optional<List<Film>> getMostPopularByDirectorOrTitle(String query) {
-        return Optional.empty();
+    public List<Film> getMostPopularByDirectorOrTitle(String query) {
+        return new ArrayList<>();
     }
 
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
@@ -166,7 +166,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> findByDirectorName(String query) {
-        return Optional.empty();
+        return new ArrayList<>();
     }
 
     @Override

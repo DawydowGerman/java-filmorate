@@ -62,7 +62,7 @@ public class DatabaseFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<List<Film>> getMostPopularByDirectorOrTitle(String query) {
+    public List<Film> getMostPopularByDirectorOrTitle(String query) {
         String sqlQuery = "SELECT FILM_ID,\n" +
                 "       NAME,\n" +
                 "       DESCRIPTION,\n" +
@@ -84,7 +84,7 @@ public class DatabaseFilmStorage implements FilmStorage {
                 "                      WHERE UPPER(NAME) LIKE UPPER(CONCAT('%', ?, '%'))))" +
                 "OR UPPER(NAME) LIKE UPPER(CONCAT('%', ?, '%'))";
         List<Film> result = jdbcTemplate.query(sqlQuery, filmRowMapper, query, query);
-        return result.isEmpty() ? Optional.empty() : Optional.of(result);
+        return result.isEmpty() ? new ArrayList<>() : result;
     }
 
     @Override
