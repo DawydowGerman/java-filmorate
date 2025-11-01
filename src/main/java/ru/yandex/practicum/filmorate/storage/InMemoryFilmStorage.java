@@ -10,6 +10,9 @@ import java.util.*;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
+    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
+    private final Map<Long, Film> films = new HashMap<>();
+
     @Override
     public List<Film> findByFilmTitle(String query) {
         return new ArrayList<>();
@@ -20,17 +23,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         return new ArrayList<>();
     }
 
-    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final Map<Long, Film> films = new HashMap<>();
-
     @Override
     public Film create(Film film) {
-        if (film.getId() == null) {
-            film.setId(getNextId());
-        }
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
-        }
+        film.setId(getNextId());
         films.put(film.getId(), film);
         log.debug("Добавлен фильм с Id {}", film.getId());
         return film;

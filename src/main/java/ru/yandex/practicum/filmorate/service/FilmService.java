@@ -67,6 +67,7 @@ public class FilmService {
         filmDTO.setGenres(filmDTO.getGenres().stream().distinct().toList());
         filmDTO.setDirectors(filmDTO.getDirectors().stream().distinct().toList());
         Film film = FilmMapper.toModelCreate(filmDTO);
+        film.setLikes(new HashSet<>());
         film = filmStorage.create(film);
         databaseFilmGenresStorage.saveFilmGenres(film);
         databaseFilmDirectorsStorage.saveFilmDirectors(film);
