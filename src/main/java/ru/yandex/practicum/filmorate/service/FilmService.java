@@ -259,11 +259,12 @@ public class FilmService {
     }
 
     public List<FilmDTO> searchByTitleAndDirector(String query, List<String> by) {
-        List<Film> result = new ArrayList<>();
-        if (by.size() < 1 || by.size() > 2) {
+        if (query == null) throw new ValidationException("Не передан запрос");
+        if (by.isEmpty() || by.size() > 2 || by == null) {
             log.error("Ошибка при посике фильма");
             throw new ValidationException("Строка запроса by должна содержать один либо два параметра");
         }
+        List<Film> result = new ArrayList<>();
         if (by.size() == 1 && by.get(0).equals("director")) {
             result = filmStorage.findByDirectorName(query);
             if (result.isEmpty()) {
