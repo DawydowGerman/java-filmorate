@@ -43,7 +43,15 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getMostPopularByDirectorOrTitle(String query) {
-        return new ArrayList<>();
+        String lowerCaseQuery = query.toLowerCase().trim();
+        return films.values()
+                .stream()
+                .filter(f -> (f.getName() != null && f.getName().toLowerCase().contains(lowerCaseQuery)) ||
+                        (f.getDirectors() != null && f.getDirectors().stream()
+                                .anyMatch(d -> d.getName() != null &&
+                                        d.getName().toLowerCase().contains(lowerCaseQuery))))
+                .sorted(Comparator.comparing(f -> f.getLikes().size(), Comparator.reverseOrder()))
+                .collect(Collectors.toList());
     }
 
     public Optional<Film> getFilmById(Long filmId) {
