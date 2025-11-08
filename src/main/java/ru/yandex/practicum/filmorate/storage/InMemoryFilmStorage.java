@@ -181,7 +181,8 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Boolean isFilmTitleExists(String name) {
-        return false;
+        return films.values().stream()
+                .anyMatch(film -> name.equals(film.getName()));
     }
 
     private long getNextId() {
