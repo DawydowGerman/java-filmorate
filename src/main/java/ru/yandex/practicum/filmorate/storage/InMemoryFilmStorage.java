@@ -176,7 +176,13 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> findByDirectorName(String query) {
-        return new ArrayList<>();
+        String lowerCaseQuery = query.toLowerCase().trim();
+        return films.values()
+                .stream()
+                .filter(f -> f.getDirectors() != null && f.getDirectors().stream()
+                        .anyMatch(d -> d.getName() != null &&
+                        d.getName().toLowerCase().contains(lowerCaseQuery)))
+                .collect(Collectors.toList());
     }
 
     @Override
