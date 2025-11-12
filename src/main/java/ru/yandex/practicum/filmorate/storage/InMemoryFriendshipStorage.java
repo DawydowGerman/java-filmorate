@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -22,7 +23,9 @@ public class InMemoryFriendshipStorage implements FriendshipStorage {
     }
 
     public Boolean isFriendshipExists(Long id, Long friendId) {
-        return true;
+        User user = inMemoryUserStorage.getUserById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + id));
+        return user.getFriends().contains(friendId);
     }
 
     @Override
