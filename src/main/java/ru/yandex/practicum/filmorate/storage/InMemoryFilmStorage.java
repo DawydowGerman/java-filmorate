@@ -63,32 +63,37 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public Film update(Film newFilm) {
-        Film oldFilm = films.get(newFilm.getId());
+        Long newFilmId = newFilm.getId();
+        if (films.size() == 0 || !films.containsKey(newFilmId)) {
+            log.error("Список фильмов пусть либо фильм с id " + newFilmId + " не найден.");
+            return null;
+        }
+        Film oldFilm = films.get(newFilmId);
         if (newFilm.getName() != null && !newFilm.getName().isEmpty()) {
-            log.trace("Изменено название фильма с Id {}", newFilm.getId());
+            log.trace("Изменено название фильма с Id {}", newFilmId);
             oldFilm.setName(newFilm.getName());
         }
         if (newFilm.getDescription() != null && !newFilm.getDescription().isEmpty()) {
-            log.trace("Изменено описание фильма с Id {}", newFilm.getId());
+            log.trace("Изменено описание фильма с Id {}", newFilmId);
             oldFilm.setDescription(newFilm.getDescription());
         }
         if (newFilm.getReleaseDate() != null) {
-            log.trace("Изменена дата релиза фильма с Id {}", newFilm.getId());
+            log.trace("Изменена дата релиза фильма с Id {}", newFilmId);
             oldFilm.setReleaseDate(newFilm.getReleaseDate());
         }
         if (newFilm.getDuration() != null) {
-            log.trace("Изменена дата продолительность фильма с Id {}", newFilm.getId());
+            log.trace("Изменена дата продолительность фильма с Id {}", newFilmId);
             oldFilm.setDuration(newFilm.getDuration());
         }
         if (newFilm.getMpa() != null) {
-            log.trace("Изменен MPA рэйтинг фильма с Id {}", newFilm.getId());
+            log.trace("Изменен MPA рэйтинг фильма с Id {}", newFilmId);
             oldFilm.setMpa(newFilm.getMpa());
         }
         if (newFilm.getGenres() != null) {
-            log.trace("Изменены жанры фильма с Id {}", newFilm.getId());
+            log.trace("Изменены жанры фильма с Id {}", newFilmId);
             oldFilm.setGenres(newFilm.getGenres());
         }
-        log.debug("Обновлен фильм с Id {}", newFilm.getId());
+        log.debug("Обновлен фильм с Id {}", newFilmId);
         return oldFilm;
     }
 
