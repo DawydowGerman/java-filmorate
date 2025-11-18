@@ -24,7 +24,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Optional<List<Film>> findAll() {
-        if (films.size() == 0) {
+        if (films.isEmpty()) {
             log.error("Ошибка при получении списка фильмов");
             return Optional.empty();
         } else return Optional.of((List<Film>) films.values());
@@ -131,16 +131,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Optional<List<Film>> getRecommendations(Long id) {
         List<Film> listFromMap = new ArrayList<>(films.values());
-        List<Film> filmsLikedByUser = new ArrayList<>();
         List<Long> listUsers = new ArrayList<>();
         List<Film> listOfFilmsLikedByOtherUsers = new ArrayList<>();
-        for (int i = 0; i < listFromMap.size(); i++) {
-            for (Long long0 : listFromMap.get(i).getLikes()) {
-                if (long0.equals(id)) {
-                    filmsLikedByUser.add(listFromMap.get(i));
-                }
-            }
-        }
+        List<Film> filmsLikedByUser = new ArrayList<>(films.values()).stream()
+                .filter(film -> film.getLikes().contains(id))
+                .collect(Collectors.toList());
         for (Film film0 : filmsLikedByUser) {
             for (Long long1 : film0.getLikes()) {
                 if (!long1.equals(id)) {
