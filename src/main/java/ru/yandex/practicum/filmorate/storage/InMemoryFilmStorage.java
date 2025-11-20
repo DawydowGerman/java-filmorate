@@ -130,33 +130,25 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Optional<List<Film>> getRecommendations(Long id) {
-        List<Film> listFromMap = new ArrayList<>(films.values());
-        List<Long> listUsers = new ArrayList<>();
-        List<Film> listOfFilmsLikedByOtherUsers = new ArrayList<>();
         List<Film> filmsLikedByUser = new ArrayList<>(films.values()).stream()
                 .filter(film -> film.getLikes().contains(id))
                 .collect(Collectors.toList());
-        for (Film film0 : filmsLikedByUser) {
-            for (Long long1 : film0.getLikes()) {
-                if (!long1.equals(id)) {
-                    listUsers.add(long1);
-                }
-            }
-        }
-        for (Film film1 : listFromMap) {
-            for (Long long2 : film1.getLikes()) {
-                for (Long long3 : listUsers) {
-                    if (long3.equals(long2)) {
-                        listOfFilmsLikedByOtherUsers.add(film1);
-                    }
-                }
-            }
-        }
+        List<Long> listUsers = filmsLikedByUser.stream()
+                .flatMap(film -> film.getLikes().stream())
+                .filter(userId -> !userId.equals(id))
+                .collect(Collectors.toList());
+        List<Film> listOfFilmsLikedByOtherUsers = new ArrayList<>(films.values()).stream()
+                .filter(film -> film.getLikes().stream()
+                        .anyMatch(filmLike -> listUsers.stream()
+                                .anyMatch(userLike -> userLike.equals(filmLike))
+                        )
+                )
+                .collect(Collectors.toList());
         listOfFilmsLikedByOtherUsers.removeAll(filmsLikedByUser);
-        if (listOfFilmsLikedByOtherUsers.size() != 0 || listOfFilmsLikedByOtherUsers != null) {
-            return Optional.of(listOfFilmsLikedByOtherUsers);
+        if (listOfFilmsLikedByOtherUsers.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return Optional.of(listOfFilmsLikedByOtherUsers);
     }
 
     @Override
