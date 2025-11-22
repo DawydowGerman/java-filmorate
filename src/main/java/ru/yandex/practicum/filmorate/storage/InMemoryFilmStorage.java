@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -158,7 +159,22 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Optional<List<Film>> getFilmsByDirector(final Long directorId, final String sort) {
-        return Optional.empty();
+        Stream<Film> filmStream = films.values().stream()
+                .filter(film -> film.getDirectors().stream()
+                        .anyMatch(director -> director.getId().equals(directorId)));
+        switch (sort.toLowerCase()) {
+            case "likes":
+                filmStream = filmStream.sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()));
+                break;
+            default:
+                filmStream = filmStream.sorted((f1, f2) -> f2.getReleaseDate().compareTo(f1.getReleaseDate()));
+                break;
+        }
+        List<Film> result = filmStream.collect(Collectors.toList());
+        if (result.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(result);
     }
 
     @Override
