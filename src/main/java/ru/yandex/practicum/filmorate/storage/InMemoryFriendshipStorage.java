@@ -44,10 +44,6 @@ public class InMemoryFriendshipStorage implements FriendshipStorage {
 
     public Optional<List<User>> getFriends(Long id) {
         List<User> result = new ArrayList<>();
-        if (inMemoryUserStorage.findAll().isEmpty()) {
-            log.error("Ошибка при получении списка юзеров");
-            return Optional.empty();
-        }
         if (inMemoryUserStorage.getUserById(id).get().getFriends().size() > 0) {
             for (Long userFriendId : inMemoryUserStorage.getUserById(id).get().getFriends()) {
                 result.add(inMemoryUserStorage.getUserById(userFriendId).get());
