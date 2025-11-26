@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component("InMemoryFriendshipStorage")
 public class InMemoryFriendshipStorage implements FriendshipStorage {
@@ -43,15 +44,13 @@ public class InMemoryFriendshipStorage implements FriendshipStorage {
     }
 
     public Optional<List<User>> getFriends(Long id) {
-        List<User> result = new ArrayList<>();
-        if (inMemoryUserStorage.getUserById(id).get().getFriends().size() > 0) {
-            for (Long userFriendId : inMemoryUserStorage.getUserById(id).get().getFriends()) {
-                result.add(inMemoryUserStorage.getUserById(userFriendId).get());
-            }
-            return Optional.of(result);
-        }
-        log.error("Ошибка при получении списка юзеров");
-        return Optional.empty();
+        User user = inMemoryUserStorage.getUserById(id).get();
+        List<Long> friendIds = user.getFriends().stream().collect(Collectors.toList());;
+        if (friendIds == null || friendIds.isEmpty()) return Optional.empty();
+        List<User> friends = friendIds.stream()
+                .map(l -> inMemoryUserStorage.getUserById(l).get())
+                .collect(Collectors.toList());
+        return Optional.of(friends);
     }
 
     @Override
