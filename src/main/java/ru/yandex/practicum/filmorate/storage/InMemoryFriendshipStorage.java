@@ -57,16 +57,13 @@ public class InMemoryFriendshipStorage implements FriendshipStorage {
     public Optional<List<User>> getMutualFriends(Long idUser0, Long idUser1) {
         User user0 = inMemoryUserStorage.getUserById(idUser0).get();
         User user1 = inMemoryUserStorage.getUserById(idUser1).get();
-        List<User> result = new ArrayList<>();
-        if (inMemoryUserStorage.findAll().isPresent()) {
-            for (User user : inMemoryUserStorage.findAll().get()) {
-                if (user.getFriends().contains(user0.getId())
-                        && user.getFriends().contains(user1.getId())) {
-                    result.add(user);
-                }
-            }
-        }
-        if (result.size() == 0) {
+
+        List<User> result = inMemoryUserStorage.findAll().get().stream()
+                .filter(user -> user.getFriends().contains(user0.getId())
+                        && user.getFriends().contains(user1.getId()))
+                .collect(Collectors.toList());
+
+        if (result.isEmpty()) {
             log.error("Ошибка при получении общих друзей");
             return Optional.empty();
         }
