@@ -56,7 +56,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public Optional<Film> getFilmById(Long filmId) {
-        if (films.size() == 0 || !films.containsKey(filmId)) {
+        if (films.isEmpty() || !films.containsKey(filmId)) {
             log.error("Список фильмов пусть либо фильм с id " + filmId + " не найден.");
             return Optional.empty();
         }
