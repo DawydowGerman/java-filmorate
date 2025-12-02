@@ -27,8 +27,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Optional<User> getUserById(Long id) {
-        if (users.size() == 0) {
-            log.error("Ошибка при получении списка юзеров");
+        if (users.isEmpty()) {
+            log.error("Список юзеров пуст.");
             return Optional.empty();
         }
         if (users.containsKey(id)) {
@@ -40,10 +40,11 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Optional<List<User>> findAll() {
-        if (users.size() == 0) {
-            log.error("Ошибка при получении списка юзеров");
+        if (users.isEmpty()) {
+            log.error("Список юзеров пуст.");
             return Optional.empty();
-        } else return Optional.of((List<User>) users.values());
+        }
+        return Optional.of((List<User>) users.values());
     }
 
     @Override
